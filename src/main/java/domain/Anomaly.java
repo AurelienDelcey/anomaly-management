@@ -14,22 +14,22 @@ public class Anomaly {
 	private final AnomalyState anomalyState;
 	
 	
-	public Anomaly() {
+	public Anomaly(EventTrace creatingTrace) {
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = null;
-		this.traceability = new Traceability();
+		this.traceability = new Traceability(creatingTrace);
 		this.anomalyState = AnomalyState.PENDING;
 		this.correctiveAction = null;
 		this.provingDocument = null;
 		this.qualityDecision = QualityDecision.EMPTY;
 	}
 	
-	public Anomaly(UUID parentId) {
+	public Anomaly(EventTrace creatingTrace, UUID parentId) {
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = parentId;
-		this.traceability = new Traceability();
+		this.traceability = new Traceability(creatingTrace);
 		this.anomalyState = AnomalyState.PENDING;
 		this.correctiveAction = null;
 		this.provingDocument = null;
@@ -51,7 +51,7 @@ public class Anomaly {
 		this.anomalyState = anomalyState;
 	}
 
-	public Anomaly transitionToCorrected() throws IllegalDomainMachintruc{
+	public Anomaly transitionToCorrected(EventTrace toCorrectedTrace) throws IllegalDomainMachintruc{
 		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalDomainMachintruc();
 		}
@@ -61,31 +61,34 @@ public class Anomaly {
 		if(this.qualityDecision == QualityDecision.EMPTY) {
 			throw new IllegalDomainMachintruc();
 		}
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, AnomalyState.CORRECTED);
+		Traceability trace = this.traceability.addToCorrectedTrace(toCorrectedTrace);
+		
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.CORRECTED);
 	}
 
-	public Anomaly transitionToResolved() throws IllegalDomainMachintruc{
+	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalDomainMachintruc{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalDomainMachintruc();
 		}
 		if(this.provingDocument == null) {
 			throw new IllegalDomainMachintruc();
 		}
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, AnomalyState.RESOLVED);
+		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
+		
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.RESOLVED);
 	}
 	
-	public Anomaly transitionToArchived()throws IllegalDomainMachintruc{
+	public Anomaly transitionToArchived(EventTrace toArchivedTrace)throws IllegalDomainMachintruc{
 		if(this.anomalyState != AnomalyState.RESOLVED) {
 			throw new IllegalDomainMachintruc();
 		}
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, AnomalyState.ARCHIVED);
+		Traceability trace = this.traceability.addToArchivedTrace(toArchivedTrace);
+		
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.ARCHIVED);
 	}
 
 	public Anomaly attachCorrectiveAction (String newCorrectiveAction) throws IllegalDomainMachintruc{
 		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalDomainMachintruc();
-		}
-		if(this.correctiveAction != null) {
 			throw new IllegalDomainMachintruc();
 		}
 		
@@ -106,9 +109,6 @@ public class Anomaly {
 	
 	public Anomaly attachProvingDocument(String newProvingDocument)throws IllegalDomainMachintruc{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
-			throw new IllegalDomainMachintruc();
-		}
-		if(this.provingDocument != null) {
 			throw new IllegalDomainMachintruc();
 		}
 		
