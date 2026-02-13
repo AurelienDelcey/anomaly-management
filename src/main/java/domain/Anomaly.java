@@ -20,8 +20,8 @@ public class Anomaly {
 		this.parentId = null;
 		this.traceability = new Traceability();
 		this.anomalyState = AnomalyState.PENDING;
-		this.correctiveAction = new CorrectiveAction();
-		this.provingDocument = new ProvingDocument();
+		this.correctiveAction = null;
+		this.provingDocument = null;
 		this.qualityDecision = QualityDecision.EMPTY;
 	}
 	
@@ -31,8 +31,8 @@ public class Anomaly {
 		this.parentId = parentId;
 		this.traceability = new Traceability();
 		this.anomalyState = AnomalyState.PENDING;
-		this.correctiveAction = new CorrectiveAction();
-		this.provingDocument = new ProvingDocument();
+		this.correctiveAction = null;
+		this.provingDocument = null;
 		this.qualityDecision = QualityDecision.EMPTY;
 	}
 	
@@ -52,43 +52,50 @@ public class Anomaly {
 	}
 
 	public Anomaly transitionToCorrected() throws IllegalDomainMachintruc{
-		if(anomalyState != AnomalyState.PENDING) {
+		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(!this.correctiveAction.isExist()) {
+		if(this.correctiveAction == null) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(qualityDecision == QualityDecision.EMPTY) {
+		if(this.qualityDecision == QualityDecision.EMPTY) {
 			throw new IllegalDomainMachintruc();
 		}
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, AnomalyState.CORRECTED);
 	}
 
 	public Anomaly transitionToResolved() throws IllegalDomainMachintruc{
-		if(anomalyState != AnomalyState.CORRECTED) {
+		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(!this.provingDocument.isExist()) {
+		if(this.provingDocument == null) {
 			throw new IllegalDomainMachintruc();
 		}
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, AnomalyState.RESOLVED);
 	}
+	
+	public Anomaly transitionToArchived()throws IllegalDomainMachintruc{
+		if(this.anomalyState != AnomalyState.RESOLVED) {
+			throw new IllegalDomainMachintruc();
+		}
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, AnomalyState.ARCHIVED);
+	}
 
-	public Anomaly attachCorrectiveAction (CorrectiveAction newCorrectiveAction) throws IllegalDomainMachintruc{
-		if(anomalyState != AnomalyState.PENDING) {
+	public Anomaly attachCorrectiveAction (String newCorrectiveAction) throws IllegalDomainMachintruc{
+		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(this.correctiveAction.isExist()) {
+		if(this.correctiveAction != null) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(!newCorrectiveAction.isExist()) {
-			throw new IllegalDomainMachintruc();
-		}
-		return new Anomaly(id, parentId, childId, newCorrectiveAction, provingDocument, traceability, qualityDecision, anomalyState);
+		
+		CorrectiveAction document = new CorrectiveAction(newCorrectiveAction);
+		
+		return new Anomaly(id, parentId, childId, document, provingDocument, traceability, qualityDecision, anomalyState);
 	}
 	
 	public Anomaly attachQualityDecision (QualityDecision newQualityDecision)throws IllegalDomainMachintruc{
-		if(anomalyState != AnomalyState.PENDING) {
+		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalDomainMachintruc();
 		}
 		if(newQualityDecision==QualityDecision.EMPTY) {
@@ -97,18 +104,30 @@ public class Anomaly {
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, newQualityDecision, anomalyState);
 	}
 	
-	public Anomaly attachProvingDocument(ProvingDocument newProvingDocument)throws IllegalDomainMachintruc{
-		if(anomalyState != AnomalyState.CORRECTED) {
+	public Anomaly attachProvingDocument(String newProvingDocument)throws IllegalDomainMachintruc{
+		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(this.provingDocument.isExist()) {
+		if(this.provingDocument != null) {
 			throw new IllegalDomainMachintruc();
 		}
-		if(!newProvingDocument.isExist()) {
-			throw new IllegalDomainMachintruc();
-		}
-		return new Anomaly(id, parentId, childId, correctiveAction, newProvingDocument, traceability, qualityDecision, anomalyState);
+		
+		ProvingDocument document = new ProvingDocument(newProvingDocument);
+		
+		return new Anomaly(id, parentId, childId, correctiveAction, document, traceability, qualityDecision, anomalyState);
 	}
 	
+	public Anomaly attachProlongationId(UUID prolongationId)throws IllegalDomainMachintruc{
+		if(this.anomalyState != AnomalyState.ARCHIVED) {
+			throw new IllegalDomainMachintruc();
+		}
+		if(this.childId != null) {
+			throw new IllegalDomainMachintruc();
+		}
+		return new Anomaly(id, parentId, prolongationId, correctiveAction, provingDocument, traceability, qualityDecision, anomalyState);
+	}
 	
+	public UUID getId() {
+		return this.id;
+	}
 }
