@@ -51,45 +51,45 @@ public class Anomaly {
 		this.anomalyState = anomalyState;
 	}
 
-	public Anomaly transitionToCorrected(EventTrace toCorrectedTrace) throws IllegalDomainMachintruc{
+	public Anomaly transitionToCorrected(EventTrace toCorrectedTrace) throws IllegalTransition,IllegalTraceErasureTentative{
 		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalTransition("Anomaly must be in PENDING state.");
 		}
 		if(this.correctiveAction == null) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalTransition("A corrective action must be attached to this anomaly to validate the transition.");
 		}
 		if(this.qualityDecision == QualityDecision.EMPTY) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalTransition("A quality decision must be attached to this anomaly to validate the transition.");
 		}
 		Traceability trace = this.traceability.addToCorrectedTrace(toCorrectedTrace);
 		
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.CORRECTED);
 	}
 
-	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalDomainMachintruc{
+	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalTransition,IllegalTraceErasureTentative{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalTransition("Anomaly must be in CORRECTED state.");
 		}
 		if(this.provingDocument == null) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalTransition("A proving document must be attached to this anomaly to validate the transition.");
 		}
 		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
 		
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.RESOLVED);
 	}
 	
-	public Anomaly transitionToArchived(EventTrace toArchivedTrace)throws IllegalDomainMachintruc{
+	public Anomaly transitionToArchived(EventTrace toArchivedTrace)throws IllegalTransition,IllegalTraceErasureTentative{
 		if(this.anomalyState != AnomalyState.RESOLVED) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalTransition("Anomaly must be in RESOLVED state.");
 		}
 		Traceability trace = this.traceability.addToArchivedTrace(toArchivedTrace);
 		
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.ARCHIVED);
 	}
 
-	public Anomaly attachCorrectiveAction (String newCorrectiveAction) throws IllegalDomainMachintruc{
+	public Anomaly attachCorrectiveAction (String newCorrectiveAction) throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalAttachment("The state of anomaly must be PENDING to attach corrective action.");
 		}
 		
 		CorrectiveAction document = new CorrectiveAction(newCorrectiveAction);
@@ -97,19 +97,19 @@ public class Anomaly {
 		return new Anomaly(id, parentId, childId, document, provingDocument, traceability, qualityDecision, anomalyState);
 	}
 	
-	public Anomaly attachQualityDecision (QualityDecision newQualityDecision)throws IllegalDomainMachintruc{
+	public Anomaly attachQualityDecision (QualityDecision newQualityDecision)throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalAttachment("The state of anomaly must be PENDING to attach quality decision.");
 		}
 		if(newQualityDecision==QualityDecision.EMPTY) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalAttachment("Quality decision can't be EMPTY.");
 		}
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, newQualityDecision, anomalyState);
 	}
 	
-	public Anomaly attachProvingDocument(String newProvingDocument)throws IllegalDomainMachintruc{
+	public Anomaly attachProvingDocument(String newProvingDocument)throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalAttachment("The state of anomaly must be CORRECTED to attach a proving document.");
 		}
 		
 		ProvingDocument document = new ProvingDocument(newProvingDocument);
@@ -117,12 +117,12 @@ public class Anomaly {
 		return new Anomaly(id, parentId, childId, correctiveAction, document, traceability, qualityDecision, anomalyState);
 	}
 	
-	public Anomaly attachProlongationId(UUID prolongationId)throws IllegalDomainMachintruc{
+	public Anomaly attachProlongationId(UUID prolongationId)throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.ARCHIVED) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalAttachment("The state of anomaly must be ARCHIVED to attach a prolongation ID.");
 		}
 		if(this.childId != null) {
-			throw new IllegalDomainMachintruc();
+			throw new IllegalAttachment("A prolongation ID is already attached to this anomaly.");
 		}
 		return new Anomaly(id, parentId, prolongationId, correctiveAction, provingDocument, traceability, qualityDecision, anomalyState);
 	}
