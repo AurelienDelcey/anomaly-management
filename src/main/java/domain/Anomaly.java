@@ -12,9 +12,10 @@ public class Anomaly {
 	private final Traceability traceability;
 	private final QualityDecision qualityDecision;
 	private final AnomalyState anomalyState;
+	private final Description description;
 	
 	
-	public Anomaly(EventTrace creatingTrace) {
+	public Anomaly(String description, EventTrace creatingTrace){
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = null;
@@ -23,9 +24,10 @@ public class Anomaly {
 		this.correctiveAction = null;
 		this.provingDocument = null;
 		this.qualityDecision = QualityDecision.EMPTY;
+		this.description = new Description(description);
 	}
 	
-	public Anomaly(EventTrace creatingTrace, UUID parentId) {
+	public Anomaly(String description, EventTrace creatingTrace, UUID parentId){
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = parentId;
@@ -34,13 +36,14 @@ public class Anomaly {
 		this.correctiveAction = null;
 		this.provingDocument = null;
 		this.qualityDecision = QualityDecision.EMPTY;
+		this.description = new Description(description);
 	}
 	
 	
 	
 	private Anomaly(UUID id, UUID parentId, UUID childId, CorrectiveAction correctiveAction,
 			ProvingDocument provingDocument, Traceability traceability, QualityDecision qualityDecision,
-			AnomalyState anomalyState) {
+			AnomalyState anomalyState, Description description) {
 		this.id = id;
 		this.parentId = parentId;
 		this.childId = childId;
@@ -49,6 +52,7 @@ public class Anomaly {
 		this.traceability = traceability;
 		this.qualityDecision = qualityDecision;
 		this.anomalyState = anomalyState;
+		this.description = description;
 	}
 
 	public Anomaly transitionToCorrected(EventTrace toCorrectedTrace) throws IllegalTransition,IllegalTraceErasureTentative{
@@ -63,7 +67,7 @@ public class Anomaly {
 		}
 		Traceability trace = this.traceability.addToCorrectedTrace(toCorrectedTrace);
 		
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.CORRECTED);
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.CORRECTED, description);
 	}
 
 	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalTransition,IllegalTraceErasureTentative{
@@ -75,7 +79,7 @@ public class Anomaly {
 		}
 		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
 		
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.RESOLVED);
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.RESOLVED, description);
 	}
 	
 	public Anomaly transitionToArchived(EventTrace toArchivedTrace)throws IllegalTransition,IllegalTraceErasureTentative{
@@ -84,7 +88,15 @@ public class Anomaly {
 		}
 		Traceability trace = this.traceability.addToArchivedTrace(toArchivedTrace);
 		
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.ARCHIVED);
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.ARCHIVED, description);
+	}
+	
+	public Anomaly attachDescription(String description) throws IllegalAttachment{
+		if(this.anomalyState != AnomalyState.PENDING) {
+			throw new IllegalAttachment("Editing the description is only permitted during the PENDING state.");
+		}
+		Description newDescription = new Description(description);
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, anomalyState, newDescription);
 	}
 
 	public Anomaly attachCorrectiveAction (String newCorrectiveAction) throws IllegalAttachment{
@@ -94,7 +106,7 @@ public class Anomaly {
 		
 		CorrectiveAction document = new CorrectiveAction(newCorrectiveAction);
 		
-		return new Anomaly(id, parentId, childId, document, provingDocument, traceability, qualityDecision, anomalyState);
+		return new Anomaly(id, parentId, childId, document, provingDocument, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachQualityDecision (QualityDecision newQualityDecision)throws IllegalAttachment{
@@ -104,7 +116,7 @@ public class Anomaly {
 		if(newQualityDecision==QualityDecision.EMPTY) {
 			throw new IllegalAttachment("Quality decision can't be EMPTY.");
 		}
-		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, newQualityDecision, anomalyState);
+		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, newQualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachProvingDocument(String newProvingDocument)throws IllegalAttachment{
@@ -114,7 +126,7 @@ public class Anomaly {
 		
 		ProvingDocument document = new ProvingDocument(newProvingDocument);
 		
-		return new Anomaly(id, parentId, childId, correctiveAction, document, traceability, qualityDecision, anomalyState);
+		return new Anomaly(id, parentId, childId, correctiveAction, document, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachProlongationId(UUID prolongationId)throws IllegalAttachment{
@@ -124,7 +136,7 @@ public class Anomaly {
 		if(this.childId != null) {
 			throw new IllegalAttachment("A prolongation ID is already attached to this anomaly.");
 		}
-		return new Anomaly(id, parentId, prolongationId, correctiveAction, provingDocument, traceability, qualityDecision, anomalyState);
+		return new Anomaly(id, parentId, prolongationId, correctiveAction, provingDocument, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public UUID getId() {
