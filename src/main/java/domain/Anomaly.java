@@ -44,6 +44,7 @@ public class Anomaly {
 	private Anomaly(UUID id, UUID parentId, UUID childId, CorrectiveAction correctiveAction,
 			ProvingDocument provingDocument, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) {
+		verifyStructuralConsistency(id, anomalyState, correctiveAction, provingDocument, qualityDecision, description);
 		this.id = id;
 		this.parentId = parentId;
 		this.childId = childId;
@@ -59,12 +60,6 @@ public class Anomaly {
 		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalTransition("Anomaly must be in PENDING state.");
 		}
-		if(this.correctiveAction == null) {
-			throw new IllegalTransition("A corrective action must be attached to this anomaly to validate the transition.");
-		}
-		if(this.qualityDecision == QualityDecision.EMPTY) {
-			throw new IllegalTransition("A quality decision must be attached to this anomaly to validate the transition.");
-		}
 		Traceability trace = this.traceability.addToCorrectedTrace(toCorrectedTrace);
 		
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.CORRECTED, description);
@@ -73,9 +68,6 @@ public class Anomaly {
 	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalTransition,IllegalTraceErasureTentative{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalTransition("Anomaly must be in CORRECTED state.");
-		}
-		if(this.provingDocument == null) {
-			throw new IllegalTransition("A proving document must be attached to this anomaly to validate the transition.");
 		}
 		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
 		
@@ -141,5 +133,37 @@ public class Anomaly {
 	
 	public UUID getId() {
 		return this.id;
+	}
+	
+	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,
+			ProvingDocument provingDocument, QualityDecision qualityDecision, Description description) {
+		if(state == null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly without state.");
+		}
+		switch(state) {
+			case PENDING -> {
+				if(description == null || id == null) {
+					throw new InconsistentAnomalyStateException("Cannot create anomaly in PENDING state without description, or ID.");
+				}
+			}
+			case CORRECTED -> {
+				if(description == null || id == null || qualityDecision == QualityDecision.EMPTY || 
+						correctiveAction == null) {
+					throw new InconsistentAnomalyStateException("Cannot create anomaly in CORRECTED state without description, ID, corrective action, or quality decision.");
+				}
+			}
+			case RESOLVED -> {
+				if(description == null || id == null || qualityDecision == QualityDecision.EMPTY || 
+						correctiveAction == null || provingDocument == null) {
+					throw new InconsistentAnomalyStateException("Cannot create anomaly in RESOLVED state without description, ID, corrective action, quality decision, or proving document.");
+				}
+			}
+			case ARCHIVED -> {
+				if(description == null || id == null || qualityDecision == QualityDecision.EMPTY || 
+						correctiveAction == null || provingDocument == null) {
+					throw new InconsistentAnomalyStateException("Cannot create anomaly in ARCHIVED state without description, ID, corrective action, quality decision, or proving document.");
+				}
+			}
+		}
 	}
 }
