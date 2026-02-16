@@ -41,4 +41,22 @@ public class Traceability {
 		}
 		return new Traceability(creation, toCorrected, toResolved, toArchivedTrace);
 	}
+
+	public EventTrace getCreation() {
+		return creation;
+	}
+
+	public EventTrace getToCorrected() {
+		return toCorrected;
+	}
+
+	public EventTrace getToResolved() {
+		return toResolved;
+	}
+
+	public EventTrace getToArchived() {
+		return toArchived;
+	}
+	
+	
 }

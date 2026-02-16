@@ -135,6 +135,38 @@ public class Anomaly {
 		return this.id;
 	}
 	
+	public UUID getParentId() {
+		return parentId;
+	}
+
+	public UUID getChildId() {
+		return childId;
+	}
+
+	public CorrectiveAction getCorrectiveAction() {
+		return correctiveAction;
+	}
+
+	public ProvingDocument getProvingDocument() {
+		return provingDocument;
+	}
+
+	public Traceability getTraceability() {
+		return traceability;
+	}
+
+	public QualityDecision getQualityDecision() {
+		return qualityDecision;
+	}
+
+	public AnomalyState getAnomalyState() {
+		return anomalyState;
+	}
+
+	public Description getDescription() {
+		return description;
+	}
+
 	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,
 			ProvingDocument provingDocument, QualityDecision qualityDecision, Description description) {
 		if(state == null) {
