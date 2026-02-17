@@ -11,8 +11,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class EventTraceTest {
 	
-	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
-	private final static String VALID_ACTOR_ID = "0000";
+	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
+	private static final String VALID_ACTOR_ID = "0000";
 
 	@ParameterizedTest
 	@NullAndEmptySource
@@ -23,7 +23,7 @@ class EventTraceTest {
 	
 	@Test
 	void eventTrace_ShouldThrowException_WhenInstantIsNull() {
-		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(VALID_ACTOR_ID,null));
+		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(VALID_ACTOR_ID, null));
 	}
 	
 	@Test

@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 
 class TraceabilityTest {
 	
-	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
-	private final static String VALID_ACTOR_ID = "0000";
+	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
+	private static final String VALID_ACTOR_ID = "0000";
 
 	@Test
-	void Constructor_ShouldReturnValideTraceability() {
+	void constructor_ShouldReturnValidTraceability() {
 		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Traceability trace = new Traceability(creatingTrace);
 		
@@ -26,7 +26,7 @@ class TraceabilityTest {
 	}
 	
 	@Test
-	void addToCorrectedTrace_ShouldReturnValideTraceability() {
+	void addToCorrectedTrace_ShouldReturnValidTraceability() {
 		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Traceability trace = new Traceability(creatingTrace);
@@ -42,7 +42,7 @@ class TraceabilityTest {
 	}
 	
 	@Test
-	void addToResolvedTrace_ShouldReturnValideTraceability() {
+	void addToResolvedTrace_ShouldReturnValidTraceability() {
 		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Traceability trace = new Traceability(creatingTrace);
@@ -58,7 +58,7 @@ class TraceabilityTest {
 	}
 	
 	@Test
-	void addToArchivedTrace_ShouldReturnValideTraceability() {
+	void addToArchivedTrace_ShouldReturnValidTraceability() {
 		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Traceability trace = new Traceability(creatingTrace);

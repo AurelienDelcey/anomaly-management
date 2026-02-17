@@ -14,8 +14,8 @@ class CorrectiveActionTest {
 	@ValueSource(strings = {"aaa-1-091991","AAA--091991",
 			"AAA-00-","AAA-00-1234567","AAA00091991",
 			"AAA-0-12345"})
-	void correctiveAction_ShouldThrowException_WhenTheDocumentIdIsInvalid(String docID) {
-		assertThrows(IllegalArgumentException.class, ()->new CorrectiveAction(docID));
+	void correctiveAction_ShouldThrowException_WhenTheDocumentIdIsInvalid(String docId) {
+		assertThrows(IllegalArgumentException.class, ()->new CorrectiveAction(docId));
 	}
 	
 	@Test

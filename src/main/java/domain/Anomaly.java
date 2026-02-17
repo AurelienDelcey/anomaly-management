@@ -100,17 +100,17 @@ public class Anomaly {
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, qualityDecision, anomalyState, newDescription);
 	}
 
-	public Anomaly attachCorrectiveAction (String newCorrectiveAction) throws IllegalAttachment{
+	public Anomaly attachCorrectiveAction (String correctiveActionId) throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalAttachment("The state of anomaly must be PENDING to attach corrective action.");
 		}
 		
-		CorrectiveAction document = new CorrectiveAction(newCorrectiveAction);
+		CorrectiveAction document = new CorrectiveAction(correctiveActionId);
 		
 		return new Anomaly(id, parentId, childId, document, provingDocument, traceability, qualityDecision, anomalyState, description);
 	}
 	
-	public Anomaly attachQualityDecision (QualityDecision newQualityDecision)throws IllegalAttachment{
+	public Anomaly attachQualityDecision(QualityDecision newQualityDecision)throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalAttachment("The state of anomaly must be PENDING to attach quality decision.");
 		}
@@ -120,12 +120,12 @@ public class Anomaly {
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, traceability, newQualityDecision, anomalyState, description);
 	}
 	
-	public Anomaly attachProvingDocument(String newProvingDocument)throws IllegalAttachment{
+	public Anomaly attachProvingDocument(String provingDocumentId)throws IllegalAttachment{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalAttachment("The state of anomaly must be CORRECTED to attach a proving document.");
 		}
 		
-		ProvingDocument document = new ProvingDocument(newProvingDocument);
+		ProvingDocument document = new ProvingDocument(provingDocumentId);
 		
 		return new Anomaly(id, parentId, childId, correctiveAction, document, traceability, qualityDecision, anomalyState, description);
 	}

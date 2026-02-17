@@ -7,8 +7,8 @@ public class Traceability {
 	private final EventTrace toResolved;
 	private final EventTrace toArchived;
 	
-	public Traceability(EventTrace creationTrace) {
-		this.creation = creationTrace;
+	public Traceability(EventTrace creation) {
+		this.creation = creation;
 		this.toCorrected = null;
 		this.toResolved = null;
 		this.toArchived = null;

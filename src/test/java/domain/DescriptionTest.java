@@ -17,7 +17,7 @@ class DescriptionTest {
 	}
 	
 	@Test
-	void description_ShouldReturnValidDescription() {
+	void shouldReturnValidDescription_WhenDescriptionIsValid() {
 		Description description = new Description("abcd");
 		assertEquals("abcd", description.description());
 	}
