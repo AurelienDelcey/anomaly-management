@@ -41,7 +41,7 @@ public class Anomaly {
 	
 	
 	
-	private Anomaly(UUID id, UUID parentId, UUID childId, CorrectiveAction correctiveAction,
+	Anomaly(UUID id, UUID parentId, UUID childId, CorrectiveAction correctiveAction,
 			ProvingDocument provingDocument, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) {
 		verifyStructuralConsistency(id, anomalyState, correctiveAction, provingDocument, qualityDecision, description);
@@ -60,6 +60,12 @@ public class Anomaly {
 		if(this.anomalyState != AnomalyState.PENDING) {
 			throw new IllegalTransition("Anomaly must be in PENDING state.");
 		}
+		if(this.correctiveAction == null) {
+			throw new IllegalTransition("A corrective action must be attached to this anomaly to validate the transition.");
+		}
+		if(this.qualityDecision == QualityDecision.EMPTY) {
+			throw new IllegalTransition("A quality decision must be attached to this anomaly to validate the transition.");
+		}
 		Traceability trace = this.traceability.addToCorrectedTrace(toCorrectedTrace);
 		
 		return new Anomaly(id, parentId, childId, correctiveAction, provingDocument, trace, qualityDecision, AnomalyState.CORRECTED, description);
@@ -68,6 +74,9 @@ public class Anomaly {
 	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalTransition,IllegalTraceErasureTentative{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalTransition("Anomaly must be in CORRECTED state.");
+		}
+		if(this.provingDocument == null) {
+			throw new IllegalTransition("A proving document must be attached to this anomaly to validate the transition.");
 		}
 		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
 		

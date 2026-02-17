@@ -6,6 +6,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class AnomalyTest {
 	
@@ -183,6 +187,117 @@ class AnomalyTest {
 		assertEquals(VALID_DOC_ID, anomalyWithProvingDocuments.getProvingDocument().documentId());
 	}
 	
+	/*@ParameterizedTest // EXTRACT IN DescrptionTest CLASS.
+	@NullAndEmptySource
+	@ValueSource(strings = {""," ","   ","\n"})
+	void creatingAnomalyWithInvalidDescription_ShouldThrowException(String description) {
+		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(description,creatingTrace));
+	}*/
+	
+	@Test
+	void transitionToCorrected_ShouldThrowException_WhenCorrectiveActionIsMissing() {
+		Anomaly anomaly = creatPendingAnomaly();
+		Anomaly anomalyWithQualityDecision = assertDoesNotThrow(()->anomaly.attachQualityDecision(QualityDecision.NA));
+		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		
+		assertThrows(IllegalTransition.class, ()->anomalyWithQualityDecision.transitionToCorrected(correctedTrace));
+	}
+	
+	@Test
+	void transitionToCorrected_ShouldThrowException_WhenQualityDecisionIsMissing() {
+		Anomaly anomaly = creatPendingAnomaly();
+		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()->anomaly.attachCorrectiveAction(VALID_DOC_ID));
+		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		
+		assertThrows(IllegalTransition.class, ()->anomalyWithCorrectiveAction.transitionToCorrected(correctedTrace));
+	}
+	
+	@Test
+	void transitionToResolved_ShouldThrowException_WhenProvingDocumentIsMissing() {
+		Anomaly anomaly = assertDoesNotThrow(()->creatCorrectedAnomaly());
+		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		
+		assertThrows(IllegalTransition.class, ()->anomaly.transitionToResolved(resolvedTrace));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "PENDING")
+	void transitionToCorrected_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValideAnomaly(state));
+		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalTransition.class, ()->anomaly.transitionToCorrected(correctedTrace));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "CORRECTED")
+	void transitionToResolved_ShouldThrowException_WhenAnomalyStateIsNotCorrected(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValideAnomaly(state));
+		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalTransition.class, ()->anomaly.transitionToResolved(resolvedTrace));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "RESOLVED")
+	void transitionToArchived_ShouldThrowException_WhenAnomalyStateIsNotResolved(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValideAnomaly(state));
+		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalTransition.class, ()->anomaly.transitionToArchived(archivedTrace));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "PENDING")
+	void AttachCorrectiveAction_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValideAnomaly(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachCorrectiveAction(VALID_DOC_ID));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "PENDING")
+	void AttachQualityDecision_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValideAnomaly(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachQualityDecision(QualityDecision.REPAIR));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "CORRECTED")
+	void attachProvingDocument_ShouldThrowException_WhenAnomalyStateIsNotCorrected(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValideAnomaly(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachProvingDocument(VALID_DOC_ID));
+	}
+	
+	@Test
+	void attachQualityDecision_ShouldThrowException_WhenStateReturnToEmpty() {
+		Anomaly anomaly = assertDoesNotThrow(()->getValideAnomaly(AnomalyState.PENDING));
+		Anomaly anomalyStateNA = assertDoesNotThrow(()->anomaly.attachQualityDecision(QualityDecision.NA));
+		assertThrows(IllegalAttachment.class, ()->anomalyStateNA.attachQualityDecision(QualityDecision.EMPTY));
+	}
+	
+	@Test
+	void attachProlongationId_ShouldThrowException_WhenAChildIdAlredyExists() {
+		Anomaly anomaly = assertDoesNotThrow(()->getValideAnomaly(AnomalyState.ARCHIVED));
+		Anomaly anomalyWithChildId = assertDoesNotThrow(()->anomaly.attachProlongationId(UUID.randomUUID()));
+		assertThrows(IllegalAttachment.class, ()->anomalyWithChildId.attachProlongationId(UUID.randomUUID()));
+	}
+	
 	private Anomaly creatPendingAnomaly() {
 		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		return new Anomaly(DESCRIPTION, creatingTrace);
@@ -204,5 +319,14 @@ class AnomalyTest {
 	private Anomaly creatArchivedAnomaly() throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment {
 		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		return creatResolvedAnomaly().transitionToArchived(archivedTrace);
+	}
+	
+	private Anomaly getValideAnomaly(AnomalyState state) throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment {
+		return switch(state) {
+		case PENDING -> creatPendingAnomaly();
+		case CORRECTED -> creatCorrectedAnomaly();
+		case RESOLVED -> creatResolvedAnomaly();
+		case ARCHIVED -> creatArchivedAnomaly();
+		};
 	}
 }
