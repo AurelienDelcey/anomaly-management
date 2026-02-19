@@ -1,4 +1,4 @@
-package domain;
+package domain.traceability;
 
 import java.time.Instant;
 

@@ -1,6 +1,17 @@
-package domain;
+package domain.anomaly;
 
 import java.util.UUID;
+
+import domain.exception.IllegalAttachment;
+import domain.exception.IllegalTraceErasureTentative;
+import domain.exception.IllegalTransition;
+import domain.exception.InconsistentAnomalyStateException;
+import domain.traceability.EventTrace;
+import domain.traceability.Traceability;
+import domain.valueobject.CorrectiveAction;
+import domain.valueobject.Description;
+import domain.valueobject.ProvingDocument;
+import domain.valueobject.QualityDecision;
 
 public class Anomaly {
 	

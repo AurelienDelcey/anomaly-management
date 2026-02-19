@@ -9,6 +9,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import domain.anomaly.Anomaly;
+import domain.anomaly.AnomalyState;
+import domain.exception.IllegalAttachment;
+import domain.exception.IllegalTraceErasureTentative;
+import domain.exception.IllegalTransition;
+import domain.traceability.EventTrace;
+import domain.valueobject.QualityDecision;
+
 class AnomalyTest {
 	
 	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");

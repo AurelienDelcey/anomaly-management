@@ -1,4 +1,6 @@
-package domain;
+package domain.traceability;
+
+import domain.exception.IllegalTraceErasureTentative;
 
 public class Traceability {
 	

@@ -9,6 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import domain.traceability.EventTrace;
+
 class EventTraceTest {
 	
 	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");

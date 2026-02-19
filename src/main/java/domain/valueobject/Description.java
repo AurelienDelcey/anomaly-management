@@ -1,4 +1,4 @@
-package domain;
+package domain.valueobject;
 
 public record Description(String description) {
 	public Description{

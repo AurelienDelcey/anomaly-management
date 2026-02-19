@@ -6,6 +6,10 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 
+import domain.exception.IllegalTraceErasureTentative;
+import domain.traceability.EventTrace;
+import domain.traceability.Traceability;
+
 class TraceabilityTest {
 	
 	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
