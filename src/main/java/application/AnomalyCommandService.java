@@ -8,7 +8,7 @@ import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.traceability.EventTrace;
-import domain.valueobject.Description;
+import domain.valueobject.QualityDecision;
 
 public class AnomalyCommandService {
 	
@@ -37,7 +37,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.attachCorrectiveAction(docId);
 			repo.save(newAnomaly);
 			return new CommandSucces();
-		} catch (IllegalAttachment | IllegalArgumentException e) {
+		} catch (IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		} 
 	}
@@ -48,7 +48,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.attachQualityDecision(decision);
 			repo.save(newAnomaly);
 			return new CommandSucces();
-		} catch (IllegalAttachment e) {
+		} catch (IllegalAttachment/*| AnoamlyNotFoundException */ e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -60,7 +60,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.transitionToCorrected(trace);
 			repo.save(newAnomaly);
 			return new CommandSucces();
-		} catch (IllegalTransition | IllegalTraceErasureTentative e) {
+		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -71,7 +71,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.attachProvingDocument(docId);
 			repo.save(newAnomaly);
 			return new CommandSucces();
-		} catch (IllegalAttachment | IllegalArgumentException e) {
+		} catch (IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		} 
 	}
@@ -83,7 +83,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.transitionToResolved(trace);
 			repo.save(newAnomaly);
 			return new CommandSucces();
-		} catch (IllegalTransition | IllegalTraceErasureTentative e) {
+		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -95,7 +95,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.transitionToArchived(trace);
 			repo.save(newAnomaly);
 			return new CommandSucces();
-		} catch (IllegalTransition | IllegalTraceErasureTentative e) {
+		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -107,10 +107,9 @@ public class AnomalyCommandService {
 			Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 			Anomaly prolongation = createProlongation(archivedAnomaly.getId(), archivedAnomaly.getDescription().description());
 			Anomaly anomalyWithProlongationId = archivedAnomaly.attachProlongationId(prolongation.getId());
-			repo.save(anomalyWithProlongationId);
-			repo.save(prolongation);
+			repo.saveAtomic(anomalyWithProlongationId, prolongation);//exception technique ne pas catch.
 			return new CommandSucces();
-		} catch (IllegalTransition | IllegalTraceErasureTentative | IllegalAttachment e) {
+		} catch (IllegalTransition | IllegalTraceErasureTentative | IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
