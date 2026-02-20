@@ -31,7 +31,7 @@ public class AnomalyCommandService {
 			Anomaly anomaly = new Anomaly(description, trace);
 			repo.save(anomaly);
 			log.info("CreateAnomaly succeeded - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 			} catch (IllegalArgumentException e) {
 				log.warn("CreateAnomaly failed - reason={}", e.getMessage());
 				return new CommandFailure(e.getMessage());
@@ -45,7 +45,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.attachCorrectiveAction(docId);
 			repo.save(newAnomaly);
 			log.info("AttachCorrectiveAction succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			log.warn("AttachCorrectiveAction failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
@@ -59,7 +59,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.attachQualityDecision(decision);
 			repo.save(newAnomaly);
 			log.info("AttachQualityDecision succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalAttachment/*| AnoamlyNotFoundException */ e) {
 			log.warn("AttachQualityDecision failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
@@ -74,7 +74,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.transitionToCorrected(trace);
 			repo.save(newAnomaly);
 			log.info("TransitionToCorrected succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			log.warn("TransitionToCorrected failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
@@ -88,7 +88,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.attachProvingDocument(docId);
 			repo.save(newAnomaly);
 			log.info("AttachProvingDocument succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			log.warn("AttachProvingDocument failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
@@ -103,7 +103,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.transitionToResolved(trace);
 			repo.save(newAnomaly);
 			log.info("TransitionToResolved succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			log.warn("TransitionToResolved failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
@@ -118,7 +118,7 @@ public class AnomalyCommandService {
 			Anomaly newAnomaly = anomaly.transitionToArchived(trace);
 			repo.save(newAnomaly);
 			log.info("TransitionToArchived succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			log.warn("TransitionToArchived failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
@@ -135,7 +135,7 @@ public class AnomalyCommandService {
 			Anomaly anomalyWithProlongationId = archivedAnomaly.attachProlongationId(prolongation.getId());
 			repo.saveAtomic(anomalyWithProlongationId, prolongation);//exception technique ne pas catch.
 			log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSucces();
+			return new CommandSuccess();
 		} catch (IllegalTransition | IllegalTraceErasureTentative | IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
 			log.warn("TransitionToArchivedWithProlongation failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());

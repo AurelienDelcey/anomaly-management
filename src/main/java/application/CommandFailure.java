@@ -1,12 +1,5 @@
 package application;
 
-public final class CommandFailure implements CommandResult{
-	
-	private final String message;
+public record CommandFailure(String message) implements CommandResult{
 
-	public CommandFailure(String message) {
-		this.message = message;
-	}
-	
-	
 }
