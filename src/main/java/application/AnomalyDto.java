@@ -5,7 +5,7 @@ import java.time.Instant;
 import domain.anomaly.AnomalyState;
 import domain.valueobject.QualityDecision;
 
-public record AnomalyDto(String ID,
+public record AnomalyDto(String id,
 		String correctiveActionId,
 		String provingDocumentId,
 		QualityDecision qualityDecision,
