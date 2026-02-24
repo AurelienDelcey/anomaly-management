@@ -5,9 +5,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example</groupId>
-    <artifactId>Anomaly</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>io.github.AurelienDelcey</groupId>
+	<artifactId>anomaly-management</artifactId>
+	<version>0.1.0</version>
+	<name>Anomaly Management</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,9 +16,9 @@
 
         <javafx.version>20.0.2</javafx.version>
         <junit.version>5.10.0</junit.version>
-
         <slf4j.version>2.0.9</slf4j.version>
         <logback.version>1.4.14</logback.version>
+        <mysql.version>8.3.0</mysql.version>
     </properties>
 
     <dependencies>
@@ -47,6 +48,13 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+        </dependency>
+
+        <!-- MySQL JDBC Driver -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql.version}</version>
         </dependency>
 
         <!-- JUnit 5 -->
@@ -85,7 +93,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>mazeMain.MazeMain</mainClass>
+                    <mainClass>main</mainClass>
                 </configuration>
             </plugin>
 
