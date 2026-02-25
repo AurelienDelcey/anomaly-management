@@ -5,17 +5,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import application.Repo;
 import domain.anomaly.Anomaly;
+import domain.anomaly.AnomalyState;
+import domain.exception.IllegalTraceErasureTentative;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.ProvingDocument;
+import domain.valueobject.QualityDecision;
 
 public class JdbcAnomalyRepository implements Repo{
 	
@@ -133,7 +137,23 @@ public class JdbcAnomalyRepository implements Repo{
 
 	@Override
 	public Anomaly findById(UUID id) {
-		return null;
+		try(Connection connection = getConnection()){
+			try(PreparedStatement preparedStatement = connection.prepareStatement("""
+					SELECT * FROM anomaly.anomalies
+					WHERE id = ?
+					""")){
+				preparedStatement.setString(1, id.toString());
+				try(ResultSet result = preparedStatement.executeQuery()){
+					if(!result.next()) {
+						throw new AnomalyNotFoundException();
+					}
+					Anomaly anomaly = mapAnomaly(result);
+					return anomaly;
+				}
+			}
+		} catch (SQLException | IllegalTraceErasureTentative e) {
+			throw new TechnicalException("impossible to reconstruct anomaly", e);
+		}
 	}
 
 	@Override
@@ -210,6 +230,73 @@ public class JdbcAnomalyRepository implements Repo{
 		stmt.setString(16, anomaly.getId().toString());
 
 		return stmt;
+	}
+
+	private Anomaly mapAnomaly(ResultSet result) throws SQLException, IllegalTraceErasureTentative {
+		String id = result.getString("id");
+		String parentId = result.getString("parent_id");
+		String childId = result.getString("child_id");
+		String state = result.getString("anomaly_state");
+		String decision = result.getString("quality_decision");
+	
+		UUID anomalyId = id == null?null:UUID.fromString(id);
+		UUID anomalyParentId = parentId == null?null:UUID.fromString(parentId);
+		UUID anomalyChildId = childId == null?null:UUID.fromString(childId);
+		
+		String description = result.getString("description");
+		Description anomalyDescription = description == null?null:new Description(description);
+		
+		String correctiveAction = result.getString("corrective_action_id");
+		CorrectiveAction anomalyCorrectiveAction = correctiveAction == null?null:new CorrectiveAction(correctiveAction);
+		
+		String provingDocument = result.getString("proving_document_id");
+		ProvingDocument anomalyProvingDocument = provingDocument == null?null:new ProvingDocument(provingDocument);
+		
+		String createdBy = result.getString("created_by");
+		Timestamp createdAt = result.getTimestamp("created_at");
+		String correctedBy = result.getString("corrected_by");
+		Timestamp correctedAt = result.getTimestamp("corrected_at");
+		String resolvedBy = result.getString("resolved_by");
+		Timestamp resolvedAt = result.getTimestamp("resolved_at");
+		String archivedBy = result.getString("archived_by");
+		Timestamp archivedAt = result.getTimestamp("archived_at");
+		
+		Instant createInstant = createdAt == null?null:createdAt.toInstant();
+		Instant correctedInstant = correctedAt == null?null:correctedAt.toInstant();
+		Instant resolvedInstant = resolvedAt == null?null:resolvedAt.toInstant();
+		Instant archivedInstant = archivedAt == null?null:archivedAt.toInstant();
+		
+		EventTrace created = new EventTrace(createdBy, createInstant);
+		EventTrace corrected = correctedInstant == null?null:new EventTrace(correctedBy, correctedInstant);
+		EventTrace resolved = resolvedInstant == null?null:new EventTrace(resolvedBy, resolvedInstant);
+		EventTrace archived = archivedInstant == null?null:new EventTrace(archivedBy, archivedInstant);
+		Traceability traceability = new Traceability(created);
+		traceability = corrected == null?traceability:traceability.addToCorrectedTrace(corrected);
+		traceability = resolved == null?traceability:traceability.addToResolvedTrace(resolved);
+		traceability = archived == null?traceability:traceability.addToArchivedTrace(archived);
+		
+		QualityDecision qualityDecision = switch(decision) {
+		case "EMPTY" -> QualityDecision.EMPTY;
+		case "NA" -> QualityDecision.NA;
+		case "REPAIR" -> QualityDecision.REPAIR;
+		case "SCRAP" -> QualityDecision.SCRAP;
+		default -> null;
+		};
+		
+		AnomalyState anomalyState = switch(state) {
+		case "PENDING" -> AnomalyState.PENDING;
+		case "CORRECTED" -> AnomalyState.CORRECTED;
+		case "RESOLVED" -> AnomalyState.RESOLVED;
+		case "ARCHIVED" -> AnomalyState.ARCHIVED;
+		default -> null;
+		};
+		
+		Anomaly anomaly = domain.anomaly.AnomalyConstructor.rehydrate(
+				anomalyId, anomalyParentId, anomalyChildId, 
+				anomalyCorrectiveAction, anomalyProvingDocument, 
+				traceability, qualityDecision, anomalyState, anomalyDescription);
+		
+		return anomaly;
 	}
 
 	private boolean isExist(Anomaly anomaly, Connection connection) throws SQLException{
