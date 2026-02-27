@@ -55,7 +55,7 @@ public class Anomaly {
 	Anomaly(UUID id, UUID parentId, UUID childId, CorrectiveAction correctiveAction,
 			ProvingDocument provingDocument, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) {
-		verifyStructuralConsistency(id, anomalyState, correctiveAction, provingDocument, qualityDecision, description);
+		verifyStructuralConsistency(id, anomalyState, correctiveAction, provingDocument, qualityDecision, description, traceability);
 		this.id = id;
 		this.parentId = parentId;
 		this.childId = childId;
@@ -188,31 +188,39 @@ public class Anomaly {
 	}
 
 	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,
-			ProvingDocument provingDocument, QualityDecision qualityDecision, Description description) {
-		if(state == null) {
+			ProvingDocument provingDocument, QualityDecision qualityDecision, Description description, Traceability traceability) {
+		if(state == null || traceability == null) {
 			throw new InconsistentAnomalyStateException("Cannot create anomaly without state.");
 		}
 		switch(state) {
 			case PENDING -> {
-				if(description == null || id == null) {
+				if(description == null || id == null || traceability.getCreation() == null || 
+						traceability.getToCorrected() != null || traceability.getToResolved() != null ||
+						traceability.getToArchived() != null) {
 					throw new InconsistentAnomalyStateException("Cannot create anomaly in PENDING state without description, or ID.");
 				}
 			}
 			case CORRECTED -> {
-				if(description == null || id == null || qualityDecision == QualityDecision.EMPTY || 
-						correctiveAction == null) {
+				if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
+						correctiveAction == null || traceability.getCreation() == null || 
+						traceability.getToCorrected() == null || traceability.getToResolved() != null ||
+						traceability.getToArchived() != null) {
 					throw new InconsistentAnomalyStateException("Cannot create anomaly in CORRECTED state without description, ID, corrective action, or quality decision.");
 				}
 			}
 			case RESOLVED -> {
-				if(description == null || id == null || qualityDecision == QualityDecision.EMPTY || 
-						correctiveAction == null || provingDocument == null) {
+				if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
+						correctiveAction == null || provingDocument == null || traceability.getCreation() == null || 
+						traceability.getToCorrected() == null || traceability.getToResolved() == null ||
+						traceability.getToArchived() != null) {
 					throw new InconsistentAnomalyStateException("Cannot create anomaly in RESOLVED state without description, ID, corrective action, quality decision, or proving document.");
 				}
 			}
 			case ARCHIVED -> {
-				if(description == null || id == null || qualityDecision == QualityDecision.EMPTY || 
-						correctiveAction == null || provingDocument == null) {
+				if(description == null || id == null || qualityDecision == null ||qualityDecision == QualityDecision.EMPTY || 
+						correctiveAction == null || provingDocument == null || traceability.getCreation() == null || 
+						traceability.getToCorrected() == null || traceability.getToResolved() == null ||
+						traceability.getToArchived() == null) {
 					throw new InconsistentAnomalyStateException("Cannot create anomaly in ARCHIVED state without description, ID, corrective action, quality decision, or proving document.");
 				}
 			}
