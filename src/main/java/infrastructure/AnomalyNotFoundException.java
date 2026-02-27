@@ -1,6 +1,6 @@
 package infrastructure;
 
-public class AnomalyNotFoundException extends TechnicalException{
+public class AnomalyNotFoundException extends Exception{
 
 	private static final long serialVersionUID = 7300275750801149382L;
 

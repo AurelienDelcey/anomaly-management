@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import domain.anomaly.Anomaly;
-import domain.exception.IllegalAttachment;
-import domain.exception.IllegalTraceErasureTentative;
-import domain.exception.IllegalTransition;
+import domain.exception.DomainException;
 import domain.traceability.EventTrace;
 import domain.valueobject.QualityDecision;
+import infrastructure.AnomalyNotFoundException;
+import infrastructure.TechnicalException;
 
 public class AnomalyCommandService {
 	
@@ -32,7 +32,7 @@ public class AnomalyCommandService {
 			repo.save(anomaly);
 			log.info("CreateAnomaly succeeded - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 			return new CommandSuccess();
-			} catch (IllegalArgumentException e) {
+			} catch (TechnicalException | IllegalArgumentException e) {
 				log.warn("CreateAnomaly failed - reason={}", e.getMessage());
 				return new CommandFailure(e.getMessage());
 			}
@@ -46,13 +46,13 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("AttachCorrectiveAction succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
+		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
 			log.warn("AttachCorrectiveAction failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		} 
 	}
 	
-	public CommandResult attachQualityDecision (UUID anomalyId, QualityDecision decision) {//String ou int Decision puis switch mapping??
+	public CommandResult attachQualityDecision (UUID anomalyId, QualityDecision decision) {
 		try {
 			log.debug("AttachQualityDecision requested - anomalyId={}, actorId={}", anomalyId, actor.id());
 			Anomaly anomaly = repo.findById(anomalyId);
@@ -60,7 +60,7 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("AttachQualityDecision succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalAttachment/*| AnoamlyNotFoundException */ e) {
+		} catch (DomainException | AnomalyNotFoundException | TechnicalException e) {
 			log.warn("AttachQualityDecision failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
@@ -75,7 +75,7 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("TransitionToCorrected succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
+		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToCorrected failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
@@ -89,7 +89,7 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("AttachProvingDocument succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
+		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
 			log.warn("AttachProvingDocument failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		} 
@@ -104,7 +104,7 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("TransitionToResolved succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
+		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToResolved failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
@@ -119,7 +119,7 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("TransitionToArchived succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalTransition | IllegalTraceErasureTentative /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
+		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToArchived failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
@@ -133,10 +133,10 @@ public class AnomalyCommandService {
 			Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 			Anomaly prolongation = createProlongation(archivedAnomaly.getId(), archivedAnomaly.getDescription().description());
 			Anomaly anomalyWithProlongationId = archivedAnomaly.attachProlongationId(prolongation.getId());
-			repo.saveAtomic(anomalyWithProlongationId, prolongation);//exception technique ne pas catch.
+			repo.saveAtomic(anomalyWithProlongationId, prolongation);
 			log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (IllegalTransition | IllegalTraceErasureTentative | IllegalAttachment /*| AnoamlyNotFoundException */| IllegalArgumentException e) {
+		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToArchivedWithProlongation failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}

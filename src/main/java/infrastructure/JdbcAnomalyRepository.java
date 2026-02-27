@@ -14,6 +14,7 @@ import application.Repo;
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
 import domain.exception.IllegalTraceErasureTentative;
+import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
@@ -131,7 +132,7 @@ public class JdbcAnomalyRepository implements Repo{
 	}
 
 	@Override
-	public Anomaly findById(UUID id) {
+	public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {
 		try(Connection connection = getConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM anomaly.anomalies
@@ -152,7 +153,7 @@ public class JdbcAnomalyRepository implements Repo{
 	}
 
 	@Override
-	public List<Anomaly> findAll(int page) {
+	public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException{
 		try(Connection connection = getConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM anomaly.anomalies
@@ -245,7 +246,7 @@ public class JdbcAnomalyRepository implements Repo{
 		return stmt;
 	}
 
-	private Anomaly mapAnomaly(ResultSet result) throws SQLException, IllegalTraceErasureTentative {
+	private Anomaly mapAnomaly(ResultSet result) throws SQLException, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		String id = result.getString("id");
 		String parentId = result.getString("parent_id");
 		String childId = result.getString("child_id");
