@@ -6,8 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import application.Repo;
@@ -131,11 +131,6 @@ public class JdbcAnomalyRepository implements Repo{
 	}
 
 	@Override
-	public Optional<Anomaly> findByIdOptional(UUID id) {
-		return Optional.empty();
-	}
-
-	@Override
 	public Anomaly findById(UUID id) {
 		try(Connection connection = getConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
@@ -157,8 +152,26 @@ public class JdbcAnomalyRepository implements Repo{
 	}
 
 	@Override
-	public List<Anomaly> findAll() {
-		return null;
+	public List<Anomaly> findAll(int page) {
+		try(Connection connection = getConnection()){
+			try(PreparedStatement preparedStatement = connection.prepareStatement("""
+					SELECT * FROM anomaly.anomalies
+					ORDER BY created_at DESC
+					LIMIT 50
+					OFFSET ?
+					""")){
+				preparedStatement.setInt(1, 50*(page-1));
+				try(ResultSet result = preparedStatement.executeQuery()){
+					List<Anomaly> anomalies = new ArrayList<>();
+					while(result.next()) {
+						anomalies.add(mapAnomaly(result));
+					}
+					return anomalies;
+				}
+			}
+		} catch (SQLException | IllegalTraceErasureTentative e) {
+			throw new TechnicalException("impossible to reconstruct anomaly", e);
+		}
 	}
 	
 	private Connection getConnection() throws SQLException {
@@ -280,7 +293,7 @@ public class JdbcAnomalyRepository implements Repo{
 		case "NA" -> QualityDecision.NA;
 		case "REPAIR" -> QualityDecision.REPAIR;
 		case "SCRAP" -> QualityDecision.SCRAP;
-		default -> null;
+		default -> throw new TechnicalException("Unknown decision: " + decision);
 		};
 		
 		AnomalyState anomalyState = switch(state) {
@@ -288,7 +301,7 @@ public class JdbcAnomalyRepository implements Repo{
 		case "CORRECTED" -> AnomalyState.CORRECTED;
 		case "RESOLVED" -> AnomalyState.RESOLVED;
 		case "ARCHIVED" -> AnomalyState.ARCHIVED;
-		default -> null;
+		default -> throw new TechnicalException("Unknown state: " + state);
 		};
 		
 		Anomaly anomaly = domain.anomaly.AnomalyConstructor.rehydrate(

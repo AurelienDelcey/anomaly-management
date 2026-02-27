@@ -14,13 +14,11 @@ public class AnomalyQueryService {
 	}
 	
 	public AnomalyDto getById(UUID id) {
-		return repo.findByIdOptional(id)
-				.map(AnomalyDtoMapper::mapToDto)
-				.orElse(null);
+		return AnomalyDtoMapper.mapToDto(repo.findById(id));
 	}
 	
-	public List<AnomalyDto> getAll(){
-		List<Anomaly> anomalyList = repo.findAll();
+	public List<AnomalyDto> getAll(int page){
+		List<Anomaly> anomalyList = repo.findAll(page);
 		return anomalyList.stream()
 				.map(AnomalyDtoMapper::mapToDto)
 				.toList();
