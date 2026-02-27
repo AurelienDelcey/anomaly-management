@@ -14,6 +14,7 @@ import domain.anomaly.AnomalyState;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
+import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.valueobject.QualityDecision;
 
@@ -309,25 +310,25 @@ class AnomalyTest {
 		return new Anomaly(DESCRIPTION, creatingTrace);
 	}
 	
-	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative {
+	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Anomaly anomaly = createPendingAnomaly().attachCorrectiveAction(VALID_DOC_ID);
 		anomaly = anomaly.attachQualityDecision(QualityDecision.NA);
 		return anomaly.transitionToCorrected(correctedTrace);
 	}
 	
-	private Anomaly createResolvedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative {
+	private Anomaly createResolvedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Anomaly anomaly = createCorrectedAnomaly().attachProvingDocument(VALID_DOC_ID);
 		return anomaly.transitionToResolved(resolvedTrace);
 	}
 	
-	private Anomaly createArchivedAnomaly() throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment {
+	private Anomaly createArchivedAnomaly() throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment, InconsistentAnomalyStateException {
 		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		return createResolvedAnomaly().transitionToArchived(archivedTrace);
 	}
 	
-	private Anomaly getValidAnomaly(AnomalyState state) throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment {
+	private Anomaly getValidAnomaly(AnomalyState state) throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment, InconsistentAnomalyStateException {
 		return switch(state) {
 		case PENDING -> createPendingAnomaly();
 		case CORRECTED -> createCorrectedAnomaly();

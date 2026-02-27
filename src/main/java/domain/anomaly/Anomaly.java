@@ -196,7 +196,7 @@ public class Anomaly {
 			case PENDING -> {
 				if(description == null || id == null || traceability.getCreation() == null || 
 						traceability.getToCorrected() != null || traceability.getToResolved() != null ||
-						traceability.getToArchived() != null) {
+						traceability.getToArchived() != null || provingDocument != null) {
 					throw new InconsistentAnomalyStateException("Cannot create anomaly in PENDING state without description, or ID.");
 				}
 			}
