@@ -25,8 +25,15 @@ import domain.valueobject.QualityDecision;
 public class JdbcAnomalyRepository implements Repo{
 	
 	private final ConnectionConfig config;
-	private static final String INSERT_STATEMENT = """
-			INSERT INTO anomaly.anomalies(
+	private final String tableName;
+	private final String INSERT_STATEMENT ;
+	private final String UPDATE_STATEMENT ;
+
+	public JdbcAnomalyRepository(ConnectionConfig config, String tableName) {
+		this.config = config;
+		this.tableName = tableName;
+		this.INSERT_STATEMENT = """
+			INSERT INTO %s(
 				id,
 				parent_id,
 				child_id,
@@ -44,29 +51,26 @@ public class JdbcAnomalyRepository implements Repo{
 				archived_by,
 				archived_at
 			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
-			""";
-	private static final String UPDATE_STATEMENT = """
-			UPDATE anomaly.anomalies
-			SET parent_id = ?,
-				child_id = ?,
-				anomaly_state = ?,
-				description = ?,
-				corrective_action_id = ?,
-				quality_decision = ?,
-				proving_document_id = ?,
-				created_by = ?,
-				created_at = ?,
-				corrected_by = ?,
-				corrected_at = ?,
-				resolved_by = ?,
-				resolved_at = ?,
-				archived_by = ?,
-				archived_at = ?
-			WHERE id = ?;
-			""";
-
-	public JdbcAnomalyRepository(ConnectionConfig config) {
-		this.config = config;
+			""".formatted(tableName);
+		this.UPDATE_STATEMENT = """
+				UPDATE %s
+				SET parent_id = ?,
+					child_id = ?,
+					anomaly_state = ?,
+					description = ?,
+					corrective_action_id = ?,
+					quality_decision = ?,
+					proving_document_id = ?,
+					created_by = ?,
+					created_at = ?,
+					corrected_by = ?,
+					corrected_at = ?,
+					resolved_by = ?,
+					resolved_at = ?,
+					archived_by = ?,
+					archived_at = ?
+				WHERE id = ?;
+				""".formatted(tableName);
 	}
 
 	@Override
@@ -135,9 +139,9 @@ public class JdbcAnomalyRepository implements Repo{
 	public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {
 		try(Connection connection = getConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
-					SELECT * FROM anomaly.anomalies
+					SELECT * FROM %s
 					WHERE id = ?
-					""")){
+					""".formatted(tableName))){
 				preparedStatement.setString(1, id.toString());
 				try(ResultSet result = preparedStatement.executeQuery()){
 					if(!result.next()) {
@@ -156,11 +160,11 @@ public class JdbcAnomalyRepository implements Repo{
 	public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException{
 		try(Connection connection = getConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
-					SELECT * FROM anomaly.anomalies
+					SELECT * FROM %s
 					ORDER BY created_at DESC
 					LIMIT 50
 					OFFSET ?
-					""")){
+					""".formatted(tableName))){
 				preparedStatement.setInt(1, 50*(page-1));
 				try(ResultSet result = preparedStatement.executeQuery()){
 					List<Anomaly> anomalies = new ArrayList<>();
@@ -315,9 +319,9 @@ public class JdbcAnomalyRepository implements Repo{
 
 	private boolean isExist(Anomaly anomaly, Connection connection) throws SQLException{
 		try(PreparedStatement preparedStatement = connection.prepareStatement("""
-						SELECT id FROM anomaly.anomalies
+						SELECT id FROM %s
 						WHERE id = ?
-						""")){
+						""".formatted(tableName))){
 			preparedStatement.setString(1, anomaly.getId().toString());
 			try (ResultSet result = preparedStatement.executeQuery()) {
 			    if (result.next()) {
