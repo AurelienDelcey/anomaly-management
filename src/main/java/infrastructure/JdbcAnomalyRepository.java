@@ -111,12 +111,14 @@ public class JdbcAnomalyRepository implements Repo{
 		try(Connection connection = getConnection()){
 			firstAlreadyInTable = isExist(anomaly1, connection);
 			secondAlreadyInTable = isExist(anomaly2, connection);
-			if(firstAlreadyInTable && !secondAlreadyInTable) {
-				connection.setAutoCommit(false);
-				try(PreparedStatement preparedUpdateStatement = bindUpdateStatement(connection, anomaly1);
-						PreparedStatement preparedInsertStatement = bindInsertStatement(connection, anomaly2)){
-					int resultUpdate = preparedUpdateStatement.executeUpdate();
-					int resultInsert = preparedInsertStatement.executeUpdate();
+			if(!(firstAlreadyInTable && !secondAlreadyInTable)) {
+				throw new TechnicalException();
+			}
+			connection.setAutoCommit(false);
+			try(PreparedStatement preparedUpdateStatement = bindUpdateStatement(connection, anomaly1);
+					PreparedStatement preparedInsertStatement = bindInsertStatement(connection, anomaly2)){
+				int resultUpdate = preparedUpdateStatement.executeUpdate();
+				int resultInsert = preparedInsertStatement.executeUpdate();
 					if(resultInsert != 1 || resultUpdate != 1) {
 						connection.rollback();
 						connection.setAutoCommit(true);
@@ -129,7 +131,6 @@ public class JdbcAnomalyRepository implements Repo{
 				}
 				connection.commit();
 				connection.setAutoCommit(true);
-			}
 		}catch (SQLException e) {
 			throw new TechnicalException("Persistence error.",e);
 		}
