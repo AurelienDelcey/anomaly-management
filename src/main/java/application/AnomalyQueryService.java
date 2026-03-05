@@ -6,6 +6,7 @@ import java.util.UUID;
 import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
 import infrastructure.AnomalyNotFoundException;
+import infrastructure.TechnicalException;
 
 public class AnomalyQueryService {
 	
@@ -15,14 +16,26 @@ public class AnomalyQueryService {
 		this.repo = repo;
 	}
 	
-	public AnomalyDto getById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {
-		return AnomalyDtoMapper.mapToDto(repo.findById(id));
+	public QueryResult getById(UUID id)throws InconsistentAnomalyStateException {
+		try {
+			AnomalyDto result = AnomalyDtoMapper.mapToDto(repo.findById(id));
+			return new QuerySuccess<AnomalyDto>(result);
+		}catch(AnomalyNotFoundException e) {
+			return new QueryNotFound();
+		}catch(TechnicalException e) {
+			return new QueryFailure(e.getMessage());
+		}
 	}
 	
-	public List<AnomalyDto> getAll(int page) throws InconsistentAnomalyStateException{
-		List<Anomaly> anomalyList = repo.findAll(page);
-		return anomalyList.stream()
-				.map(AnomalyDtoMapper::mapToDto)
-				.toList();
+	public QueryResult getAll(int page) throws InconsistentAnomalyStateException{
+		try {
+			List<Anomaly> anomalyList = repo.findAll(page);
+			List<AnomalyDto> anomalyListDto = anomalyList.stream()
+					.map(AnomalyDtoMapper::mapToDto)
+					.toList();
+			return new QuerySuccess<List<AnomalyDto>>(anomalyListDto);
+		}catch(TechnicalException e) {
+			return new QueryFailure(e.getMessage());
+		}
 	}
 }
