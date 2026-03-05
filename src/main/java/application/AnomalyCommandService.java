@@ -46,10 +46,13 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("AttachCorrectiveAction succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("AttachCorrectiveAction failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
-		} 
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult attachQualityDecision (UUID anomalyId, QualityDecision decision) {
@@ -60,8 +63,11 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("AttachQualityDecision succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | TechnicalException e) {
+		} catch (DomainException | TechnicalException e) {
 			log.warn("AttachQualityDecision failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -75,8 +81,11 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("TransitionToCorrected succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToCorrected failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -89,10 +98,13 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("AttachProvingDocument succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("AttachProvingDocument failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
-		} 
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult transitionToResolved (UUID anomalyId) {
@@ -104,8 +116,11 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("TransitionToResolved succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToResolved failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -119,8 +134,11 @@ public class AnomalyCommandService {
 			repo.save(newAnomaly);
 			log.info("TransitionToArchived succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToArchived failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -136,8 +154,11 @@ public class AnomalyCommandService {
 			repo.saveAtomic(anomalyWithProlongationId, prolongation);
 			log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | AnomalyNotFoundException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("TransitionToArchivedWithProlongation failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
 	}
