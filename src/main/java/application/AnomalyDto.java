@@ -6,6 +6,8 @@ import domain.anomaly.AnomalyState;
 import domain.valueobject.QualityDecision;
 
 public record AnomalyDto(String id,
+		String parentId,
+		String childId,
 		String correctiveActionId,
 		String provingDocumentId,
 		QualityDecision qualityDecision,

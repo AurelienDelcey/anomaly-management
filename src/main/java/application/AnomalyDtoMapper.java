@@ -19,6 +19,8 @@ public final class AnomalyDtoMapper {
 		Traceability traceability = anomaly.getTraceability();
 		
 		String id = anomaly.getId().toString();
+		String parentId = anomaly.getParentId() == null ? null : anomaly.getParentId().toString();
+		String childId = anomaly.getChildId() == null ? null : anomaly.getChildId().toString();
 		String correctiveActionId = anomaly.getCorrectiveAction() == null ? null : anomaly.getCorrectiveAction().documentId();
 		String provingDocumentId = anomaly.getProvingDocument() == null ? null : anomaly.getProvingDocument().documentId();
 		QualityDecision qualityDecision = anomaly.getQualityDecision();
@@ -32,7 +34,7 @@ public final class AnomalyDtoMapper {
 		Instant resolvedAt = instantOrNull(traceability.getToResolved());
 		String archivedBy = actorOrNull(traceability.getToArchived());
 		Instant archivedAt = instantOrNull(traceability.getToArchived());
-		return new AnomalyDto(id, correctiveActionId, provingDocumentId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
+		return new AnomalyDto(id, parentId, childId, correctiveActionId, provingDocumentId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
 	}
 	
 	private static String actorOrNull(EventTrace trace) {
