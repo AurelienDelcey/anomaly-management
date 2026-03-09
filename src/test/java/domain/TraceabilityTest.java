@@ -30,6 +30,11 @@ class TraceabilityTest {
 	}
 	
 	@Test
+	void constructor_ShouldReturnException_WhenCreatingTraceIsNull() {
+		assertThrows(IllegalArgumentException.class, ()-> new Traceability(null));
+	}
+	
+	@Test
 	void addToCorrectedTrace_ShouldReturnValidTraceability() {
 		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
