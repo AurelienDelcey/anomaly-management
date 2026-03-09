@@ -10,6 +10,9 @@ public class Traceability {
 	private final EventTrace toArchived;
 	
 	public Traceability(EventTrace creation) {
+		if(creation == null) {
+			throw new IllegalArgumentException("Creation Trace cannot be null.");
+		}
 		this.creation = creation;
 		this.toCorrected = null;
 		this.toResolved = null;
