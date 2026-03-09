@@ -1,5 +1,5 @@
 package application;
 
-public record QueryNotFound() implements QueryResult{
+public record QueryNotFound<T>() implements QueryResult<T>{
 
 }

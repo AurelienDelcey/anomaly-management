@@ -1,5 +1,5 @@
 package application;
 
-public record QueryFailure(String message) implements QueryResult{
+public record QueryFailure<T>(String message) implements QueryResult<T>{
 
 }

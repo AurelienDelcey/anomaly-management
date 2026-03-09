@@ -16,18 +16,18 @@ public class AnomalyQueryService {
 		this.repo = repo;
 	}
 	
-	public QueryResult getById(UUID id)throws InconsistentAnomalyStateException {
+	public QueryResult<AnomalyDto> getById(UUID id)throws InconsistentAnomalyStateException {
 		try {
 			AnomalyDto result = AnomalyDtoMapper.mapToDto(repo.findById(id));
 			return new QuerySuccess<AnomalyDto>(result);
 		}catch(AnomalyNotFoundException e) {
-			return new QueryNotFound();
+			return new QueryNotFound<AnomalyDto>();
 		}catch(TechnicalException e) {
-			return new QueryFailure(e.getMessage());
+			return new QueryFailure<AnomalyDto>(e.getMessage());
 		}
 	}
 	
-	public QueryResult getAll(int page) throws InconsistentAnomalyStateException{
+	public QueryResult<List<AnomalyDto>> getAll(int page) throws InconsistentAnomalyStateException{
 		try {
 			List<Anomaly> anomalyList = repo.findAll(page);
 			List<AnomalyDto> anomalyListDto = anomalyList.stream()
@@ -35,7 +35,7 @@ public class AnomalyQueryService {
 					.toList();
 			return new QuerySuccess<List<AnomalyDto>>(anomalyListDto);
 		}catch(TechnicalException e) {
-			return new QueryFailure(e.getMessage());
+			return new QueryFailure<List<AnomalyDto>>(e.getMessage());
 		}
 	}
 }
