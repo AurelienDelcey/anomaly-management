@@ -78,20 +78,16 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		if(anomaly==null) {
 			throw new IllegalArgumentException("Anomaly should exist.");
 		}
-		boolean alreadyInTable = false;
 		try(Connection connection = openConnection()){
-			alreadyInTable = existsById(anomaly, connection);
-			if(alreadyInTable) {
+			if(existsById(anomaly, connection)) {
 				try(PreparedStatement preparedStatement = prepareUpdateStatement(connection, anomaly)){
-					int result = preparedStatement.executeUpdate();
-					if(result != 1) {
+					if(preparedStatement.executeUpdate() != 1) {
 						throw new TechnicalException("Persistence error: update fail.");
 					}
 				}
 			}else {
 				try(PreparedStatement preparedStatement = prepareInsertStatement(connection, anomaly)){
-					int result = preparedStatement.executeUpdate();
-					if(result != 1) {
+					if(preparedStatement.executeUpdate() != 1) {
 						throw new TechnicalException("Persistence error: insertion fail.");
 					}
 				}
@@ -106,13 +102,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		if(anomaly1 == null || anomaly2 == null) {
 			throw new IllegalArgumentException("Anomalies should exist.");
 		}
-		boolean firstAlreadyInTable = false;
-		boolean secondAlreadyInTable = false;
 		try(Connection connection = openConnection()){
-			firstAlreadyInTable = existsById(anomaly1, connection);
-			secondAlreadyInTable = existsById(anomaly2, connection);
-			if(!(firstAlreadyInTable && !secondAlreadyInTable)) {
-				throw new TechnicalException();
+			if (!existsById(anomaly1, connection) || existsById(anomaly2, connection)) {
+			    throw new TechnicalException();
 			}
 			connection.setAutoCommit(false);
 			try(PreparedStatement preparedUpdateStatement = prepareUpdateStatement(connection, anomaly1);
