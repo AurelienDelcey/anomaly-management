@@ -66,7 +66,7 @@ class AnomalyCommandServiceTest {
 	@Test
 	void ShouldCompleteAnomalyLifecycle() {
 		assertSuccess(command.createAnomaly(DESCRIPTION));
-		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.getAll(1));
+		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -80,7 +80,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.transitionToResolved(anomalyId));
 		assertSuccess(command.transitionToArchived(anomalyId));
 		
-		QueryResult<AnomalyDto> queryResult = assertDoesNotThrow(()->query.getById(anomalyId));
+		QueryResult<AnomalyDto> queryResult = assertDoesNotThrow(()->query.findById(anomalyId));
 		AnomalyDto anomalyDto = switch(queryResult) {
 		case QuerySuccess<AnomalyDto> success -> success.payload();
 		case QueryNotFound<AnomalyDto> notFound ->fail("Archived anomaly not found.");
@@ -100,7 +100,7 @@ class AnomalyCommandServiceTest {
 	@Test
 	void shouldRejectInvalidTransition() {
 		assertSuccess(command.createAnomaly(DESCRIPTION));
-		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.getAll(1));
+		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -115,7 +115,7 @@ class AnomalyCommandServiceTest {
 	@Test
 	void transitionToArchivedWithProlongation() {
 		assertSuccess(command.createAnomaly(DESCRIPTION));
-		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.getAll(1));
+		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -130,7 +130,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.transitionToResolved(anomalyId));
 		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId));
 		
-		QueryResult<List<AnomalyDto>> anomaliesAfterProlongation = assertDoesNotThrow(()->query.getAll(1));
+		QueryResult<List<AnomalyDto>> anomaliesAfterProlongation = assertDoesNotThrow(()->query.findPage(1));
 		List<AnomalyDto> listAfterProlongation = switch ( anomaliesAfterProlongation) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -162,7 +162,7 @@ class AnomalyCommandServiceTest {
 	
 	@Test
 	void shouldReturnResultNotFound() {
-		QueryResult<AnomalyDto> queryResult = assertDoesNotThrow(()->query.getById(UUID.randomUUID()));
+		QueryResult<AnomalyDto> queryResult = assertDoesNotThrow(()->query.findById(UUID.randomUUID()));
 		switch(queryResult) {
 			case QuerySuccess<AnomalyDto> success -> fail("Fail anomaly not found expected.");
 			case QueryNotFound<AnomalyDto> notFound -> {}

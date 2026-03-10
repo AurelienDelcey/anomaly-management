@@ -13,15 +13,15 @@ import infrastructure.exception.TechnicalException;
 
 public class AnomalyQueryService {
 	
-	private final AnomalyRepository repo;
+	private final AnomalyRepository repository;
 
-	public AnomalyQueryService(AnomalyRepository repo) {
-		this.repo = repo;
+	public AnomalyQueryService(AnomalyRepository repository) {
+		this.repository = repository;
 	}
 	
-	public QueryResult<AnomalyDto> getById(UUID id)throws InconsistentAnomalyStateException {
+	public QueryResult<AnomalyDto> findById(UUID id)throws InconsistentAnomalyStateException {
 		try {
-			AnomalyDto result = AnomalyDtoMapper.mapToDto(repo.findById(id));
+			AnomalyDto result = AnomalyDtoMapper.mapToDto(repository.findById(id));
 			return new QuerySuccess<AnomalyDto>(result);
 		}catch(AnomalyNotFoundException e) {
 			return new QueryNotFound<AnomalyDto>();
@@ -30,13 +30,13 @@ public class AnomalyQueryService {
 		}
 	}
 	
-	public QueryResult<List<AnomalyDto>> getAll(int page) throws InconsistentAnomalyStateException{
+	public QueryResult<List<AnomalyDto>> findPage(int page) throws InconsistentAnomalyStateException{
 		try {
-			List<Anomaly> anomalyList = repo.findAll(page);
-			List<AnomalyDto> anomalyListDto = anomalyList.stream()
+			List<Anomaly> anomalies = repository.findAll(page);
+			List<AnomalyDto> anomalyDtos = anomalies.stream()
 					.map(AnomalyDtoMapper::mapToDto)
 					.toList();
-			return new QuerySuccess<List<AnomalyDto>>(anomalyListDto);
+			return new QuerySuccess<List<AnomalyDto>>(anomalyDtos);
 		}catch(TechnicalException e) {
 			return new QueryFailure<List<AnomalyDto>>(e.getMessage());
 		}
