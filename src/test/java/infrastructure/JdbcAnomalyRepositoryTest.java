@@ -55,7 +55,7 @@ class JdbcAnomalyRepositoryTest {
 	}
 
 	@Test
-	void saveAndFindById_shouldReturntheSameAnomaly_whenAnomalyStateIsPending() {
+	void saveAndFindById_shouldReturnTheSameAnomaly_whenAnomalyStateIsPending() {
 		Anomaly anomaly = createPendingAnomaly();
 		repo.save(anomaly);
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
@@ -76,7 +76,7 @@ class JdbcAnomalyRepositoryTest {
 	}
 	
 	@Test
-	void saveAndFindById_shouldReturntheSameAnomaly_whenAnomalyStateIsCorrected() {
+	void saveAndFindById_shouldReturnTheSameAnomaly_whenAnomalyStateIsCorrected() {
 		Anomaly anomaly = assertDoesNotThrow(()->createCorrectedAnomaly());
 		repo.save(anomaly);
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
@@ -98,7 +98,7 @@ class JdbcAnomalyRepositoryTest {
 	}
 	
 	@Test
-	void saveAndFindById_shouldReturntheSameAnomaly_whenAnomalyStateIsResolved() {
+	void saveAndFindById_shouldReturnTheSameAnomaly_whenAnomalyStateIsResolved() {
 		Anomaly anomaly = assertDoesNotThrow(()->createResolvedAnomaly());
 		repo.save(anomaly);
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
@@ -121,7 +121,7 @@ class JdbcAnomalyRepositoryTest {
 	}
 	
 	@Test
-	void saveAndFindById_shouldReturntheSameAnomaly_whenAnomalyStateIsArchived() {
+	void saveAndFindById_shouldReturnTheSameAnomaly_whenAnomalyStateIsArchived() {
 		Anomaly anomaly = assertDoesNotThrow(()->createArchivedAnomaly());
 		repo.save(anomaly);
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));

@@ -64,7 +64,7 @@ class AnomalyCommandServiceTest {
 	}
 
 	@Test
-	void ShouldCompleteAnomalyLifecycle() {
+	void shouldCompleteAnomalyLifecycle() {
 		assertSuccess(command.createAnomaly(DESCRIPTION));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
