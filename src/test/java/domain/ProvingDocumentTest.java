@@ -7,22 +7,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import domain.valueobject.ProvingDocument;
+import domain.valueobject.Evidence;
 
-class ProvingDocumentTest {
+class EvidenceTest {
 
 	@ParameterizedTest
 	@NullAndEmptySource
 	@ValueSource(strings = {"aaa-1-091991","AAA--091991",
 			"AAA-00-","AAA-00-1234567","AAA00091991",
 			"AAA-0-12345"})
-	void provingDocument_ShouldThrowException_WhenTheDocumentIdIsInvalid(String docId) {
-		assertThrows(IllegalArgumentException.class, ()->new ProvingDocument(docId));
+	void evidence_ShouldThrowException_WhenTheDocumentIdIsInvalid(String docId) {
+		assertThrows(IllegalArgumentException.class, ()->new Evidence(docId));
 	}
 	
 	@Test
-	void provingDocument_ShouldReturnValidProvingDocument() {
-		ProvingDocument provingDocument = new ProvingDocument("AAA-0-091991");
-		assertEquals("AAA-0-091991", provingDocument.documentId());
+	void evidence_ShouldReturnValidEvidence() {
+		Evidence evidence = new Evidence("AAA-0-091991");
+		assertEquals("AAA-0-091991", evidence.documentId());
 	}
 }

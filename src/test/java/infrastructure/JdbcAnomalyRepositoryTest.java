@@ -68,7 +68,7 @@ class JdbcAnomalyRepositoryTest {
 		assertNull(newAnomaly.getTraceability().getToArchived());
 		assertEquals(anomaly.getAnomalyState(), newAnomaly.getAnomalyState());
 		assertNull(newAnomaly.getCorrectiveAction());
-		assertNull(newAnomaly.getProvingDocument());
+		assertNull(newAnomaly.getEvidence());
 		assertEquals(anomaly.getQualityDecision(), newAnomaly.getQualityDecision());
 		assertEquals(anomaly.getDescription().description(), newAnomaly.getDescription().description());
 	}
@@ -90,7 +90,7 @@ class JdbcAnomalyRepositoryTest {
 		assertNull(newAnomaly.getTraceability().getToArchived());
 		assertEquals(anomaly.getAnomalyState(), newAnomaly.getAnomalyState());
 		assertEquals(anomaly.getCorrectiveAction().documentId(), newAnomaly.getCorrectiveAction().documentId());
-		assertNull(newAnomaly.getProvingDocument());
+		assertNull(newAnomaly.getEvidence());
 		assertEquals(anomaly.getQualityDecision(), newAnomaly.getQualityDecision());
 		assertEquals(anomaly.getDescription().description(), newAnomaly.getDescription().description());
 	}
@@ -113,7 +113,7 @@ class JdbcAnomalyRepositoryTest {
 		assertNull(newAnomaly.getTraceability().getToArchived());
 		assertEquals(anomaly.getAnomalyState(), newAnomaly.getAnomalyState());
 		assertEquals(anomaly.getCorrectiveAction().documentId(), newAnomaly.getCorrectiveAction().documentId());
-		assertEquals(anomaly.getProvingDocument().documentId(), newAnomaly.getProvingDocument().documentId());
+		assertEquals(anomaly.getEvidence().documentId(), newAnomaly.getEvidence().documentId());
 		assertEquals(anomaly.getQualityDecision(), newAnomaly.getQualityDecision());
 		assertEquals(anomaly.getDescription().description(), newAnomaly.getDescription().description());
 	}
@@ -137,7 +137,7 @@ class JdbcAnomalyRepositoryTest {
 		assertEquals(anomaly.getTraceability().getToArchived().instant(), newAnomaly.getTraceability().getToArchived().instant());
 		assertEquals(anomaly.getAnomalyState(), newAnomaly.getAnomalyState());
 		assertEquals(anomaly.getCorrectiveAction().documentId(), newAnomaly.getCorrectiveAction().documentId());
-		assertEquals(anomaly.getProvingDocument().documentId(), newAnomaly.getProvingDocument().documentId());
+		assertEquals(anomaly.getEvidence().documentId(), newAnomaly.getEvidence().documentId());
 		assertEquals(anomaly.getQualityDecision(), newAnomaly.getQualityDecision());
 		assertEquals(anomaly.getDescription().description(), newAnomaly.getDescription().description());
 	}
@@ -167,7 +167,7 @@ class JdbcAnomalyRepositoryTest {
 		assertEquals(parentAnomalyWithProlongationId.getTraceability().getToArchived().instant(), anomalies.get(1).getTraceability().getToArchived().instant());
 		assertEquals(parentAnomalyWithProlongationId.getAnomalyState(), anomalies.get(1).getAnomalyState());
 		assertEquals(parentAnomalyWithProlongationId.getCorrectiveAction().documentId(), anomalies.get(1).getCorrectiveAction().documentId());
-		assertEquals(parentAnomalyWithProlongationId.getProvingDocument().documentId(), anomalies.get(1).getProvingDocument().documentId());
+		assertEquals(parentAnomalyWithProlongationId.getEvidence().documentId(), anomalies.get(1).getEvidence().documentId());
 		assertEquals(parentAnomalyWithProlongationId.getQualityDecision(), anomalies.get(1).getQualityDecision());
 		assertEquals(parentAnomalyWithProlongationId.getDescription().description(), anomalies.get(1).getDescription().description());
 		
@@ -181,7 +181,7 @@ class JdbcAnomalyRepositoryTest {
 		assertNull(anomalies.get(0).getTraceability().getToArchived());
 		assertEquals(childAnomaly.getAnomalyState(), anomalies.get(0).getAnomalyState());
 		assertNull(anomalies.get(0).getCorrectiveAction());
-		assertNull(anomalies.get(0).getProvingDocument());
+		assertNull(anomalies.get(0).getEvidence());
 		assertEquals(childAnomaly.getQualityDecision(), anomalies.get(0).getQualityDecision());
 		assertEquals(childAnomaly.getDescription().description(), anomalies.get(0).getDescription().description());
 		
@@ -211,7 +211,7 @@ class JdbcAnomalyRepositoryTest {
 	
 	private Anomaly createResolvedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = createCorrectedAnomaly().attachProvingDocument(VALID_DOC_ID);
+		Anomaly anomaly = createCorrectedAnomaly().attachEvidence(VALID_DOC_ID);
 		return anomaly.transitionToResolved(resolvedTrace);
 	}
 	

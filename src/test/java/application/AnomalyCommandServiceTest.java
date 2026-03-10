@@ -68,7 +68,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.attachCorrectiveAction(anomalyId, VALID_DOC_ID));
 		assertSuccess(command.attachQualityDecision(anomalyId, QualityDecision.NA));
 		assertSuccess(command.transitionToCorrected(anomalyId));
-		assertSuccess(command.attachProvingDocument(anomalyId, VALID_DOC_ID));
+		assertSuccess(command.attachEvidence(anomalyId, VALID_DOC_ID));
 		assertSuccess(command.transitionToResolved(anomalyId));
 		assertSuccess(command.transitionToArchived(anomalyId));
 		
@@ -85,7 +85,7 @@ class AnomalyCommandServiceTest {
 		assertEquals(AnomalyState.ARCHIVED, anomalyDto.anomalyState());
 		assertEquals(VALID_DOC_ID, anomalyDto.correctiveActionId());
 		assertEquals(QualityDecision.NA, anomalyDto.qualityDecision());
-		assertEquals(VALID_DOC_ID, anomalyDto.provingDocumentId());
+		assertEquals(VALID_DOC_ID, anomalyDto.evidenceId());
 		assertEquals(DESCRIPTION, anomalyDto.description());
 	}
 	
@@ -118,7 +118,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.attachCorrectiveAction(anomalyId, VALID_DOC_ID));
 		assertSuccess(command.attachQualityDecision(anomalyId, QualityDecision.NA));
 		assertSuccess(command.transitionToCorrected(anomalyId));
-		assertSuccess(command.attachProvingDocument(anomalyId, VALID_DOC_ID));
+		assertSuccess(command.attachEvidence(anomalyId, VALID_DOC_ID));
 		assertSuccess(command.transitionToResolved(anomalyId));
 		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId));
 		
@@ -140,7 +140,7 @@ class AnomalyCommandServiceTest {
 		assertEquals(AnomalyState.ARCHIVED, parent.anomalyState());
 		assertEquals(VALID_DOC_ID, parent.correctiveActionId());
 		assertEquals(QualityDecision.NA, parent.qualityDecision());
-		assertEquals(VALID_DOC_ID, parent.provingDocumentId());
+		assertEquals(VALID_DOC_ID, parent.evidenceId());
 		assertEquals(DESCRIPTION, parent.description());
 		
 		assertEquals(parent.id(), child.parentId());
@@ -148,7 +148,7 @@ class AnomalyCommandServiceTest {
 		assertEquals(AnomalyState.PENDING, child.anomalyState());
 		assertNull(child.correctiveActionId());
 		assertEquals(QualityDecision.EMPTY, child.qualityDecision());
-		assertNull(child.provingDocumentId());
+		assertNull(child.evidenceId());
 		assertEquals(DESCRIPTION, child.description());
 	}
 	

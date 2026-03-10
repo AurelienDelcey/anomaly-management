@@ -18,7 +18,7 @@ import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
-import domain.valueobject.ProvingDocument;
+import domain.valueobject.Evidence;
 
 class AnomalyConstructorTest {
 	
@@ -40,7 +40,7 @@ class AnomalyConstructorTest {
 		assertNull(anomaly.getParentId());
 		assertNull(anomaly.getChildId());
 		assertNull(anomaly.getCorrectiveAction());
-		assertNull(anomaly.getProvingDocument());
+		assertNull(anomaly.getEvidence());
 		assertNotNull(anomaly.getTraceability().getCreation());
 		assertNull(anomaly.getTraceability().getToCorrected());
 		assertNull(anomaly.getTraceability().getToResolved());
@@ -64,7 +64,7 @@ class AnomalyConstructorTest {
 		assertNull(anomaly.getParentId());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
-		assertNull(anomaly.getProvingDocument());
+		assertNull(anomaly.getEvidence());
 		assertNotNull(anomaly.getTraceability().getCreation());
 		assertNotNull(anomaly.getTraceability().getToCorrected());
 		assertNull(anomaly.getTraceability().getToResolved());
@@ -79,7 +79,7 @@ class AnomalyConstructorTest {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
 					UUID.fromString(FIXED_UUID),null,null,
 					createValidCorrectiveAction(),
-					createValidProvingDocument(),
+					createValidEvidence(),
 					createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 					createValidDescription())
 		);
@@ -88,7 +88,7 @@ class AnomalyConstructorTest {
 		assertNull(anomaly.getParentId());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomaly.getProvingDocument().documentId());
+		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
 		assertNotNull(anomaly.getTraceability().getCreation());
 		assertNotNull(anomaly.getTraceability().getToCorrected());
 		assertNotNull(anomaly.getTraceability().getToResolved());
@@ -103,7 +103,7 @@ class AnomalyConstructorTest {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
 					UUID.fromString(FIXED_UUID),null,null,
 					createValidCorrectiveAction(),
-					createValidProvingDocument(),
+					createValidEvidence(),
 					createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 					createValidDescription())
 		);
@@ -112,7 +112,7 @@ class AnomalyConstructorTest {
 		assertNull(anomaly.getParentId());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomaly.getProvingDocument().documentId());
+		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
 		assertNotNull(anomaly.getTraceability().getCreation());
 		assertNotNull(anomaly.getTraceability().getToCorrected());
 		assertNotNull(anomaly.getTraceability().getToResolved());
@@ -155,7 +155,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						null)
 						);
@@ -164,7 +164,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						null)
 						);
@@ -196,7 +196,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						null,NA,RESOLVED,
 						createValidDescription())
 						);
@@ -205,7 +205,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						null,NA,ARCHIVED,
 						createValidDescription())
 						);
@@ -237,7 +237,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						null,null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						createValidDescription())
 						);
@@ -246,7 +246,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						null,null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						createValidDescription())
 						);
@@ -275,7 +275,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),EMPTY,RESOLVED,
 						createValidDescription())
 						);
@@ -284,7 +284,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),EMPTY,ARCHIVED,
 						createValidDescription())
 						);
@@ -310,7 +310,7 @@ class AnomalyConstructorTest {
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,null,
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						createValidDescription())
 						);
@@ -318,7 +318,7 @@ class AnomalyConstructorTest {
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,null,
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						createValidDescription())
 						);
@@ -331,7 +331,7 @@ class AnomalyConstructorTest {
 	mode = EnumSource.Mode.EXCLUDE,
 	names = {"PENDING", "CORRECTED"}
 	)
-	void rehydrateAnomalyNotPendingOrCorrected_shouldThrowException_WhenProvingDocumentIsMissing(AnomalyState state) {
+	void rehydrateAnomalyNotPendingOrCorrected_shouldThrowException_WhenEvidenceIsMissing(AnomalyState state) {
 		switch(state) {
 			case PENDING ->{}
 			case CORRECTED->{}
@@ -357,10 +357,10 @@ class AnomalyConstructorTest {
 	}
 	
 	@Test
-	void rehydrateAnomalyPending_shouldThrowException_WhenProvingDocument() {
+	void rehydrateAnomalyPending_shouldThrowException_WhenEvidence() {
 		assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 				UUID.fromString(FIXED_UUID),null,null,null,
-				createValidProvingDocument(),
+				createValidEvidence(),
 				createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 				createValidDescription())
 				);
@@ -387,7 +387,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(PENDING),NA,RESOLVED,
 						createValidDescription())
 						);
@@ -396,7 +396,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(PENDING),NA,ARCHIVED,
 						createValidDescription())
 						);
@@ -423,7 +423,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(CORRECTED),NA,RESOLVED,
 						createValidDescription())
 						);
@@ -432,7 +432,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(CORRECTED),NA,ARCHIVED,
 						createValidDescription())
 						);
@@ -468,7 +468,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,ARCHIVED,
 						createValidDescription())
 						);
@@ -503,7 +503,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID),null,null,
 						createValidCorrectiveAction(),
-						createValidProvingDocument(),
+						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,RESOLVED,
 						createValidDescription())
 						);
@@ -520,8 +520,8 @@ class AnomalyConstructorTest {
 		return new CorrectiveAction(VALID_DOC_ID);
 	}
 	
-	private ProvingDocument createValidProvingDocument() {
-		return new ProvingDocument(VALID_DOC_ID);
+	private Evidence createValidEvidence() {
+		return new Evidence(VALID_DOC_ID);
 	}
 	
 	private Description createValidDescription() {

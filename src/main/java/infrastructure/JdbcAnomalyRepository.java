@@ -19,7 +19,7 @@ import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
-import domain.valueobject.ProvingDocument;
+import domain.valueobject.Evidence;
 import domain.valueobject.QualityDecision;
 
 public class JdbcAnomalyRepository implements Repo{
@@ -192,7 +192,7 @@ public class JdbcAnomalyRepository implements Repo{
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
-		ProvingDocument provingDocument = anomaly.getProvingDocument();
+		Evidence evidence = anomaly.getEvidence();
 		EventTrace created = traceability.getCreation();
 		EventTrace corrected = traceability.getToCorrected();
 		EventTrace resolved = traceability.getToResolved();
@@ -205,7 +205,7 @@ public class JdbcAnomalyRepository implements Repo{
 		stmt.setString(5, description.description());
 		stmt.setString(6, correctiveAction == null ? null:correctiveAction.documentId());
 		stmt.setString(7, anomaly.getQualityDecision().toString());
-		stmt.setString(8, provingDocument == null ? null:provingDocument.documentId());
+		stmt.setString(8, evidence == null ? null:evidence.documentId());
 		stmt.setString(9, created.actorId());
 		stmt.setTimestamp(10, Timestamp.from(created.instant()));
 		stmt.setString(11, corrected == null ? null:corrected.actorId());
@@ -225,7 +225,7 @@ public class JdbcAnomalyRepository implements Repo{
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
-		ProvingDocument provingDocument = anomaly.getProvingDocument();
+		Evidence evidence = anomaly.getEvidence();
 		EventTrace created = traceability.getCreation();
 		EventTrace corrected = traceability.getToCorrected();
 		EventTrace resolved = traceability.getToResolved();
@@ -237,7 +237,7 @@ public class JdbcAnomalyRepository implements Repo{
 		stmt.setString(4, description.description());
 		stmt.setString(5, correctiveAction == null ? null:correctiveAction.documentId());
 		stmt.setString(6, anomaly.getQualityDecision().toString());
-		stmt.setString(7, provingDocument == null ? null:provingDocument.documentId());
+		stmt.setString(7, evidence == null ? null:evidence.documentId());
 		stmt.setString(8, created.actorId());
 		stmt.setTimestamp(9, Timestamp.from(created.instant()));
 		stmt.setString(10, corrected == null ? null:corrected.actorId());
@@ -268,8 +268,8 @@ public class JdbcAnomalyRepository implements Repo{
 		String correctiveAction = result.getString("corrective_action_id");
 		CorrectiveAction anomalyCorrectiveAction = correctiveAction == null?null:new CorrectiveAction(correctiveAction);
 		
-		String provingDocument = result.getString("proving_document_id");
-		ProvingDocument anomalyProvingDocument = provingDocument == null?null:new ProvingDocument(provingDocument);
+		String evidence = result.getString("proving_document_id");
+		Evidence anomalyEvidence = evidence == null?null:new Evidence(evidence);
 		
 		String createdBy = result.getString("created_by");
 		Timestamp createdAt = result.getTimestamp("created_at");
@@ -312,7 +312,7 @@ public class JdbcAnomalyRepository implements Repo{
 		
 		Anomaly anomaly = domain.anomaly.AnomalyConstructor.rehydrate(
 				anomalyId, anomalyParentId, anomalyChildId, 
-				anomalyCorrectiveAction, anomalyProvingDocument, 
+				anomalyCorrectiveAction, anomalyEvidence, 
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		
 		return anomaly;

@@ -90,16 +90,16 @@ public class AnomalyCommandService {
 		}
 	}
 	
-	public CommandResult attachProvingDocument (UUID anomalyId, String docId) {
+	public CommandResult attachEvidence (UUID anomalyId, String docId) {
 		try {
-			log.debug("AttachProvingDocument requested - anomalyId={}, actorId={}", anomalyId, actor.id());
+			log.debug("AttachEvidence requested - anomalyId={}, actorId={}", anomalyId, actor.id());
 			Anomaly anomaly = repo.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachProvingDocument(docId);
+			Anomaly newAnomaly = anomaly.attachEvidence(docId);
 			repo.save(newAnomaly);
-			log.info("AttachProvingDocument succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
+			log.info("AttachEvidence succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
 		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
-			log.warn("AttachProvingDocument failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			log.warn("AttachEvidence failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		} catch (AnomalyNotFoundException e) {
 			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());

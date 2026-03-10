@@ -35,7 +35,7 @@ class AnomalyTest {
 		assertEquals(FIXED_INSTANT, anomaly.getTraceability().getCreation().instant());
 		assertEquals(AnomalyState.PENDING, anomaly.getAnomalyState());
 		assertNull(anomaly.getCorrectiveAction());
-		assertNull(anomaly.getProvingDocument());
+		assertNull(anomaly.getEvidence());
 		assertEquals(QualityDecision.EMPTY, anomaly.getQualityDecision());
 		assertEquals(DESCRIPTION, anomaly.getDescription().description());
 	}
@@ -52,7 +52,7 @@ class AnomalyTest {
 		assertEquals(FIXED_INSTANT, anomaly.getTraceability().getCreation().instant());
 		assertEquals(AnomalyState.PENDING, anomaly.getAnomalyState());
 		assertNull(anomaly.getCorrectiveAction());
-		assertNull(anomaly.getProvingDocument());
+		assertNull(anomaly.getEvidence());
 		assertEquals(QualityDecision.EMPTY, anomaly.getQualityDecision());
 		assertEquals(DESCRIPTION, anomaly.getDescription().description());
 	}
@@ -76,7 +76,7 @@ class AnomalyTest {
 		assertEquals(FIXED_INSTANT, anomalyCorrected.getTraceability().getToCorrected().instant());
 		assertEquals(AnomalyState.CORRECTED, anomalyCorrected.getAnomalyState());
 		assertEquals(VALID_DOC_ID, anomalyCorrected.getCorrectiveAction().documentId());
-		assertNull(anomalyCorrected.getProvingDocument());
+		assertNull(anomalyCorrected.getEvidence());
 		assertEquals(QualityDecision.NA, anomalyCorrected.getQualityDecision());
 		assertEquals(DESCRIPTION, anomalyCorrected.getDescription().description());
 	}
@@ -90,8 +90,8 @@ class AnomalyTest {
 		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()-> anomaly.attachCorrectiveAction(VALID_DOC_ID));
 		Anomaly anomalyWithQualityDecision = assertDoesNotThrow(()-> anomalyWithCorrectiveAction.attachQualityDecision(QualityDecision.NA));
 		Anomaly anomalyCorrected = assertDoesNotThrow(()-> anomalyWithQualityDecision.transitionToCorrected(toCorrectedTrace));
-		Anomaly anomalyWithProvingDocuments = assertDoesNotThrow(()-> anomalyCorrected.attachProvingDocument(VALID_DOC_ID));
-		Anomaly anomalyResolved = assertDoesNotThrow(()-> anomalyWithProvingDocuments.transitionToResolved(toResolvedTrace));
+		Anomaly anomalyWithEvidences = assertDoesNotThrow(()-> anomalyCorrected.attachEvidence(VALID_DOC_ID));
+		Anomaly anomalyResolved = assertDoesNotThrow(()-> anomalyWithEvidences.transitionToResolved(toResolvedTrace));
 		
 		
 		assertNotNull(anomalyResolved.getId());
@@ -105,7 +105,7 @@ class AnomalyTest {
 		assertEquals(FIXED_INSTANT, anomalyResolved.getTraceability().getToResolved().instant());
 		assertEquals(AnomalyState.RESOLVED, anomalyResolved.getAnomalyState());
 		assertEquals(VALID_DOC_ID, anomalyResolved.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomalyResolved.getProvingDocument().documentId());
+		assertEquals(VALID_DOC_ID, anomalyResolved.getEvidence().documentId());
 		assertEquals(QualityDecision.NA, anomalyResolved.getQualityDecision());
 		assertEquals(DESCRIPTION, anomalyResolved.getDescription().description());
 	}
@@ -120,8 +120,8 @@ class AnomalyTest {
 		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()-> anomaly.attachCorrectiveAction(VALID_DOC_ID));
 		Anomaly anomalyWithQualityDecision = assertDoesNotThrow(()-> anomalyWithCorrectiveAction.attachQualityDecision(QualityDecision.NA));
 		Anomaly anomalyCorrected = assertDoesNotThrow(()-> anomalyWithQualityDecision.transitionToCorrected(toCorrectedTrace));
-		Anomaly anomalyWithProvingDocuments = assertDoesNotThrow(()-> anomalyCorrected.attachProvingDocument(VALID_DOC_ID));
-		Anomaly anomalyResolved = assertDoesNotThrow(()-> anomalyWithProvingDocuments.transitionToResolved(toResolvedTrace));
+		Anomaly anomalyWithEvidences = assertDoesNotThrow(()-> anomalyCorrected.attachEvidence(VALID_DOC_ID));
+		Anomaly anomalyResolved = assertDoesNotThrow(()-> anomalyWithEvidences.transitionToResolved(toResolvedTrace));
 		Anomaly anomalyArchived = assertDoesNotThrow(()-> anomalyResolved.transitionToArchived(toArchivedTrace));
 		
 		
@@ -138,7 +138,7 @@ class AnomalyTest {
 		assertEquals(FIXED_INSTANT, anomalyArchived.getTraceability().getToArchived().instant());
 		assertEquals(AnomalyState.ARCHIVED, anomalyArchived.getAnomalyState());
 		assertEquals(VALID_DOC_ID, anomalyArchived.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomalyArchived.getProvingDocument().documentId());
+		assertEquals(VALID_DOC_ID, anomalyArchived.getEvidence().documentId());
 		assertEquals(QualityDecision.NA, anomalyArchived.getQualityDecision());
 		assertEquals(DESCRIPTION, anomalyArchived.getDescription().description());
 	}
@@ -161,7 +161,7 @@ class AnomalyTest {
 		assertEquals(FIXED_INSTANT, anomalyWithProlongationId.getTraceability().getToArchived().instant());
 		assertEquals(AnomalyState.ARCHIVED, anomalyWithProlongationId.getAnomalyState());
 		assertEquals(VALID_DOC_ID, anomalyWithProlongationId.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomalyWithProlongationId.getProvingDocument().documentId());
+		assertEquals(VALID_DOC_ID, anomalyWithProlongationId.getEvidence().documentId());
 		assertEquals(QualityDecision.NA, anomalyWithProlongationId.getQualityDecision());
 		assertEquals(DESCRIPTION, anomalyWithProlongationId.getDescription().description());
 	}
@@ -187,11 +187,11 @@ class AnomalyTest {
 	}
 	
 	@Test
-	void attachProvingDocument_ShouldReturnAnomalyWithProvingDocument(){
+	void attachEvidence_ShouldReturnAnomalyWithEvidence(){
 		Anomaly anomaly = assertDoesNotThrow(()-> createCorrectedAnomaly());
 		
-		Anomaly anomalyWithProvingDocuments = assertDoesNotThrow(()-> anomaly.attachProvingDocument(VALID_DOC_ID));
-		assertEquals(VALID_DOC_ID, anomalyWithProvingDocuments.getProvingDocument().documentId());
+		Anomaly anomalyWithEvidences = assertDoesNotThrow(()-> anomaly.attachEvidence(VALID_DOC_ID));
+		assertEquals(VALID_DOC_ID, anomalyWithEvidences.getEvidence().documentId());
 	}
 	
 	/*@ParameterizedTest // EXTRACT IN DescrptionTest CLASS.
@@ -221,7 +221,7 @@ class AnomalyTest {
 	}
 	
 	@Test
-	void transitionToResolved_ShouldThrowException_WhenProvingDocumentIsMissing() {
+	void transitionToResolved_ShouldThrowException_WhenEvidenceIsMissing() {
 		Anomaly anomaly = assertDoesNotThrow(()->createCorrectedAnomaly());
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		
@@ -286,9 +286,9 @@ class AnomalyTest {
 			value = AnomalyState.class,
 			mode = EnumSource.Mode.EXCLUDE,
 			names = "CORRECTED")
-	void attachProvingDocument_ShouldThrowException_WhenAnomalyStateIsNotCorrected(AnomalyState state) {
+	void attachEvidence_ShouldThrowException_WhenAnomalyStateIsNotCorrected(AnomalyState state) {
 		Anomaly anomaly = assertDoesNotThrow(()-> getValidAnomaly(state));
-		assertThrows(IllegalAttachment.class, ()->anomaly.attachProvingDocument(VALID_DOC_ID));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachEvidence(VALID_DOC_ID));
 	}
 	
 	@Test
@@ -319,7 +319,7 @@ class AnomalyTest {
 	
 	private Anomaly createResolvedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = createCorrectedAnomaly().attachProvingDocument(VALID_DOC_ID);
+		Anomaly anomaly = createCorrectedAnomaly().attachEvidence(VALID_DOC_ID);
 		return anomaly.transitionToResolved(resolvedTrace);
 	}
 	
