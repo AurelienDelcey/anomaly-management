@@ -149,7 +149,7 @@ class JdbcAnomalyRepositoryTest {
 		Anomaly parentAnomaly = assertDoesNotThrow(()->createArchivedAnomaly());
 		repo.save(parentAnomaly);
 		Anomaly childAnomaly = createPendingProlongationAnomaly(parentAnomaly.getId());
-		Anomaly parentAnomalyWithProlongationId = assertDoesNotThrow(()->parentAnomaly.attachProlongationId(childAnomaly.getId()));
+		Anomaly parentAnomalyWithProlongationId = assertDoesNotThrow(()->parentAnomaly.linkProlongation(childAnomaly.getId()));
 		
 		repo.saveAtomic(parentAnomalyWithProlongationId, childAnomaly);
 		List<Anomaly> anomalies = assertDoesNotThrow(()->repo.findAll(1));
@@ -195,13 +195,13 @@ class JdbcAnomalyRepositoryTest {
 	}
 	
 	private Anomaly createPendingAnomaly() {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(DESCRIPTION, creatingTrace);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		return new Anomaly(DESCRIPTION, creationTrace);
 	}
 	
 	private Anomaly createPendingProlongationAnomaly(UUID parentId) {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
-		return new Anomaly(DESCRIPTION, creatingTrace, parentId);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
+		return new Anomaly(DESCRIPTION, creationTrace, parentId);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {

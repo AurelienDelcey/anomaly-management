@@ -43,8 +43,8 @@ class AnomalyTest {
 	@Test
 	void prolongationConstructor_ShouldReturnValidAnomaly() {
 		UUID parentId = UUID.randomUUID();
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = new Anomaly(DESCRIPTION, creatingTrace, parentId);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		Anomaly anomaly = new Anomaly(DESCRIPTION, creationTrace, parentId);
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
 		assertNotNull(anomaly.getParentId());
@@ -146,7 +146,7 @@ class AnomalyTest {
 	@Test
 	void attachProlongationId_ShouldReturnValidAnomaly(){
 		Anomaly anomaly = assertDoesNotThrow(()-> createArchivedAnomaly());
-		Anomaly anomalyWithProlongationId = assertDoesNotThrow(()-> anomaly.attachProlongationId(UUID.randomUUID()));
+		Anomaly anomalyWithProlongationId = assertDoesNotThrow(()-> anomaly.linkProlongation(UUID.randomUUID()));
 		
 		assertNotNull(anomalyWithProlongationId.getId());
 		assertNotNull(anomalyWithProlongationId.getChildId());
@@ -198,8 +198,8 @@ class AnomalyTest {
 	@NullAndEmptySource
 	@ValueSource(strings = {""," ","   ","\n"})
 	void creatingAnomalyWithInvalidDescription_ShouldThrowException(String description) {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(description,creatingTrace));
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(description,creationTrace));
 	}*/
 	
 	@Test
@@ -301,13 +301,13 @@ class AnomalyTest {
 	@Test
 	void attachProlongationId_ShouldThrowException_WhenAChildIdAlreadyExists() {
 		Anomaly anomaly = assertDoesNotThrow(()->getValidAnomaly(AnomalyState.ARCHIVED));
-		Anomaly anomalyWithChildId = assertDoesNotThrow(()->anomaly.attachProlongationId(UUID.randomUUID()));
-		assertThrows(IllegalAttachment.class, ()->anomalyWithChildId.attachProlongationId(UUID.randomUUID()));
+		Anomaly anomalyWithChildId = assertDoesNotThrow(()->anomaly.linkProlongation(UUID.randomUUID()));
+		assertThrows(IllegalAttachment.class, ()->anomalyWithChildId.linkProlongation(UUID.randomUUID()));
 	}
 	
 	private Anomaly createPendingAnomaly() {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(DESCRIPTION, creatingTrace);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		return new Anomaly(DESCRIPTION, creationTrace);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {

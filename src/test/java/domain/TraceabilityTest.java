@@ -17,8 +17,8 @@ class TraceabilityTest {
 
 	@Test
 	void constructor_ShouldReturnValidTraceability() {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		Traceability trace = new Traceability(creationTrace);
 		
 		assertNotNull(trace.getCreation());
 		assertNull(trace.getToCorrected());
@@ -30,15 +30,15 @@ class TraceabilityTest {
 	}
 	
 	@Test
-	void constructor_ShouldReturnException_WhenCreatingTraceIsNull() {
+	void constructor_ShouldReturnException_WhenCreationTraceIsNull() {
 		assertThrows(IllegalArgumentException.class, ()-> new Traceability(null));
 	}
 	
 	@Test
 	void addToCorrectedTrace_ShouldReturnValidTraceability() {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		Traceability trace = new Traceability(creationTrace);
 		
 		Traceability traceabilityWithToCorrectedTrace = assertDoesNotThrow(()->trace.addToCorrectedTrace(correctedTrace));
 		
@@ -52,9 +52,9 @@ class TraceabilityTest {
 	
 	@Test
 	void addToResolvedTrace_ShouldReturnValidTraceability() {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		Traceability trace = new Traceability(creationTrace);
 		
 		Traceability traceabilityWithToResolvedTrace = assertDoesNotThrow(()->trace.addToResolvedTrace(resolvedTrace));
 		
@@ -68,9 +68,9 @@ class TraceabilityTest {
 	
 	@Test
 	void addToArchivedTrace_ShouldReturnValidTraceability() {
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		Traceability trace = new Traceability(creationTrace);
 		
 		Traceability traceabilityWithToArchivedTrace = assertDoesNotThrow(()->trace.addToArchivedTrace(archivedTrace));
 		
@@ -84,10 +84,10 @@ class TraceabilityTest {
 	
 	@Test
 	void addToCorrectedTrace_ShouldReturnException_WhenToCorrectedTraceAlreadyExists(){
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace otherToCorrectedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		Traceability trace = new Traceability(creationTrace);
 		
 		Traceability traceabilityWithToCorrectedTrace = assertDoesNotThrow(()->trace.addToCorrectedTrace(correctedTrace));
 		assertThrows(IllegalTraceErasureTentative.class, ()->traceabilityWithToCorrectedTrace.addToCorrectedTrace(otherToCorrectedTrace));
@@ -95,10 +95,10 @@ class TraceabilityTest {
 	
 	@Test
 	void addToResolvedTrace_ShouldReturnException_WhenToResolvedTraceAlreadyExists(){
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace toResolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace otherToResolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		Traceability trace = new Traceability(creationTrace);
 		
 		Traceability traceabilityWithToResolvedTrace = assertDoesNotThrow(()->trace.addToResolvedTrace(toResolvedTrace));
 		assertThrows(IllegalTraceErasureTentative.class, ()->traceabilityWithToResolvedTrace.addToResolvedTrace(otherToResolvedTrace));
@@ -106,10 +106,10 @@ class TraceabilityTest {
 	
 	@Test
 	void addToArchivedTrace_ShouldReturnException_WhenToArchivedTraceAlreadyExists(){
-		EventTrace creatingTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		EventTrace otherToArchivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creatingTrace);
+		Traceability trace = new Traceability(creationTrace);
 		
 		Traceability traceabilityWithToArchivedTrace = assertDoesNotThrow(()->trace.addToArchivedTrace(archivedTrace));
 		assertThrows(IllegalTraceErasureTentative.class, ()-> traceabilityWithToArchivedTrace.addToArchivedTrace(otherToArchivedTrace));

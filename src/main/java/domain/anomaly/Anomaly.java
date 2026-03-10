@@ -26,11 +26,11 @@ public class Anomaly {
 	private final Description description;
 	
 	
-	public Anomaly(String description, EventTrace creatingTrace){
+	public Anomaly(String description, EventTrace creationTrace){
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = null;
-		this.traceability = new Traceability(creatingTrace);
+		this.traceability = new Traceability(creationTrace);
 		this.anomalyState = AnomalyState.PENDING;
 		this.correctiveAction = null;
 		this.evidence = null;
@@ -38,11 +38,11 @@ public class Anomaly {
 		this.description = new Description(description);
 	}
 	
-	public Anomaly(String description, EventTrace creatingTrace, UUID parentId){
+	public Anomaly(String description, EventTrace creationTrace, UUID parentId){
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = parentId;
-		this.traceability = new Traceability(creatingTrace);
+		this.traceability = new Traceability(creationTrace);
 		this.anomalyState = AnomalyState.PENDING;
 		this.correctiveAction = null;
 		this.evidence = null;
@@ -87,7 +87,7 @@ public class Anomaly {
 			throw new IllegalTransition("Anomaly must be in CORRECTED state.");
 		}
 		if(this.evidence == null) {
-			throw new IllegalTransition("A proving document must be attached to this anomaly to validate the transition.");
+			throw new IllegalTransition("Evidence must be attached to validate the transition.");
 		}
 		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
 		
@@ -116,9 +116,9 @@ public class Anomaly {
 			throw new IllegalAttachment("The state of anomaly must be PENDING to attach corrective action.");
 		}
 		
-		CorrectiveAction document = new CorrectiveAction(correctiveActionId);
+		CorrectiveAction action = new CorrectiveAction(correctiveActionId);
 		
-		return new Anomaly(id, parentId, childId, document, evidence, traceability, qualityDecision, anomalyState, description);
+		return new Anomaly(id, parentId, childId, action, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachQualityDecision(QualityDecision newQualityDecision)throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -133,7 +133,7 @@ public class Anomaly {
 	
 	public Anomaly attachEvidence(String evidenceId)throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
-			throw new IllegalAttachment("The state of anomaly must be CORRECTED to attach a proving document.");
+			throw new IllegalAttachment("Evidence can only be attached in CORRECTED state.");
 		}
 		
 		Evidence document = new Evidence(evidenceId);
@@ -141,7 +141,7 @@ public class Anomaly {
 		return new Anomaly(id, parentId, childId, correctiveAction, document, traceability, qualityDecision, anomalyState, description);
 	}
 	
-	public Anomaly attachProlongationId(UUID prolongationId)throws IllegalAttachment, InconsistentAnomalyStateException{
+	public Anomaly linkProlongation(UUID prolongationId)throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(this.anomalyState != AnomalyState.ARCHIVED) {
 			throw new IllegalAttachment("The state of anomaly must be ARCHIVED to attach a prolongation ID.");
 		}
@@ -213,7 +213,7 @@ public class Anomaly {
 						correctiveAction == null || evidence == null || traceability.getCreation() == null || 
 						traceability.getToCorrected() == null || traceability.getToResolved() == null ||
 						traceability.getToArchived() != null) {
-					throw new InconsistentAnomalyStateException("Cannot create anomaly in RESOLVED state without description, ID, corrective action, quality decision, or proving document.");
+					throw new InconsistentAnomalyStateException("Cannot create anomaly in RESOLVED state without description, ID, corrective action, quality decision, or evidence.");
 				}
 			}
 			case ARCHIVED -> {

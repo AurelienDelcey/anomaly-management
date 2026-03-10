@@ -152,7 +152,7 @@ public class AnomalyCommandService {
 			Anomaly anomaly = repo.findById(anomalyId);
 			Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 			Anomaly prolongation = createProlongation(archivedAnomaly.getId(), archivedAnomaly.getDescription().description());
-			Anomaly anomalyWithProlongationId = archivedAnomaly.attachProlongationId(prolongation.getId());
+			Anomaly anomalyWithProlongationId = archivedAnomaly.linkProlongation(prolongation.getId());
 			repo.saveAtomic(anomalyWithProlongationId, prolongation);
 			log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
