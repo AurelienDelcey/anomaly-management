@@ -32,9 +32,9 @@ public class AnomalyRepositoryMapper {
 		String state = result.getString("anomaly_state");
 		String decision = result.getString("quality_decision");
 	
-		UUID anomalyId = id == null?null:UUID.fromString(id);
-		UUID anomalyParentId = parentId == null?null:UUID.fromString(parentId);
-		UUID anomalyChildId = childId == null?null:UUID.fromString(childId);
+		UUID anomalyId = uuidOrNullFromString(id);
+		UUID anomalyParentId = uuidOrNullFromString(parentId);
+		UUID anomalyChildId = uuidOrNullFromString(childId);
 		
 		String description = result.getString("description");
 		Description anomalyDescription = description == null?null:new Description(description);
@@ -54,15 +54,15 @@ public class AnomalyRepositoryMapper {
 		String archivedBy = result.getString("archived_by");
 		Timestamp archivedAt = result.getTimestamp("archived_at");
 		
-		Instant createInstant = createdAt == null?null:createdAt.toInstant();
-		Instant correctedInstant = correctedAt == null?null:correctedAt.toInstant();
-		Instant resolvedInstant = resolvedAt == null?null:resolvedAt.toInstant();
-		Instant archivedInstant = archivedAt == null?null:archivedAt.toInstant();
+		Instant createdInstant = instantOrNullFromTimestamp(createdAt);
+		Instant correctedInstant = instantOrNullFromTimestamp(correctedAt);
+		Instant resolvedInstant = instantOrNullFromTimestamp(resolvedAt);
+		Instant archivedInstant = instantOrNullFromTimestamp(archivedAt);
 		
-		EventTrace created = new EventTrace(createdBy, createInstant);
-		EventTrace corrected = correctedInstant == null?null:new EventTrace(correctedBy, correctedInstant);
-		EventTrace resolved = resolvedInstant == null?null:new EventTrace(resolvedBy, resolvedInstant);
-		EventTrace archived = archivedInstant == null?null:new EventTrace(archivedBy, archivedInstant);
+		EventTrace created = new EventTrace(createdBy, createdInstant);
+		EventTrace corrected = eventTraceOrNull(correctedBy, correctedInstant);
+		EventTrace resolved = eventTraceOrNull(resolvedBy, resolvedInstant);
+		EventTrace archived = eventTraceOrNull(archivedBy, archivedInstant);
 		Traceability traceability = new Traceability(created);
 		traceability = corrected == null?traceability:traceability.addToCorrectedTrace(corrected);
 		traceability = resolved == null?traceability:traceability.addToResolvedTrace(resolved);
@@ -78,7 +78,7 @@ public class AnomalyRepositoryMapper {
 		
 		AnomalyState anomalyState = switch(state) {
 		case "PENDING" -> AnomalyState.PENDING;
-		case "CORRECTED" -> AnomalyState.CORRECTED;
+		case "CORRECTED" -> AnomalyState.CORRECTED; 
 		case "RESOLVED" -> AnomalyState.RESOLVED;
 		case "ARCHIVED" -> AnomalyState.ARCHIVED;
 		default -> throw new TechnicalException("Unknown state: " + state);
@@ -90,5 +90,17 @@ public class AnomalyRepositoryMapper {
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		
 		return anomaly;
+	}
+	
+	private static UUID uuidOrNullFromString(String id) {
+		return id == null ? null : UUID.fromString(id);
+	}
+	
+	private static Instant instantOrNullFromTimestamp(Timestamp timestamp) {
+		return timestamp == null ? null : timestamp.toInstant();
+	}
+	
+	private static EventTrace eventTraceOrNull(String actor, Instant instant) {
+		return instant == null || actor == null ? null : new EventTrace(actor, instant);
 	}
 }
