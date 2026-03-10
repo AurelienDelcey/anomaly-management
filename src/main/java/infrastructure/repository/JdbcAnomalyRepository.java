@@ -178,7 +178,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	}
 	
 	private PreparedStatement prepareInsertStatement(Connection connection, Anomaly anomaly) throws SQLException {
-		PreparedStatement stmt = connection.prepareStatement(INSERT_STATEMENT);
+		PreparedStatement query = connection.prepareStatement(INSERT_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		UUID parentId = anomaly.getParentId();
 		UUID childId = anomaly.getChildId();
@@ -190,28 +190,28 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		EventTrace resolved = traceability.getToResolved();
 		EventTrace archived = traceability.getToArchived();
 		
-		stmt.setString(1, anomaly.getId().toString());
-		stmt.setString(2, parentId == null ? null:parentId.toString());
-		stmt.setString(3, childId == null ? null:childId.toString());
-		stmt.setString(4, anomaly.getAnomalyState().toString());
-		stmt.setString(5, description.description());
-		stmt.setString(6, correctiveAction == null ? null:correctiveAction.documentId());
-		stmt.setString(7, anomaly.getQualityDecision().toString());
-		stmt.setString(8, evidence == null ? null:evidence.documentId());
-		stmt.setString(9, created.actorId());
-		stmt.setTimestamp(10, Timestamp.from(created.instant()));
-		stmt.setString(11, corrected == null ? null:corrected.actorId());
-		stmt.setTimestamp(12, corrected == null ? null:Timestamp.from(corrected.instant()));
-		stmt.setString(13, resolved == null ? null:resolved.actorId());
-		stmt.setTimestamp(14, resolved == null ? null:Timestamp.from(resolved.instant()));
-		stmt.setString(15, archived == null ? null:archived.actorId());
-		stmt.setTimestamp(16, archived == null ? null:Timestamp.from(archived.instant()));
+		query.setString(1, anomaly.getId().toString());
+		query.setString(2, stringOrNullFromUuid(parentId));
+		query.setString(3, stringOrNullFromUuid(childId));
+		query.setString(4, anomaly.getAnomalyState().toString());
+		query.setString(5, description.description());
+		query.setString(6, correctiveAction == null ? null:correctiveAction.documentId());
+		query.setString(7, anomaly.getQualityDecision().toString());
+		query.setString(8, evidence == null ? null:evidence.documentId());
+		query.setString(9, stringOrNullFromEventTrace(created));
+		query.setTimestamp(10, timestampOrNullFromEventTrace(created));
+		query.setString(11, stringOrNullFromEventTrace(corrected));
+		query.setTimestamp(12, timestampOrNullFromEventTrace(corrected));
+		query.setString(13, stringOrNullFromEventTrace(resolved));
+		query.setTimestamp(14, timestampOrNullFromEventTrace(resolved));
+		query.setString(15, stringOrNullFromEventTrace(archived));
+		query.setTimestamp(16, timestampOrNullFromEventTrace(archived));
 
-		return stmt;
+		return query;
 	}
 	
 	private PreparedStatement prepareUpdateStatement(Connection connection, Anomaly anomaly) throws SQLException {
-		PreparedStatement stmt = connection.prepareStatement(UPDATE_STATEMENT);
+		PreparedStatement query = connection.prepareStatement(UPDATE_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		UUID parentId = anomaly.getParentId();
 		UUID childId = anomaly.getChildId();
@@ -223,24 +223,24 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		EventTrace resolved = traceability.getToResolved();
 		EventTrace archived = traceability.getToArchived();
 		
-		stmt.setString(1, parentId == null ? null:parentId.toString());
-		stmt.setString(2, childId == null ? null:childId.toString());
-		stmt.setString(3, anomaly.getAnomalyState().toString());
-		stmt.setString(4, description.description());
-		stmt.setString(5, correctiveAction == null ? null:correctiveAction.documentId());
-		stmt.setString(6, anomaly.getQualityDecision().toString());
-		stmt.setString(7, evidence == null ? null:evidence.documentId());
-		stmt.setString(8, created.actorId());
-		stmt.setTimestamp(9, Timestamp.from(created.instant()));
-		stmt.setString(10, corrected == null ? null:corrected.actorId());
-		stmt.setTimestamp(11, corrected == null ? null:Timestamp.from(corrected.instant()));
-		stmt.setString(12, resolved == null ? null:resolved.actorId());
-		stmt.setTimestamp(13, resolved == null ? null:Timestamp.from(resolved.instant()));
-		stmt.setString(14, archived == null ? null:archived.actorId());
-		stmt.setTimestamp(15, archived == null ? null:Timestamp.from(archived.instant()));
-		stmt.setString(16, anomaly.getId().toString());
+		query.setString(1, stringOrNullFromUuid(parentId));
+		query.setString(2, stringOrNullFromUuid(childId));
+		query.setString(3, anomaly.getAnomalyState().toString());
+		query.setString(4, description.description());
+		query.setString(5, correctiveAction == null ? null:correctiveAction.documentId());
+		query.setString(6, anomaly.getQualityDecision().toString());
+		query.setString(7, evidence == null ? null:evidence.documentId());
+		query.setString(8, stringOrNullFromEventTrace(created));
+		query.setTimestamp(9, timestampOrNullFromEventTrace(created));
+		query.setString(10, stringOrNullFromEventTrace(corrected));
+		query.setTimestamp(11, timestampOrNullFromEventTrace(corrected));
+		query.setString(12, stringOrNullFromEventTrace(resolved));
+		query.setTimestamp(13, timestampOrNullFromEventTrace(resolved));
+		query.setString(14, stringOrNullFromEventTrace(archived));
+		query.setTimestamp(15, timestampOrNullFromEventTrace(archived));
+		query.setString(16, anomaly.getId().toString());
 
-		return stmt;
+		return query;
 	}
 
 	
@@ -252,11 +252,20 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 						""".formatted(tableName))){
 			preparedStatement.setString(1, anomaly.getId().toString());
 			try (ResultSet result = preparedStatement.executeQuery()) {
-			    if (result.next()) {
-			        return true;
-			    }
+			        return result.next();
 			}
 		}
-		return false;
+	}
+	
+	private String stringOrNullFromUuid(UUID id) {
+		return id == null ? null : id.toString();
+	}
+	
+	private String stringOrNullFromEventTrace(EventTrace trace) {
+		return trace == null ? null : trace.actorId();
+	}
+	
+	private Timestamp timestampOrNullFromEventTrace(EventTrace trace) {
+		return trace == null ? null : Timestamp.from(trace.instant());
 	}
 }
