@@ -1,4 +1,4 @@
-package infrastructure;
+package infrastructure.exception;
 
 public class AnomalyNotFoundException extends Exception{
 

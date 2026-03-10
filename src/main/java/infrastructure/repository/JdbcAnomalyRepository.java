@@ -1,4 +1,4 @@
-package infrastructure;
+package infrastructure.repository;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,6 +21,8 @@ import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
 import domain.valueobject.QualityDecision;
+import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.TechnicalException;
 
 public class JdbcAnomalyRepository implements Repo{
 	

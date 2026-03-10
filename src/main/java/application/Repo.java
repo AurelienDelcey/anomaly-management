@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
-import infrastructure.AnomalyNotFoundException;
+import infrastructure.exception.AnomalyNotFoundException;
 
 public interface Repo {
 	

@@ -10,8 +10,8 @@ import domain.anomaly.Anomaly;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;
 import domain.valueobject.QualityDecision;
-import infrastructure.AnomalyNotFoundException;
-import infrastructure.TechnicalException;
+import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.TechnicalException;
 
 public class AnomalyCommandService {
 	

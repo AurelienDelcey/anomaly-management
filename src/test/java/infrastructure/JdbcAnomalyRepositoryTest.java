@@ -19,6 +19,9 @@ import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.valueobject.QualityDecision;
+import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.repository.ConnectionConfig;
+import infrastructure.repository.JdbcAnomalyRepository;
 
 class JdbcAnomalyRepositoryTest {
 	

@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
-import infrastructure.AnomalyNotFoundException;
-import infrastructure.TechnicalException;
+import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.TechnicalException;
 
 public class AnomalyQueryService {
 	

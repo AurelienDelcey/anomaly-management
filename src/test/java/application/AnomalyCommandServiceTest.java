@@ -17,8 +17,8 @@ import org.junit.jupiter.api.Test;
 
 import domain.anomaly.AnomalyState;
 import domain.valueobject.QualityDecision;
-import infrastructure.ConnectionConfig;
-import infrastructure.JdbcAnomalyRepository;
+import infrastructure.repository.ConnectionConfig;
+import infrastructure.repository.JdbcAnomalyRepository;
 
 class AnomalyCommandServiceTest {
 	
