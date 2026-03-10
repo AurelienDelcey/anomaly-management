@@ -81,17 +81,17 @@ public class JdbcAnomalyRepository implements Repository{
 			throw new IllegalArgumentException("Anomaly should exist.");
 		}
 		boolean alreadyInTable = false;
-		try(Connection connection = getConnection()){
-			alreadyInTable = isExist(anomaly, connection);
+		try(Connection connection = openConnection()){
+			alreadyInTable = existsById(anomaly, connection);
 			if(alreadyInTable) {
-				try(PreparedStatement preparedStatement = bindUpdateStatement(connection, anomaly)){
+				try(PreparedStatement preparedStatement = prepareUpdateStatement(connection, anomaly)){
 					int result = preparedStatement.executeUpdate();
 					if(result != 1) {
 						throw new TechnicalException("Persistence error: update fail.");
 					}
 				}
 			}else {
-				try(PreparedStatement preparedStatement = bindInsertStatement(connection, anomaly)){
+				try(PreparedStatement preparedStatement = prepareInsertStatement(connection, anomaly)){
 					int result = preparedStatement.executeUpdate();
 					if(result != 1) {
 						throw new TechnicalException("Persistence error: insertion fail.");
@@ -110,15 +110,15 @@ public class JdbcAnomalyRepository implements Repository{
 		}
 		boolean firstAlreadyInTable = false;
 		boolean secondAlreadyInTable = false;
-		try(Connection connection = getConnection()){
-			firstAlreadyInTable = isExist(anomaly1, connection);
-			secondAlreadyInTable = isExist(anomaly2, connection);
+		try(Connection connection = openConnection()){
+			firstAlreadyInTable = existsById(anomaly1, connection);
+			secondAlreadyInTable = existsById(anomaly2, connection);
 			if(!(firstAlreadyInTable && !secondAlreadyInTable)) {
 				throw new TechnicalException();
 			}
 			connection.setAutoCommit(false);
-			try(PreparedStatement preparedUpdateStatement = bindUpdateStatement(connection, anomaly1);
-					PreparedStatement preparedInsertStatement = bindInsertStatement(connection, anomaly2)){
+			try(PreparedStatement preparedUpdateStatement = prepareUpdateStatement(connection, anomaly1);
+					PreparedStatement preparedInsertStatement = prepareInsertStatement(connection, anomaly2)){
 				int resultUpdate = preparedUpdateStatement.executeUpdate();
 				int resultInsert = preparedInsertStatement.executeUpdate();
 					if(resultInsert != 1 || resultUpdate != 1) {
@@ -140,7 +140,7 @@ public class JdbcAnomalyRepository implements Repository{
 
 	@Override
 	public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {
-		try(Connection connection = getConnection()){
+		try(Connection connection = openConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM %s
 					WHERE id = ?
@@ -161,7 +161,7 @@ public class JdbcAnomalyRepository implements Repository{
 
 	@Override
 	public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException{
-		try(Connection connection = getConnection()){
+		try(Connection connection = openConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM %s
 					ORDER BY created_at DESC
@@ -182,12 +182,12 @@ public class JdbcAnomalyRepository implements Repository{
 		}
 	}
 	
-	private Connection getConnection() throws SQLException {
+	private Connection openConnection() throws SQLException {
 		Connection connection = DriverManager.getConnection(config.url(), config.user(), config.password());
 		return connection;
 	}
 	
-	private PreparedStatement bindInsertStatement(Connection connection, Anomaly anomaly) throws SQLException {
+	private PreparedStatement prepareInsertStatement(Connection connection, Anomaly anomaly) throws SQLException {
 		PreparedStatement stmt = connection.prepareStatement(INSERT_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		UUID parentId = anomaly.getParentId();
@@ -220,7 +220,7 @@ public class JdbcAnomalyRepository implements Repository{
 		return stmt;
 	}
 	
-	private PreparedStatement bindUpdateStatement(Connection connection, Anomaly anomaly) throws SQLException {
+	private PreparedStatement prepareUpdateStatement(Connection connection, Anomaly anomaly) throws SQLException {
 		PreparedStatement stmt = connection.prepareStatement(UPDATE_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		UUID parentId = anomaly.getParentId();
@@ -320,7 +320,7 @@ public class JdbcAnomalyRepository implements Repository{
 		return anomaly;
 	}
 
-	private boolean isExist(Anomaly anomaly, Connection connection) throws SQLException{
+	private boolean existsById(Anomaly anomaly, Connection connection) throws SQLException{
 		try(PreparedStatement preparedStatement = connection.prepareStatement("""
 						SELECT id FROM %s
 						WHERE id = ?
