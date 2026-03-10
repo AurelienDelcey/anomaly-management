@@ -1,8 +1,11 @@
-package application;
+package application.query;
 
 import java.util.List;
 import java.util.UUID;
 
+import application.dto.AnomalyDto;
+import application.dto.AnomalyDtoMapper;
+import application.repository.Repo;
 import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
 import infrastructure.exception.AnomalyNotFoundException;

@@ -1,4 +1,4 @@
-package application;
+package application.command;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import application.repository.Repo;
+import domain.actor.Actor;
 import domain.anomaly.Anomaly;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;

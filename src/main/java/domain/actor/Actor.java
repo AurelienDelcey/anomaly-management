@@ -1,4 +1,4 @@
-package application;
+package domain.actor;
 
 public record Actor(String id, int privilegeLevel) {
 	public Actor{

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import application.Repo;
+import application.repository.Repo;
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
 import domain.exception.IllegalTraceErasureTentative;
