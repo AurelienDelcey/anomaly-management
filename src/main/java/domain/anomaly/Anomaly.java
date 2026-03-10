@@ -188,42 +188,57 @@ public class Anomaly {
 	}
 
 	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,
-			Evidence evidence, QualityDecision qualityDecision, Description description, Traceability traceability) throws InconsistentAnomalyStateException {
+			Evidence evidence, QualityDecision qualityDecision, Description description, 
+			Traceability traceability) throws InconsistentAnomalyStateException {
 		if(state == null || traceability == null) {
 			throw new InconsistentAnomalyStateException("Cannot create anomaly without state.");
 		}
 		switch(state) {
-			case PENDING -> {
-				if(description == null || id == null || traceability.getCreation() == null || 
-						traceability.getToCorrected() != null || traceability.getToResolved() != null ||
-						traceability.getToArchived() != null || evidence != null) {
-					throw new InconsistentAnomalyStateException("Cannot create anomaly in PENDING state without description, or ID.");
-				}
-			}
-			case CORRECTED -> {
-				if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
-						correctiveAction == null || traceability.getCreation() == null || 
-						traceability.getToCorrected() == null || traceability.getToResolved() != null ||
-						traceability.getToArchived() != null) {
-					throw new InconsistentAnomalyStateException("Cannot create anomaly in CORRECTED state without description, ID, corrective action, or quality decision.");
-				}
-			}
-			case RESOLVED -> {
-				if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
-						correctiveAction == null || evidence == null || traceability.getCreation() == null || 
-						traceability.getToCorrected() == null || traceability.getToResolved() == null ||
-						traceability.getToArchived() != null) {
-					throw new InconsistentAnomalyStateException("Cannot create anomaly in RESOLVED state without description, ID, corrective action, quality decision, or evidence.");
-				}
-			}
-			case ARCHIVED -> {
-				if(description == null || id == null || qualityDecision == null ||qualityDecision == QualityDecision.EMPTY || 
-						correctiveAction == null || evidence == null || traceability.getCreation() == null || 
-						traceability.getToCorrected() == null || traceability.getToResolved() == null ||
-						traceability.getToArchived() == null) {
-					throw new InconsistentAnomalyStateException("Cannot create anomaly in ARCHIVED state without description, ID, corrective action, quality decision, or evidence.");
-				}
-			}
+			case PENDING -> verifyPendingStructure(id, evidence, description, traceability);
+			case CORRECTED -> verifyCorrectedStructure(id, correctiveAction, qualityDecision, description, traceability);
+			case RESOLVED -> verifyResolvedStructure(id, correctiveAction, evidence, qualityDecision, description, traceability);
+			case ARCHIVED -> verifyArchivedStructure(id, correctiveAction, evidence, qualityDecision, description, traceability);
+		}
+	}
+
+	private void verifyArchivedStructure(UUID id, CorrectiveAction correctiveAction, Evidence evidence,
+			QualityDecision qualityDecision, Description description, Traceability traceability)
+			throws InconsistentAnomalyStateException {
+		if(description == null || id == null || qualityDecision == null ||qualityDecision == QualityDecision.EMPTY || 
+				correctiveAction == null || evidence == null || traceability.getCreation() == null || 
+				traceability.getToCorrected() == null || traceability.getToResolved() == null ||
+				traceability.getToArchived() == null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly in ARCHIVED state without description, ID, corrective action, quality decision, or evidence.");
+		}
+	}
+
+	private void verifyResolvedStructure(UUID id, CorrectiveAction correctiveAction, Evidence evidence,
+			QualityDecision qualityDecision, Description description, Traceability traceability)
+			throws InconsistentAnomalyStateException {
+		if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
+				correctiveAction == null || evidence == null || traceability.getCreation() == null || 
+				traceability.getToCorrected() == null || traceability.getToResolved() == null ||
+				traceability.getToArchived() != null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly in RESOLVED state without description, ID, corrective action, quality decision, or evidence.");
+		}
+	}
+
+	private void verifyCorrectedStructure(UUID id, CorrectiveAction correctiveAction, QualityDecision qualityDecision,
+			Description description, Traceability traceability) throws InconsistentAnomalyStateException {
+		if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
+				correctiveAction == null || traceability.getCreation() == null || 
+				traceability.getToCorrected() == null || traceability.getToResolved() != null ||
+				traceability.getToArchived() != null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly in CORRECTED state without description, ID, corrective action, or quality decision.");
+		}
+	}
+
+	private void verifyPendingStructure(UUID id, Evidence evidence, Description description, Traceability traceability)
+			throws InconsistentAnomalyStateException {
+		if(description == null || id == null || traceability.getCreation() == null || 
+				traceability.getToCorrected() != null || traceability.getToResolved() != null ||
+				traceability.getToArchived() != null || evidence != null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly in PENDING state without description, or ID.");
 		}
 	}
 }
