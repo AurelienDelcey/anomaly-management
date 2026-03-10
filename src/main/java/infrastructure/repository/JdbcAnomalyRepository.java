@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import application.repository.Repository;
+import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
 import domain.exception.IllegalTraceErasureTentative;
@@ -24,7 +24,7 @@ import domain.valueobject.QualityDecision;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.exception.TechnicalException;
 
-public class JdbcAnomalyRepository implements Repository{
+public class JdbcAnomalyRepository implements AnomalyRepository{
 	
 	private final ConnectionConfig config;
 	private final String tableName;

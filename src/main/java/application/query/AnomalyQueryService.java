@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import application.dto.AnomalyDto;
 import application.dto.AnomalyDtoMapper;
-import application.repository.Repository;
+import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
 import infrastructure.exception.AnomalyNotFoundException;
@@ -13,9 +13,9 @@ import infrastructure.exception.TechnicalException;
 
 public class AnomalyQueryService {
 	
-	private final Repository repo;
+	private final AnomalyRepository repo;
 
-	public AnomalyQueryService(Repository repo) {
+	public AnomalyQueryService(AnomalyRepository repo) {
 		this.repo = repo;
 	}
 	
