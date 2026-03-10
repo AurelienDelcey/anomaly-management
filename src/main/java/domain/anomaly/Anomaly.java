@@ -221,7 +221,7 @@ public class Anomaly {
 						correctiveAction == null || evidence == null || traceability.getCreation() == null || 
 						traceability.getToCorrected() == null || traceability.getToResolved() == null ||
 						traceability.getToArchived() == null) {
-					throw new InconsistentAnomalyStateException("Cannot create anomaly in ARCHIVED state without description, ID, corrective action, quality decision, or proving document.");
+					throw new InconsistentAnomalyStateException("Cannot create anomaly in ARCHIVED state without description, ID, corrective action, quality decision, or evidence.");
 				}
 			}
 		}

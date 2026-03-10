@@ -11,7 +11,7 @@ public class Traceability {
 	
 	public Traceability(EventTrace creation) {
 		if(creation == null) {
-			throw new IllegalArgumentException("Creation Trace cannot be null.");
+			throw new IllegalArgumentException("Creation trace cannot be null.");
 		}
 		this.creation = creation;
 		this.toCorrected = null;
@@ -26,25 +26,25 @@ public class Traceability {
 		this.toArchived = toArchived;
 	}
 	
-	public Traceability addToCorrectedTrace(EventTrace toCorrectedTrace) throws IllegalTraceErasureTentative{
+	public Traceability addToCorrectedTrace(EventTrace correctedTrace) throws IllegalTraceErasureTentative{
 		if(this.toCorrected != null) {
 			throw new IllegalTraceErasureTentative("Traceability for CORRECTED transition already exists.");
 		}
-		return new Traceability(creation, toCorrectedTrace, toResolved, toArchived);
+		return new Traceability(creation, correctedTrace, toResolved, toArchived);
 	}
 	
-	public Traceability addToResolvedTrace(EventTrace toResolvedTrace) throws IllegalTraceErasureTentative{
+	public Traceability addToResolvedTrace(EventTrace resolvedTrace) throws IllegalTraceErasureTentative{
 		if(this.toResolved != null) {
 			throw new IllegalTraceErasureTentative("Traceability for RESOLVED transition already exists.");
 		}
-		return new Traceability(creation, toCorrected, toResolvedTrace, toArchived);
+		return new Traceability(creation, toCorrected, resolvedTrace, toArchived);
 	}
 	
-	public Traceability addToArchivedTrace(EventTrace toArchivedTrace) throws IllegalTraceErasureTentative{
+	public Traceability addToArchivedTrace(EventTrace archivedTrace) throws IllegalTraceErasureTentative{
 		if(this.toArchived != null) {
 			throw new IllegalTraceErasureTentative("Traceability for ARCHIVED transition already exists.");
 		}
-		return new Traceability(creation, toCorrected, toResolved, toArchivedTrace);
+		return new Traceability(creation, toCorrected, toResolved, archivedTrace);
 	}
 
 	public EventTrace getCreation() {
