@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,18 +22,16 @@ import infrastructure.JdbcAnomalyRepository;
 
 class AnomalyCommandServiceTest {
 	
-	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
-	private final static Instant FIXED_INSTANT_LATER = Instant.parse("2026-02-17T00:00:00Z");
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static int PRIVILEGE = 0;
 	private static final String TABLE = "anomaly.anomalies_test";
-	private static AnomalyCommandService command;
-	private static AnomalyQueryService query;
-	private static JdbcAnomalyRepository repo;
-	private static ConnectionConfig config ;
-	private static Actor actor;
+	private AnomalyCommandService command;
+	private AnomalyQueryService query;
+	private JdbcAnomalyRepository repo;
+	private ConnectionConfig config ;
+	private Actor actor;
 
 	@BeforeEach
 	void setUp() throws Exception {
