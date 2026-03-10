@@ -63,10 +63,8 @@ public class AnomalyRepositoryMapper {
 		EventTrace corrected = eventTraceOrNull(correctedBy, correctedInstant);
 		EventTrace resolved = eventTraceOrNull(resolvedBy, resolvedInstant);
 		EventTrace archived = eventTraceOrNull(archivedBy, archivedInstant);
-		Traceability traceability = new Traceability(created);
-		traceability = corrected == null?traceability:traceability.addToCorrectedTrace(corrected);
-		traceability = resolved == null?traceability:traceability.addToResolvedTrace(resolved);
-		traceability = archived == null?traceability:traceability.addToArchivedTrace(archived);
+		
+		Traceability traceability =  buildTraceability(created, corrected, resolved, archived);
 		
 		QualityDecision qualityDecision = switch(decision) {
 		case "EMPTY" -> QualityDecision.EMPTY;
@@ -102,5 +100,13 @@ public class AnomalyRepositoryMapper {
 	
 	private static EventTrace eventTraceOrNull(String actor, Instant instant) {
 		return instant == null || actor == null ? null : new EventTrace(actor, instant);
+	}
+	
+	private static Traceability buildTraceability(EventTrace created, EventTrace corrected, EventTrace resolved, EventTrace archived) throws IllegalTraceErasureTentative {
+		Traceability traceability = new Traceability(created);
+		traceability = corrected == null?traceability:traceability.addToCorrectedTrace(corrected);
+		traceability = resolved == null?traceability:traceability.addToResolvedTrace(resolved);
+		traceability = archived == null?traceability:traceability.addToArchivedTrace(archived);
+		return traceability;
 	}
 }
