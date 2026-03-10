@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import application.repository.Repo;
+import application.repository.Repository;
 import domain.actor.Actor;
 import domain.anomaly.Anomaly;
 import domain.exception.DomainException;
@@ -18,10 +18,10 @@ import infrastructure.exception.TechnicalException;
 public class AnomalyCommandService {
 	
 	private static final Logger log = LoggerFactory.getLogger(AnomalyCommandService.class);
-	private final Repo repo;
+	private final Repository repo;
 	private final Actor actor;
 	
-	public AnomalyCommandService(Repo repo, Actor actor) {
+	public AnomalyCommandService(Repository repo, Actor actor) {
 		this.repo = repo;
 		this.actor = actor;
 	}

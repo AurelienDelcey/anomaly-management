@@ -7,7 +7,7 @@ import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
 import infrastructure.exception.AnomalyNotFoundException;
 
-public interface Repo {
+public interface Repository {
 	
 	public void save(Anomaly anomaly);
 	public void saveAtomic(Anomaly anomaly1, Anomaly anomaly2);
