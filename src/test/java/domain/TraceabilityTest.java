@@ -36,9 +36,8 @@ class TraceabilityTest {
 	
 	@Test
 	void addToCorrectedTrace_ShouldReturnValidTraceability() {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creationTrace);
+		EventTrace correctedTrace = getValidEventTrace();
+		Traceability trace = getValidTraceability();
 		
 		Traceability traceabilityWithToCorrectedTrace = assertDoesNotThrow(()->trace.addToCorrectedTrace(correctedTrace));
 		
@@ -52,9 +51,8 @@ class TraceabilityTest {
 	
 	@Test
 	void addToResolvedTrace_ShouldReturnValidTraceability() {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creationTrace);
+		EventTrace resolvedTrace = getValidEventTrace();
+		Traceability trace = getValidTraceability();
 		
 		Traceability traceabilityWithToResolvedTrace = assertDoesNotThrow(()->trace.addToResolvedTrace(resolvedTrace));
 		
@@ -68,9 +66,8 @@ class TraceabilityTest {
 	
 	@Test
 	void addToArchivedTrace_ShouldReturnValidTraceability() {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creationTrace);
+		EventTrace archivedTrace = getValidEventTrace();
+		Traceability trace = getValidTraceability();
 		
 		Traceability traceabilityWithToArchivedTrace = assertDoesNotThrow(()->trace.addToArchivedTrace(archivedTrace));
 		
@@ -84,34 +81,38 @@ class TraceabilityTest {
 	
 	@Test
 	void addToCorrectedTrace_ShouldReturnException_WhenToCorrectedTraceAlreadyExists(){
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace otherToCorrectedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creationTrace);
-		
+		EventTrace correctedTrace = getValidEventTrace();
+		EventTrace otherToCorrectedTrace = getValidEventTrace();
+		Traceability trace = getValidTraceability();
 		Traceability traceabilityWithToCorrectedTrace = assertDoesNotThrow(()->trace.addToCorrectedTrace(correctedTrace));
+		
 		assertThrows(IllegalTraceErasureTentative.class, ()->traceabilityWithToCorrectedTrace.addToCorrectedTrace(otherToCorrectedTrace));
 	}
 	
 	@Test
 	void addToResolvedTrace_ShouldReturnException_WhenToResolvedTraceAlreadyExists(){
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace toResolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace otherToResolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creationTrace);
-		
+		EventTrace toResolvedTrace = getValidEventTrace();
+		EventTrace otherToResolvedTrace = getValidEventTrace();
+		Traceability trace = getValidTraceability();
 		Traceability traceabilityWithToResolvedTrace = assertDoesNotThrow(()->trace.addToResolvedTrace(toResolvedTrace));
+		
 		assertThrows(IllegalTraceErasureTentative.class, ()->traceabilityWithToResolvedTrace.addToResolvedTrace(otherToResolvedTrace));
 	}
 	
 	@Test
 	void addToArchivedTrace_ShouldReturnException_WhenToArchivedTraceAlreadyExists(){
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace otherToArchivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Traceability trace = new Traceability(creationTrace);
-		
+		EventTrace archivedTrace = getValidEventTrace();
+		EventTrace otherToArchivedTrace = getValidEventTrace();
+		Traceability trace = getValidTraceability();
 		Traceability traceabilityWithToArchivedTrace = assertDoesNotThrow(()->trace.addToArchivedTrace(archivedTrace));
+		
 		assertThrows(IllegalTraceErasureTentative.class, ()-> traceabilityWithToArchivedTrace.addToArchivedTrace(otherToArchivedTrace));
+	}
+	
+	private EventTrace getValidEventTrace() {
+		return new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+	}
+	private Traceability getValidTraceability() {
+		return new Traceability(getValidEventTrace());
 	}
 }

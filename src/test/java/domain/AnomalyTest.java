@@ -28,6 +28,7 @@ class AnomalyTest {
 	@Test
 	void constructor_ShouldReturnValidAnomaly() {
 		Anomaly anomaly = createPendingAnomaly();
+		
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
 		assertNull(anomaly.getParentId());
@@ -45,6 +46,7 @@ class AnomalyTest {
 		UUID parentId = UUID.randomUUID();
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Anomaly anomaly = new Anomaly(DESCRIPTION, creationTrace, parentId);
+		
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
 		assertNotNull(anomaly.getParentId());
@@ -83,13 +85,9 @@ class AnomalyTest {
 	
 	@Test
 	void transitionToResolved_ShouldReturnValidAnomaly() {
-		Anomaly anomaly = createPendingAnomaly();
-		EventTrace toCorrectedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		Anomaly anomalyCorrected = assertDoesNotThrow(()-> getValidAnomaly(AnomalyState.CORRECTED));
 		EventTrace toResolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		
-		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()-> anomaly.attachCorrectiveAction(VALID_DOC_ID));
-		Anomaly anomalyWithQualityDecision = assertDoesNotThrow(()-> anomalyWithCorrectiveAction.attachQualityDecision(QualityDecision.NA));
-		Anomaly anomalyCorrected = assertDoesNotThrow(()-> anomalyWithQualityDecision.transitionToCorrected(toCorrectedTrace));
 		Anomaly anomalyWithEvidences = assertDoesNotThrow(()-> anomalyCorrected.attachEvidence(VALID_DOC_ID));
 		Anomaly anomalyResolved = assertDoesNotThrow(()-> anomalyWithEvidences.transitionToResolved(toResolvedTrace));
 		
@@ -112,16 +110,8 @@ class AnomalyTest {
 	
 	@Test
 	void transitionToArchived_ShouldReturnValidAnomaly(){
-		Anomaly anomaly = createPendingAnomaly();
-		EventTrace toCorrectedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		EventTrace toResolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		Anomaly anomalyResolved = assertDoesNotThrow(()->getValidAnomaly(AnomalyState.RESOLVED));
 		EventTrace toArchivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		
-		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()-> anomaly.attachCorrectiveAction(VALID_DOC_ID));
-		Anomaly anomalyWithQualityDecision = assertDoesNotThrow(()-> anomalyWithCorrectiveAction.attachQualityDecision(QualityDecision.NA));
-		Anomaly anomalyCorrected = assertDoesNotThrow(()-> anomalyWithQualityDecision.transitionToCorrected(toCorrectedTrace));
-		Anomaly anomalyWithEvidences = assertDoesNotThrow(()-> anomalyCorrected.attachEvidence(VALID_DOC_ID));
-		Anomaly anomalyResolved = assertDoesNotThrow(()-> anomalyWithEvidences.transitionToResolved(toResolvedTrace));
 		Anomaly anomalyArchived = assertDoesNotThrow(()-> anomalyResolved.transitionToArchived(toArchivedTrace));
 		
 		
@@ -193,14 +183,6 @@ class AnomalyTest {
 		Anomaly anomalyWithEvidences = assertDoesNotThrow(()-> anomaly.attachEvidence(VALID_DOC_ID));
 		assertEquals(VALID_DOC_ID, anomalyWithEvidences.getEvidence().documentId());
 	}
-	
-	/*@ParameterizedTest // EXTRACT IN DescrptionTest CLASS.
-	@NullAndEmptySource
-	@ValueSource(strings = {""," ","   ","\n"})
-	void creatingAnomalyWithInvalidDescription_ShouldThrowException(String description) {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(description,creationTrace));
-	}*/
 	
 	@Test
 	void transitionToCorrected_ShouldThrowException_WhenCorrectiveActionIsMissing() {

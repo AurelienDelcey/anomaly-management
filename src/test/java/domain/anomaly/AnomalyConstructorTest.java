@@ -36,18 +36,7 @@ class AnomalyConstructorTest {
 					createValidDescription())
 		);
 		
-		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
-		assertNull(anomaly.getChildId());
-		assertNull(anomaly.getCorrectiveAction());
-		assertNull(anomaly.getEvidence());
-		assertNotNull(anomaly.getTraceability().getCreation());
-		assertNull(anomaly.getTraceability().getToCorrected());
-		assertNull(anomaly.getTraceability().getToResolved());
-		assertNull(anomaly.getTraceability().getToArchived());
-		assertEquals(EMPTY, anomaly.getQualityDecision());
-		assertEquals(PENDING, anomaly.getAnomalyState());
-		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+		assertAnomalyAtState(anomaly, AnomalyState.PENDING);
 	}
 	
 	@Test
@@ -60,18 +49,7 @@ class AnomalyConstructorTest {
 					createValidDescription())
 		);
 		
-		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
-		assertNull(anomaly.getChildId());
-		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
-		assertNull(anomaly.getEvidence());
-		assertNotNull(anomaly.getTraceability().getCreation());
-		assertNotNull(anomaly.getTraceability().getToCorrected());
-		assertNull(anomaly.getTraceability().getToResolved());
-		assertNull(anomaly.getTraceability().getToArchived());
-		assertEquals(NA, anomaly.getQualityDecision());
-		assertEquals(CORRECTED, anomaly.getAnomalyState());
-		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+		assertAnomalyAtState(anomaly, AnomalyState.CORRECTED);
 	}
 
 	@Test
@@ -84,18 +62,7 @@ class AnomalyConstructorTest {
 					createValidDescription())
 		);
 		
-		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
-		assertNull(anomaly.getChildId());
-		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
-		assertNotNull(anomaly.getTraceability().getCreation());
-		assertNotNull(anomaly.getTraceability().getToCorrected());
-		assertNotNull(anomaly.getTraceability().getToResolved());
-		assertNull(anomaly.getTraceability().getToArchived());
-		assertEquals(NA, anomaly.getQualityDecision());
-		assertEquals(RESOLVED, anomaly.getAnomalyState());
-		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+		assertAnomalyAtState(anomaly, AnomalyState.RESOLVED);
 	}
 	
 	@Test
@@ -108,18 +75,7 @@ class AnomalyConstructorTest {
 					createValidDescription())
 		);
 		
-		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
-		assertNull(anomaly.getChildId());
-		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
-		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
-		assertNotNull(anomaly.getTraceability().getCreation());
-		assertNotNull(anomaly.getTraceability().getToCorrected());
-		assertNotNull(anomaly.getTraceability().getToResolved());
-		assertNotNull(anomaly.getTraceability().getToArchived());
-		assertEquals(NA, anomaly.getQualityDecision());
-		assertEquals(ARCHIVED, anomaly.getAnomalyState());
-		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+		assertAnomalyAtState(anomaly, AnomalyState.ARCHIVED);
 	}
 	
 	@Test
@@ -550,6 +506,76 @@ class AnomalyConstructorTest {
 				yield traceability;
 			}
 		};
+	}
+	
+	private void assertAnomalyAtState(Anomaly anomaly, AnomalyState state) {
+		switch(state){
+			case PENDING -> assertPendingAnomaly(anomaly);
+			case CORRECTED -> assertCorrectedAnomaly(anomaly);
+			case RESOLVED -> assertResolvedAnomaly(anomaly);
+			case ARCHIVED -> assertArchivedAnomaly(anomaly);
+			default -> fail("incorrect state in assert anomaly");
+		};
+	}
+	
+	private void assertPendingAnomaly(Anomaly anomaly) {
+		assertEquals(FIXED_UUID, anomaly.getId().toString());
+		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getChildId());
+		assertNull(anomaly.getCorrectiveAction());
+		assertNull(anomaly.getEvidence());
+		assertNotNull(anomaly.getTraceability().getCreation());
+		assertNull(anomaly.getTraceability().getToCorrected());
+		assertNull(anomaly.getTraceability().getToResolved());
+		assertNull(anomaly.getTraceability().getToArchived());
+		assertEquals(EMPTY, anomaly.getQualityDecision());
+		assertEquals(PENDING, anomaly.getAnomalyState());
+		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+	}
+	
+	private void assertCorrectedAnomaly(Anomaly anomaly) {
+		assertEquals(FIXED_UUID, anomaly.getId().toString());
+		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getChildId());
+		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
+		assertNull(anomaly.getEvidence());
+		assertNotNull(anomaly.getTraceability().getCreation());
+		assertNotNull(anomaly.getTraceability().getToCorrected());
+		assertNull(anomaly.getTraceability().getToResolved());
+		assertNull(anomaly.getTraceability().getToArchived());
+		assertEquals(NA, anomaly.getQualityDecision());
+		assertEquals(CORRECTED, anomaly.getAnomalyState());
+		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+	}
+	
+	private void assertResolvedAnomaly(Anomaly anomaly) {
+		assertEquals(FIXED_UUID, anomaly.getId().toString());
+		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getChildId());
+		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
+		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
+		assertNotNull(anomaly.getTraceability().getCreation());
+		assertNotNull(anomaly.getTraceability().getToCorrected());
+		assertNotNull(anomaly.getTraceability().getToResolved());
+		assertNull(anomaly.getTraceability().getToArchived());
+		assertEquals(NA, anomaly.getQualityDecision());
+		assertEquals(RESOLVED, anomaly.getAnomalyState());
+		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+	}
+	
+	private void assertArchivedAnomaly(Anomaly anomaly) {
+		assertEquals(FIXED_UUID, anomaly.getId().toString());
+		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getChildId());
+		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
+		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
+		assertNotNull(anomaly.getTraceability().getCreation());
+		assertNotNull(anomaly.getTraceability().getToCorrected());
+		assertNotNull(anomaly.getTraceability().getToResolved());
+		assertNotNull(anomaly.getTraceability().getToArchived());
+		assertEquals(NA, anomaly.getQualityDecision());
+		assertEquals(ARCHIVED, anomaly.getAnomalyState());
+		assertEquals(DESCRIPTION, anomaly.getDescription().description());
 	}
 }
 
