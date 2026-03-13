@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.Sector;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
@@ -45,7 +46,7 @@ class AnomalyTest {
 	void prolongationConstructor_ShouldReturnValidAnomaly() {
 		UUID parentId = UUID.randomUUID();
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = new Anomaly(DESCRIPTION, creationTrace, parentId);
+		Anomaly anomaly = new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, parentId);
 		
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
@@ -289,7 +290,7 @@ class AnomalyTest {
 	
 	private Anomaly createPendingAnomaly() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(DESCRIPTION, creationTrace);
+		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {

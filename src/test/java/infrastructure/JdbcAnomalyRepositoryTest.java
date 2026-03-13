@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import domain.anomaly.Anomaly;
+import domain.anomaly.Sector;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
@@ -196,12 +197,12 @@ class JdbcAnomalyRepositoryTest {
 	
 	private Anomaly createPendingAnomaly() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(DESCRIPTION, creationTrace);
+		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace);
 	}
 	
 	private Anomaly createPendingProlongationAnomaly(UUID parentId) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
-		return new Anomaly(DESCRIPTION, creationTrace, parentId);
+		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, parentId);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {

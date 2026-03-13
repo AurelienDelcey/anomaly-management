@@ -13,11 +13,11 @@ public final class AnomalyConstructor {
 	
 	private AnomalyConstructor() {}
 	
-	public static Anomaly rehydrate(UUID id, UUID parentId, UUID childId, CorrectiveAction correctiveAction,
+	public static Anomaly rehydrate(UUID id, UUID parentId, UUID childId, Sector sector, CorrectiveAction correctiveAction,
 			Evidence evidence, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) throws InconsistentAnomalyStateException {
 		
-		return new Anomaly(id, parentId, childId,
+		return new Anomaly(id, parentId, childId, sector,
 				correctiveAction, evidence, traceability,
 				qualityDecision, anomalyState, description);
 	}

@@ -31,7 +31,7 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomalyInPendingState_withValidData_shouldReturnValidAnomaly() {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
-					UUID.fromString(FIXED_UUID),null,null,null,null,
+					UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 					createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 					createValidDescription())
 		);
@@ -42,7 +42,7 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomalyInCorrectedState_withValidData_shouldReturnValidAnomaly() {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
-					UUID.fromString(FIXED_UUID),null,null,
+					UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 					createValidCorrectiveAction(),
 					null,
 					createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
@@ -55,7 +55,7 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomalyInResolvedState_withValidData_shouldReturnValidAnomaly() {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
-					UUID.fromString(FIXED_UUID),null,null,
+					UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 					createValidCorrectiveAction(),
 					createValidEvidence(),
 					createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
@@ -68,7 +68,7 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomalyInArchivedState_withValidData_shouldReturnValidAnomaly() {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
-					UUID.fromString(FIXED_UUID),null,null,
+					UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 					createValidCorrectiveAction(),
 					createValidEvidence(),
 					createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
@@ -81,7 +81,7 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomaly_shouldThrowException_WhenStateIsMissing() {
 		assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-				null,null,null,null,null,
+				null,null,null, Sector.FORGING,null,null,
 				createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 				createValidDescription())
 				);
@@ -93,14 +93,14 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 						null)
 						);
 			}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
@@ -109,7 +109,7 @@ class AnomalyConstructorTest {
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
@@ -118,7 +118,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
@@ -134,14 +134,14 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 						null,EMPTY,PENDING,
 						createValidDescription())
 						);
 			}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						null,NA,CORRECTED,
@@ -150,7 +150,7 @@ class AnomalyConstructorTest {
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						null,NA,RESOLVED,
@@ -159,7 +159,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						null,NA,ARCHIVED,
@@ -175,14 +175,14 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						null,null,null,null,null,
+						null,null,null, Sector.FORGING,null,null,
 						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 						createValidDescription())
 						);
 			}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						null,null,null,
+						null,null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
@@ -191,7 +191,7 @@ class AnomalyConstructorTest {
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						null,null,null,
+						null,null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
@@ -200,7 +200,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						null,null,null,
+						null,null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
@@ -220,7 +220,7 @@ class AnomalyConstructorTest {
 			case PENDING ->{}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(CORRECTED),EMPTY,CORRECTED,
@@ -229,7 +229,7 @@ class AnomalyConstructorTest {
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),EMPTY,RESOLVED,
@@ -238,7 +238,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),EMPTY,ARCHIVED,
@@ -258,14 +258,14 @@ class AnomalyConstructorTest {
 			case PENDING ->{}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
 						createValidDescription())
 						);
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						createValidDescription())
@@ -273,7 +273,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						createValidDescription())
@@ -293,7 +293,7 @@ class AnomalyConstructorTest {
 			case CORRECTED->{}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
@@ -302,7 +302,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
@@ -315,7 +315,7 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomalyPending_shouldThrowException_WhenEvidence() {
 		assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-				UUID.fromString(FIXED_UUID),null,null,null,
+				UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,
 				createValidEvidence(),
 				createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 				createValidDescription())
@@ -332,7 +332,7 @@ class AnomalyConstructorTest {
 			case PENDING ->{}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(PENDING),NA,CORRECTED,
@@ -341,7 +341,7 @@ class AnomalyConstructorTest {
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(PENDING),NA,RESOLVED,
@@ -350,7 +350,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(PENDING),NA,ARCHIVED,
@@ -369,7 +369,7 @@ class AnomalyConstructorTest {
 			switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 						createValidTraceabilityAtState(CORRECTED),EMPTY,PENDING,
 						createValidDescription())
 						);
@@ -377,7 +377,7 @@ class AnomalyConstructorTest {
 			case CORRECTED->{}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(CORRECTED),NA,RESOLVED,
@@ -386,7 +386,7 @@ class AnomalyConstructorTest {
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(CORRECTED),NA,ARCHIVED,
@@ -405,14 +405,14 @@ class AnomalyConstructorTest {
 			switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 						createValidTraceabilityAtState(RESOLVED),EMPTY,PENDING,
 						createValidDescription())
 						);
 			}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(RESOLVED),NA,CORRECTED,
@@ -422,7 +422,7 @@ class AnomalyConstructorTest {
 			case RESOLVED->{}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,ARCHIVED,
@@ -441,14 +441,14 @@ class AnomalyConstructorTest {
 			switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,null,null,
 						createValidTraceabilityAtState(ARCHIVED),EMPTY,PENDING,
 						createValidDescription())
 						);
 			}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						null,
 						createValidTraceabilityAtState(ARCHIVED),NA,CORRECTED,
@@ -457,7 +457,7 @@ class AnomalyConstructorTest {
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID),null,null,
+						UUID.fromString(FIXED_UUID),null,null, Sector.FORGING,
 						createValidCorrectiveAction(),
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,RESOLVED,

@@ -27,6 +27,7 @@ import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.Sector;
 import domain.valueobject.QualityDecision;
 import infrastructure.repository.ConnectionConfig;
 import infrastructure.repository.JdbcAnomalyRepository;
@@ -65,7 +66,7 @@ class AnomalyCommandServiceTest {
 
 	@Test
 	void shouldCompleteAnomalyLifecycle() {
-		assertSuccess(command.createAnomaly(DESCRIPTION));
+		assertSuccess(command.createAnomaly(DESCRIPTION, Sector.FORGING));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
@@ -99,7 +100,7 @@ class AnomalyCommandServiceTest {
 	
 	@Test
 	void shouldRejectInvalidTransition() {
-		assertSuccess(command.createAnomaly(DESCRIPTION));
+		assertSuccess(command.createAnomaly(DESCRIPTION, Sector.FORGING));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
@@ -114,7 +115,7 @@ class AnomalyCommandServiceTest {
 	
 	@Test
 	void transitionToArchivedWithProlongation() {
-		assertSuccess(command.createAnomaly(DESCRIPTION));
+		assertSuccess(command.createAnomaly(DESCRIPTION, Sector.FORGING));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();

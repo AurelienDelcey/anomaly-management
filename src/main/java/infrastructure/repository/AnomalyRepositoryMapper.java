@@ -83,7 +83,7 @@ public class AnomalyRepositoryMapper {
 		};
 		
 		Anomaly anomaly = rehydrate(
-				anomalyId, anomalyParentId, anomalyChildId, 
+				anomalyId, anomalyParentId, anomalyChildId, null, //add sector mapping
 				anomalyCorrectiveAction, anomalyEvidence, 
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		

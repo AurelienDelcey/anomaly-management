@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import application.actor.Actor;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
+import domain.anomaly.Sector;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;
 import domain.valueobject.QualityDecision;
@@ -26,11 +27,11 @@ public class AnomalyCommandService {
 		this.actor = actor;
 	}
 	
-	public CommandResult createAnomaly (String description) {
+	public CommandResult createAnomaly (String description, Sector sector) {
 		try {
 			log.debug("CreateAnomaly requested - actorId={}",actor.id()); 
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
-			Anomaly anomaly = new Anomaly(description, trace);
+			Anomaly anomaly = new Anomaly(description, sector, trace);
 			repository.save(anomaly);
 			log.info("CreateAnomaly succeeded - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 			return new CommandSuccess();
@@ -38,6 +39,25 @@ public class AnomalyCommandService {
 				log.warn("CreateAnomaly failed - reason={}", e.getMessage());
 				return new CommandFailure(e.getMessage());
 			}
+	}
+	
+	//TODO create attach description method
+	
+	public CommandResult attachSector (UUID anomalyId, Sector sector) {
+		try {
+			log.debug("AttachSector requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			Anomaly anomaly = repository.findById(anomalyId);
+			Anomaly newAnomaly = anomaly.attachSector(sector);
+			repository.save(newAnomaly);
+			log.info("AttachSector succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
+			return new CommandSuccess();
+		} catch (DomainException | TechnicalException e) {
+			log.warn("AttachSector failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachSector anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult attachCorrectiveAction (UUID anomalyId, String docId) {
@@ -151,7 +171,7 @@ public class AnomalyCommandService {
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
 			Anomaly anomaly = repository.findById(anomalyId);
 			Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
-			Anomaly prolongation = createProlongation(archivedAnomaly.getId(), archivedAnomaly.getDescription().description());
+			Anomaly prolongation = createProlongation(archivedAnomaly.getId(), archivedAnomaly.getDescription().description(), archivedAnomaly.getSector());
 			Anomaly anomalyWithProlongationId = archivedAnomaly.linkProlongation(prolongation.getId());
 			repository.saveAtomic(anomalyWithProlongationId, prolongation);
 			log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
@@ -165,9 +185,9 @@ public class AnomalyCommandService {
 		}
 	}
 	
-	private Anomaly createProlongation (UUID parentId, String description) {
+	private Anomaly createProlongation (UUID parentId, String description, Sector sector) {
 		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		Anomaly anomaly = new Anomaly(description, trace, parentId);
+		Anomaly anomaly = new Anomaly(description, sector, trace, parentId);
 		log.debug("CreateProlongation - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 		return anomaly;
 	}
