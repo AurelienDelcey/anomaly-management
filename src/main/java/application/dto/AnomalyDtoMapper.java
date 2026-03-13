@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.Sector;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 import domain.valueobject.QualityDecision;
@@ -22,6 +23,7 @@ public final class AnomalyDtoMapper {
 		String id = stringOrNullFromUuid(anomaly.getId());
 		String parentId = stringOrNullFromUuid(anomaly.getParentId());
 		String childId = stringOrNullFromUuid(anomaly.getChildId());
+		Sector sector = anomaly.getSector();
 		String correctiveActionId = anomaly.getCorrectiveAction() == null ? null : anomaly.getCorrectiveAction().documentId();
 		String evidenceId = anomaly.getEvidence() == null ? null : anomaly.getEvidence().documentId();
 		QualityDecision qualityDecision = anomaly.getQualityDecision();
@@ -35,7 +37,7 @@ public final class AnomalyDtoMapper {
 		Instant resolvedAt = instantOrNull(traceability.getToResolved());
 		String archivedBy = actorOrNull(traceability.getToArchived());
 		Instant archivedAt = instantOrNull(traceability.getToArchived());
-		return new AnomalyDto(id, parentId, childId, correctiveActionId, evidenceId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
+		return new AnomalyDto(id, parentId, childId, sector, correctiveActionId, evidenceId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
 	}
 	
 	private static String actorOrNull(EventTrace trace) {
