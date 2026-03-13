@@ -58,7 +58,7 @@ public class Anomaly {
 	Anomaly(UUID id, UUID parentId, UUID childId, Sector sector, CorrectiveAction correctiveAction,
 			Evidence evidence, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) throws InconsistentAnomalyStateException {
-		verifyStructuralConsistency(id, anomalyState, correctiveAction, evidence, qualityDecision, description, traceability);
+		verifyStructuralConsistency(id, anomalyState, correctiveAction, evidence, qualityDecision, description, traceability, sector);
 		this.id = id;
 		this.parentId = parentId;
 		this.childId = childId;
@@ -208,22 +208,22 @@ public class Anomaly {
 
 	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,//TODO add sector verrif
 			Evidence evidence, QualityDecision qualityDecision, Description description, 
-			Traceability traceability) throws InconsistentAnomalyStateException {
-		if(state == null || traceability == null) {
+			Traceability traceability, Sector sector) throws InconsistentAnomalyStateException {
+		if(state == null || traceability == null ) {
 			throw new InconsistentAnomalyStateException("Cannot create anomaly without state.");
 		}
 		switch(state) {
-			case PENDING -> verifyPendingStructure(id, evidence, description, traceability);
-			case CORRECTED -> verifyCorrectedStructure(id, correctiveAction, qualityDecision, description, traceability);
-			case RESOLVED -> verifyResolvedStructure(id, correctiveAction, evidence, qualityDecision, description, traceability);
-			case ARCHIVED -> verifyArchivedStructure(id, correctiveAction, evidence, qualityDecision, description, traceability);
+			case PENDING -> verifyPendingStructure(id, evidence, description, traceability, sector);
+			case CORRECTED -> verifyCorrectedStructure(id, correctiveAction, qualityDecision, description, traceability, sector);
+			case RESOLVED -> verifyResolvedStructure(id, correctiveAction, evidence, qualityDecision, description, traceability, sector);
+			case ARCHIVED -> verifyArchivedStructure(id, correctiveAction, evidence, qualityDecision, description, traceability, sector);
 		}
 	}
 
 	private void verifyArchivedStructure(UUID id, CorrectiveAction correctiveAction, Evidence evidence,
-			QualityDecision qualityDecision, Description description, Traceability traceability)
+			QualityDecision qualityDecision, Description description, Traceability traceability, Sector sector)
 			throws InconsistentAnomalyStateException {
-		if(description == null || id == null || qualityDecision == null ||qualityDecision == QualityDecision.EMPTY || 
+		if(description == null || sector == null|| id == null || qualityDecision == null ||qualityDecision == QualityDecision.EMPTY || 
 				correctiveAction == null || evidence == null || traceability.getCreation() == null || 
 				traceability.getToCorrected() == null || traceability.getToResolved() == null ||
 				traceability.getToArchived() == null) {
@@ -232,9 +232,9 @@ public class Anomaly {
 	}
 
 	private void verifyResolvedStructure(UUID id, CorrectiveAction correctiveAction, Evidence evidence,
-			QualityDecision qualityDecision, Description description, Traceability traceability)
+			QualityDecision qualityDecision, Description description, Traceability traceability, Sector sector)
 			throws InconsistentAnomalyStateException {
-		if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
+		if(description == null || sector == null|| id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
 				correctiveAction == null || evidence == null || traceability.getCreation() == null || 
 				traceability.getToCorrected() == null || traceability.getToResolved() == null ||
 				traceability.getToArchived() != null) {
@@ -243,8 +243,8 @@ public class Anomaly {
 	}
 
 	private void verifyCorrectedStructure(UUID id, CorrectiveAction correctiveAction, QualityDecision qualityDecision,
-			Description description, Traceability traceability) throws InconsistentAnomalyStateException {
-		if(description == null || id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
+			Description description, Traceability traceability, Sector sector) throws InconsistentAnomalyStateException {
+		if(description == null || sector == null|| id == null || qualityDecision == null || qualityDecision == QualityDecision.EMPTY ||
 				correctiveAction == null || traceability.getCreation() == null || 
 				traceability.getToCorrected() == null || traceability.getToResolved() != null ||
 				traceability.getToArchived() != null) {
@@ -252,11 +252,11 @@ public class Anomaly {
 		}
 	}
 
-	private void verifyPendingStructure(UUID id, Evidence evidence, Description description, Traceability traceability)
+	private void verifyPendingStructure(UUID id, Evidence evidence, Description description, Traceability traceability, Sector sector)
 			throws InconsistentAnomalyStateException {
-		if(description == null || id == null || traceability.getCreation() == null || 
+		if(description == null || sector == null || id == null || traceability.getCreation() == null || 
 				traceability.getToCorrected() != null || traceability.getToResolved() != null ||
-				traceability.getToArchived() != null || evidence != null) {
+				traceability.getToArchived() != null || evidence != null ) {
 			throw new InconsistentAnomalyStateException("Cannot create anomaly in PENDING state without description, or ID.");
 		}
 	}
