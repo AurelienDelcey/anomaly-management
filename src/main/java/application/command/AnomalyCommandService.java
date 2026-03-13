@@ -28,7 +28,7 @@ public class AnomalyCommandService {
 	
 	public CommandResult createAnomaly (String description) {
 		try {
-			log.debug("CreateAnomaly requested - actorId={}",actor.id());
+			log.debug("CreateAnomaly requested - actorId={}",actor.id()); 
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
 			Anomaly anomaly = new Anomaly(description, trace);
 			repository.save(anomaly);

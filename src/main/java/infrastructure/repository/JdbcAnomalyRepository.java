@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
 import domain.exception.IllegalTraceErasureTentative;
@@ -24,6 +26,7 @@ import static infrastructure.repository.AnomalyRepositoryMapper.mapAnomaly;
 
 public class JdbcAnomalyRepository implements AnomalyRepository{
 	
+	private static final Logger log = LoggerFactory.getLogger(JdbcAnomalyRepository.class);
 	private final ConnectionConfig config;
 	private final String tableName;
 	private final String INSERT_STATEMENT ;
@@ -78,21 +81,25 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		if(anomaly==null) {
 			throw new IllegalArgumentException("Anomaly should exist.");
 		}
+		log.debug("save requested - anomalyId={}", anomaly.getId());
 		try(Connection connection = openConnection()){
 			if(existsById(anomaly, connection)) {
 				try(PreparedStatement preparedStatement = prepareUpdateStatement(connection, anomaly)){
 					if(preparedStatement.executeUpdate() != 1) {
 						throw new TechnicalException("Persistence error: update fail.");
 					}
+					log.debug("update success 1 row affected - anomalyId={}", anomaly.getId());
 				}
 			}else {
 				try(PreparedStatement preparedStatement = prepareInsertStatement(connection, anomaly)){
 					if(preparedStatement.executeUpdate() != 1) {
 						throw new TechnicalException("Persistence error: insertion fail.");
 					}
+					log.debug("save success 1 row affected - anomalyId={}", anomaly.getId());
 				}
 			}
 		}catch (SQLException e) {
+			log.warn("technical SQL exception when saving anomaly - anomalyId={}", anomaly.getId());
 			throw new TechnicalException("Persistence error.",e);
 		}
 	}
@@ -102,34 +109,43 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		if(anomaly1 == null || anomaly2 == null) {
 			throw new IllegalArgumentException("Anomalies should exist.");
 		}
+		log.debug("saveAtomic requested - parentAnomalyId={}, childAnomalyId={}", anomaly1.getId(), anomaly2.getId());
 		try(Connection connection = openConnection()){
 			if (!existsById(anomaly1, connection) || existsById(anomaly2, connection)) {
+				log.warn("saveAtomic fail parent anomaly does not exist or child anomaly already exist - parentAnomalyId={}, childAnomalyId={}", anomaly1.getId(), anomaly2.getId());
 			    throw new TechnicalException();
 			}
 			connection.setAutoCommit(false);
 			try(PreparedStatement preparedUpdateStatement = prepareUpdateStatement(connection, anomaly1);
 					PreparedStatement preparedInsertStatement = prepareInsertStatement(connection, anomaly2)){
 				int resultUpdate = preparedUpdateStatement.executeUpdate();
+				log.debug("saveAtomic parent anomaly update success - parentAnomalyId={}", anomaly1.getId());
 				int resultInsert = preparedInsertStatement.executeUpdate();
+				log.debug("saveAtomic child anomaly insert success - childAnomalyId={}", anomaly2.getId());
 					if(resultInsert != 1 || resultUpdate != 1) {
 						connection.rollback();
 						connection.setAutoCommit(true);
+						log.warn("saveAtomic fail - row affected={}, parentAnomalyId={}, childAnomalyId={}", resultInsert+resultUpdate, anomaly1.getId(), anomaly2.getId());
 						throw new TechnicalException("Persistence error: transaction fail.");
 					}
 				}catch(Exception e) {
 					connection.rollback();
 					connection.setAutoCommit(true);
+					log.warn("saveAtomic fail for technical exception - parentAnomalyId={}, childAnomalyId={}", anomaly1.getId(), anomaly2.getId());
 					throw e;
 				}
 				connection.commit();
 				connection.setAutoCommit(true);
+				log.debug("saveAtomic success - parentAnomalyId={}, childAnomalyId={}", anomaly1.getId(), anomaly2.getId());
 		}catch (SQLException e) {
+			log.warn("saveAtomic fail for technical SQL exception - parentAnomalyId={}, childAnomalyId={}", anomaly1.getId(), anomaly2.getId());
 			throw new TechnicalException("Persistence error.",e);
 		}
 	}
 
 	@Override
 	public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {
+		log.debug("findByID requested - anomalyId={}", id);
 		try(Connection connection = openConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM %s
@@ -141,16 +157,19 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 						throw new AnomalyNotFoundException();
 					}
 					Anomaly anomaly = mapAnomaly(result);
+					log.debug("findByID request success - anomalyId={}", id);
 					return anomaly;
 				}
 			}
 		} catch (SQLException | IllegalTraceErasureTentative e) {
+			log.warn("findById failure for SQL technical exception- anomalyId={}", id);
 			throw new TechnicalException("impossible to reconstruct anomaly", e);
 		}
 	}
 
 	@Override
 	public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException{
+		log.debug("findAll requested - page={}", page);
 		try(Connection connection = openConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM %s
@@ -164,10 +183,12 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 					while(result.next()) {
 						anomalies.add(mapAnomaly(result));
 					}
+					log.debug("findAll success - page={}", page);
 					return anomalies;
 				}
 			}
 		} catch (SQLException | IllegalTraceErasureTentative e) {
+			log.warn("findAll failure for SQL technical exception- page={}", page);
 			throw new TechnicalException("impossible to reconstruct anomaly", e);
 		}
 	}
