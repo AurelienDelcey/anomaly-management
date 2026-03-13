@@ -1,6 +1,7 @@
 package application.dto;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
@@ -18,9 +19,9 @@ public final class AnomalyDtoMapper {
 	public static AnomalyDto mapToDto(Anomaly anomaly) {
 		Traceability traceability = anomaly.getTraceability();
 		
-		String id = anomaly.getId().toString();
-		String parentId = anomaly.getParentId() == null ? null : anomaly.getParentId().toString();
-		String childId = anomaly.getChildId() == null ? null : anomaly.getChildId().toString();
+		String id = stringOrNullFromUuid(anomaly.getId());
+		String parentId = stringOrNullFromUuid(anomaly.getParentId());
+		String childId = stringOrNullFromUuid(anomaly.getChildId());
 		String correctiveActionId = anomaly.getCorrectiveAction() == null ? null : anomaly.getCorrectiveAction().documentId();
 		String evidenceId = anomaly.getEvidence() == null ? null : anomaly.getEvidence().documentId();
 		QualityDecision qualityDecision = anomaly.getQualityDecision();
@@ -43,5 +44,9 @@ public final class AnomalyDtoMapper {
 
 	private static Instant instantOrNull(EventTrace trace) {
 	    return trace == null ? null : trace.instant();
+	}
+	
+	private static String stringOrNullFromUuid(UUID uuid) {
+		return uuid == null ? null : uuid.toString();
 	}
 }
