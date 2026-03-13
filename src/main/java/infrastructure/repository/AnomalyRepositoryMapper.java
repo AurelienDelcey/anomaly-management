@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.Sector;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
@@ -31,6 +32,7 @@ public class AnomalyRepositoryMapper {
 		String childId = result.getString("child_id");
 		String state = result.getString("anomaly_state");
 		String decision = result.getString("quality_decision");
+		String sector = result.getString("sector");
 	
 		UUID anomalyId = uuidOrNullFromString(id);
 		UUID anomalyParentId = uuidOrNullFromString(parentId);
@@ -82,8 +84,17 @@ public class AnomalyRepositoryMapper {
 		default -> throw new TechnicalException("Unknown state: " + state);
 		};
 		
+		Sector anomalySector = switch(sector) {
+		case "FORGING" -> Sector.FORGING;
+		case "FINISHING" -> Sector.FINISHING;
+		case "HEAT_TREATMENT" -> Sector.HEAT_TREATMENT;
+		case "MACHINING" -> Sector.MACHINING;
+		case "SHIPPING" -> Sector.SHIPPING;
+		default -> throw new TechnicalException("Unknown sector: " + sector);
+		};
+		
 		Anomaly anomaly = rehydrate(
-				anomalyId, anomalyParentId, anomalyChildId, null, //add sector mapping
+				anomalyId, anomalyParentId, anomalyChildId, anomalySector,
 				anomalyCorrectiveAction, anomalyEvidence, 
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		

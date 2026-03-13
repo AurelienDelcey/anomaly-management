@@ -51,7 +51,7 @@ public class AnomalyCommandService {
 			repository.save(newAnomaly);
 			log.info("AttachSector succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess();
-		} catch (DomainException | TechnicalException e) {
+		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
 			log.warn("AttachSector failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		} catch (AnomalyNotFoundException e) {

@@ -206,7 +206,7 @@ public class Anomaly {
 		return description;
 	}
 
-	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,//TODO add sector verrif
+	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,
 			Evidence evidence, QualityDecision qualityDecision, Description description, 
 			Traceability traceability, Sector sector) throws InconsistentAnomalyStateException {
 		if(state == null || traceability == null ) {
