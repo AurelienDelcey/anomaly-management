@@ -33,6 +33,7 @@ class AnomalyTest {
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
 		assertNull(anomaly.getParentId());
+		assertEquals(Sector.FORGING, anomaly.getSector());
 		assertEquals(VALID_ACTOR_ID, anomaly.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomaly.getTraceability().getCreation().instant());
 		assertEquals(AnomalyState.PENDING, anomaly.getAnomalyState());
@@ -40,6 +41,13 @@ class AnomalyTest {
 		assertNull(anomaly.getEvidence());
 		assertEquals(QualityDecision.EMPTY, anomaly.getQualityDecision());
 		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+	}
+	
+
+	@Test
+	void constructor_ShouldThrowException_WhenSectorIsNull() {
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace));
 	}
 	
 	@Test
@@ -51,6 +59,7 @@ class AnomalyTest {
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
 		assertNotNull(anomaly.getParentId());
+		assertEquals(Sector.FORGING, anomaly.getSector());
 		assertEquals(VALID_ACTOR_ID, anomaly.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomaly.getTraceability().getCreation().instant());
 		assertEquals(AnomalyState.PENDING, anomaly.getAnomalyState());
@@ -58,6 +67,12 @@ class AnomalyTest {
 		assertNull(anomaly.getEvidence());
 		assertEquals(QualityDecision.EMPTY, anomaly.getQualityDecision());
 		assertEquals(DESCRIPTION, anomaly.getDescription().description());
+	}
+	
+	@Test
+	void prolongationConstructor_ShouldThrowException_WhenSectorIsNull() {
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace, UUID.randomUUID()));
 	}
 	
 	@Test
@@ -73,6 +88,7 @@ class AnomalyTest {
 		assertNotNull(anomalyCorrected.getId());
 		assertNull(anomalyCorrected.getChildId());
 		assertNull(anomalyCorrected.getParentId());
+		assertEquals(Sector.FORGING, anomalyCorrected.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyCorrected.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyCorrected.getTraceability().getCreation().instant());
 		assertEquals(VALID_ACTOR_ID, anomalyCorrected.getTraceability().getToCorrected().actorId());
@@ -96,6 +112,7 @@ class AnomalyTest {
 		assertNotNull(anomalyResolved.getId());
 		assertNull(anomalyResolved.getChildId());
 		assertNull(anomalyResolved.getParentId());
+		assertEquals(Sector.FORGING, anomalyResolved.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyResolved.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyResolved.getTraceability().getCreation().instant());
 		assertEquals(VALID_ACTOR_ID, anomalyResolved.getTraceability().getToCorrected().actorId());
@@ -119,6 +136,7 @@ class AnomalyTest {
 		assertNotNull(anomalyArchived.getId());
 		assertNull(anomalyArchived.getChildId());
 		assertNull(anomalyArchived.getParentId());
+		assertEquals(Sector.FORGING, anomalyArchived.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyArchived.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyArchived.getTraceability().getCreation().instant());
 		assertEquals(VALID_ACTOR_ID, anomalyArchived.getTraceability().getToCorrected().actorId());
@@ -142,6 +160,7 @@ class AnomalyTest {
 		assertNotNull(anomalyWithProlongationId.getId());
 		assertNotNull(anomalyWithProlongationId.getChildId());
 		assertNull(anomalyWithProlongationId.getParentId());
+		assertEquals(Sector.FORGING, anomalyWithProlongationId.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyWithProlongationId.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyWithProlongationId.getTraceability().getCreation().instant());
 		assertEquals(VALID_ACTOR_ID, anomalyWithProlongationId.getTraceability().getToCorrected().actorId());
@@ -164,6 +183,21 @@ class AnomalyTest {
 		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()->anomaly.attachCorrectiveAction(VALID_DOC_ID));
 		assertEquals(VALID_DOC_ID, anomalyWithCorrectiveAction.getCorrectiveAction().documentId());
 	}
+	
+	@Test
+	void attachSector_ShouldReturnAnomalyWithCorrectSector(){
+		Anomaly anomaly = assertDoesNotThrow(()-> createPendingAnomaly());
+		
+		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()->anomaly.attachSector(Sector.FINISHING));
+		assertEquals(Sector.FINISHING, anomalyWithCorrectiveAction.getSector());
+	}
+	
+	@Test
+	void attachSector_ShouldThrowException_WhenSectorIsNull() {
+	    Anomaly anomaly = createPendingAnomaly();
+	    assertThrows(IllegalArgumentException.class, () -> anomaly.attachSector(null));
+	}
+
 	
 	@Test
 	void attachQualityDecision_ShouldReturnAnomalyWithQualityDecision(){
@@ -252,6 +286,16 @@ class AnomalyTest {
 	void attachCorrectiveAction_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
 		Anomaly anomaly = assertDoesNotThrow(()-> getValidAnomaly(state));
 		assertThrows(IllegalAttachment.class, ()->anomaly.attachCorrectiveAction(VALID_DOC_ID));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "PENDING")
+	void attachSector_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValidAnomaly(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachSector(Sector.FINISHING));
 	}
 	
 	@ParameterizedTest

@@ -28,6 +28,9 @@ public class Anomaly {
 	
 	
 	public Anomaly(String description, Sector sector, EventTrace creationTrace){
+		if(sector == null) {
+			throw new IllegalArgumentException("Sector cannot be null.");
+		}
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = null;
@@ -41,6 +44,9 @@ public class Anomaly {
 	}
 	
 	public Anomaly(String description, Sector sector, EventTrace creationTrace, UUID parentId){
+		if(sector == null) {
+			throw new IllegalArgumentException("Sector cannot be null.");
+		}
 		this.id = UUID.randomUUID();
 		this.childId = null;
 		this.parentId = parentId;
