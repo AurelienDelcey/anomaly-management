@@ -8,6 +8,7 @@ import domain.valueobject.QualityDecision;
 
 public record AnomalyDto(String id,
 		String parentId,
+		String prolongationComent,
 		String childId,
 		Sector sector,
 		String correctiveActionId,

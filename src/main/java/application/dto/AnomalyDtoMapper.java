@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.ProlongationContext;
 import domain.anomaly.Sector;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
@@ -21,7 +22,8 @@ public final class AnomalyDtoMapper {
 		Traceability traceability = anomaly.getTraceability();
 		
 		String id = stringOrNullFromUuid(anomaly.getId());
-		String parentId = stringOrNullFromUuid(anomaly.getParentId());
+		String parentId = idStringOrNullFromProlongationContext(anomaly.getProlongationContext());
+		String prolongationComment = commentStringOrNullFromProlongationContext(anomaly.getProlongationContext());
 		String childId = stringOrNullFromUuid(anomaly.getChildId());
 		Sector sector = anomaly.getSector();
 		String correctiveActionId = anomaly.getCorrectiveAction() == null ? null : anomaly.getCorrectiveAction().documentId();
@@ -37,7 +39,7 @@ public final class AnomalyDtoMapper {
 		Instant resolvedAt = instantOrNull(traceability.getToResolved());
 		String archivedBy = actorOrNull(traceability.getToArchived());
 		Instant archivedAt = instantOrNull(traceability.getToArchived());
-		return new AnomalyDto(id, parentId, childId, sector, correctiveActionId, evidenceId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
+		return new AnomalyDto(id, parentId, prolongationComment, childId, sector, correctiveActionId, evidenceId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
 	}
 	
 	private static String actorOrNull(EventTrace trace) {
@@ -50,5 +52,13 @@ public final class AnomalyDtoMapper {
 	
 	private static String stringOrNullFromUuid(UUID uuid) {
 		return uuid == null ? null : uuid.toString();
+	}
+	
+	private static String idStringOrNullFromProlongationContext(ProlongationContext context) {
+		return context == null ? null : context.parentId().toString();
+	}
+	
+	private static String commentStringOrNullFromProlongationContext(ProlongationContext context) {
+		return context == null ? null : context.prolongationComment();
 	}
 }
