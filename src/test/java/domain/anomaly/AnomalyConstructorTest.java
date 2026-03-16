@@ -130,6 +130,47 @@ class AnomalyConstructorTest {
 	
 	@ParameterizedTest
 	@EnumSource(value = AnomalyState.class)
+	void rehydrateAnomaly_shouldThrowException_WhenSectorIsMissing(AnomalyState state) {
+		switch(state) {
+			case PENDING ->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID),null,null, null,null,null,
+						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
+						createValidDescription())
+						);
+			}
+			case CORRECTED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID),null,null, null,
+						createValidCorrectiveAction(),
+						null,
+						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
+						createValidDescription())
+						);
+			}
+			case RESOLVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID),null,null, null,
+						createValidCorrectiveAction(),
+						createValidEvidence(),
+						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidDescription())
+						);
+			}
+			case ARCHIVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID),null,null, null,
+						createValidCorrectiveAction(),
+						createValidEvidence(),
+						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
+						createValidDescription())
+						);
+			}
+		}
+	}
+	
+	@ParameterizedTest
+	@EnumSource(value = AnomalyState.class)
 	void rehydrateAnomaly_shouldThrowException_WhenTraceabilityIsMissing(AnomalyState state) {
 		switch(state) {
 			case PENDING ->{
