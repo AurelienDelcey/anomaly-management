@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.ProlongationContext;
 import domain.anomaly.Sector;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
@@ -29,14 +30,17 @@ public class AnomalyRepositoryMapper {
 	public static Anomaly mapAnomaly(ResultSet result) throws SQLException, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		String id = result.getString("id");
 		String parentId = result.getString("parent_id");
+		String prolongationComment = result.getString("prolongation_comment");
 		String childId = result.getString("child_id");
 		String state = result.getString("anomaly_state");
 		String decision = result.getString("quality_decision");
 		String sector = result.getString("sector");
 	
 		UUID anomalyId = uuidOrNullFromString(id);
-		UUID anomalyParentId = uuidOrNullFromString(parentId);
 		UUID anomalyChildId = uuidOrNullFromString(childId);
+		UUID anomalyParentId = uuidOrNullFromString(parentId);
+		
+		ProlongationContext context = prolongationContextOrNull(anomalyParentId, prolongationComment);
 		
 		String description = result.getString("description");
 		Description anomalyDescription = description == null?null:new Description(description);
@@ -94,7 +98,7 @@ public class AnomalyRepositoryMapper {
 		};
 		
 		Anomaly anomaly = rehydrate(
-				anomalyId, anomalyParentId, anomalyChildId, anomalySector,
+				anomalyId, context, anomalyChildId, anomalySector,
 				anomalyCorrectiveAction, anomalyEvidence, 
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		
@@ -111,6 +115,10 @@ public class AnomalyRepositoryMapper {
 	
 	private static EventTrace eventTraceOrNull(String actor, Instant instant) {
 		return instant == null || actor == null ? null : new EventTrace(actor, instant);
+	}
+	
+	private static ProlongationContext prolongationContextOrNull(UUID parentId, String comment) {
+		return parentId == null || comment == null ? null : new ProlongationContext(parentId, comment);
 	}
 	
 	private static Traceability buildTraceability(EventTrace created, EventTrace corrected, EventTrace resolved, EventTrace archived) throws IllegalTraceErasureTentative {

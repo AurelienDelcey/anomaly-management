@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
+import domain.anomaly.ProlongationContext;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
@@ -53,8 +54,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				resolved_at,
 				archived_by,
 				archived_at,
-				sector
-			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+				sector,
+				prolongation_comment
+			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 			""".formatted(tableName);
 		this.UPDATE_STATEMENT = """
 				UPDATE %s
@@ -73,7 +75,8 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 					resolved_at = ?,
 					archived_by = ?,
 					archived_at = ?,
-					sector = ?
+					sector = ?,
+					prolongation_comment = ?
 				WHERE id = ?;
 				""".formatted(tableName);
 	}
@@ -203,7 +206,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	private PreparedStatement prepareInsertStatement(Connection connection, Anomaly anomaly) throws SQLException {
 		PreparedStatement query = connection.prepareStatement(INSERT_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
-		UUID parentId = anomaly.getParentId();
+		ProlongationContext prolongationContext = anomaly.getProlongationContext();
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
@@ -214,7 +217,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		EventTrace archived = traceability.getToArchived();
 		
 		query.setString(1, anomaly.getId().toString());
-		query.setString(2, stringOrNullFromUuid(parentId));
+		query.setString(2, prolongationContext == null ? null:prolongationContext.parentId().toString());
 		query.setString(3, stringOrNullFromUuid(childId));
 		query.setString(4, anomaly.getAnomalyState().name());
 		query.setString(5, description.description());
@@ -230,6 +233,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setString(15, stringOrNullFromEventTrace(archived));
 		query.setTimestamp(16, timestampOrNullFromEventTrace(archived));
 		query.setString(17, anomaly.getSector().name());
+		query.setString(18, prolongationContext == null ? null:prolongationContext.prolongationComment());
 
 		return query;
 	}
@@ -237,7 +241,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	private PreparedStatement prepareUpdateStatement(Connection connection, Anomaly anomaly) throws SQLException {
 		PreparedStatement query = connection.prepareStatement(UPDATE_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
-		UUID parentId = anomaly.getParentId();
+		ProlongationContext prolongationContext = anomaly.getProlongationContext();
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
@@ -247,7 +251,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		EventTrace resolved = traceability.getToResolved();
 		EventTrace archived = traceability.getToArchived();
 		
-		query.setString(1, stringOrNullFromUuid(parentId));
+		query.setString(1, prolongationContext == null ? null:prolongationContext.parentId().toString());
 		query.setString(2, stringOrNullFromUuid(childId));
 		query.setString(3, anomaly.getAnomalyState().name());
 		query.setString(4, description.description());
@@ -263,7 +267,8 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setString(14, stringOrNullFromEventTrace(archived));
 		query.setTimestamp(15, timestampOrNullFromEventTrace(archived));
 		query.setString(16, anomaly.getSector().name());
-		query.setString(17, anomaly.getId().toString());
+		query.setString(17, prolongationContext == null ? null:prolongationContext.prolongationComment());
+		query.setString(18, anomaly.getId().toString());
 
 		return query;
 	}
