@@ -8,6 +8,7 @@ import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
+import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
@@ -18,6 +19,7 @@ import domain.valueobject.Sector;
 public class Anomaly {
 	
 	private final UUID id;
+	private final BusinessId businessId;
 	private final ProlongationContext prolongationContext;
 	private final UUID childId;
 	private final Sector sector;
@@ -29,11 +31,15 @@ public class Anomaly {
 	private final Description description;
 	
 	
-	public Anomaly(String description, Sector sector, EventTrace creationTrace){
+	public Anomaly(BusinessId businessId, String description, Sector sector, EventTrace creationTrace){
+		if(businessId == null) {
+			throw new IllegalArgumentException("businessId cannot be null.");
+		}
 		if(sector == null) {
 			throw new IllegalArgumentException("Sector cannot be null.");
 		}
 		this.id = UUID.randomUUID();
+		this.businessId = businessId;
 		this.childId = null;
 		this.prolongationContext = null;
 		this.sector = sector;
@@ -45,7 +51,10 @@ public class Anomaly {
 		this.description = new Description(description);
 	}
 	
-	public Anomaly(String description, Sector sector, EventTrace creationTrace, ProlongationContext prolongationContext){
+	public Anomaly(BusinessId businessId, String description, Sector sector, EventTrace creationTrace, ProlongationContext prolongationContext){
+		if(businessId == null) {
+			throw new IllegalArgumentException("businessId cannot be null.");
+		}
 		if(sector == null) {
 			throw new IllegalArgumentException("Sector cannot be null.");
 		}
@@ -53,6 +62,7 @@ public class Anomaly {
 			throw new IllegalArgumentException("prolongationContext cannot be null.");
 		}
 		this.id = UUID.randomUUID();
+		this.businessId = businessId;
 		this.childId = null;
 		this.prolongationContext = prolongationContext;
 		this.sector = sector;
@@ -66,11 +76,12 @@ public class Anomaly {
 	
 	
 	
-	Anomaly(UUID id, ProlongationContext prolongationContext, UUID childId, Sector sector, CorrectiveAction correctiveAction,
+	Anomaly(UUID id,BusinessId businessId, ProlongationContext prolongationContext, UUID childId, Sector sector, CorrectiveAction correctiveAction,
 			Evidence evidence, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) throws InconsistentAnomalyStateException {
-		verifyStructuralConsistency(id, anomalyState, correctiveAction, evidence, qualityDecision, description, traceability, sector);
+		verifyStructuralConsistency(id, businessId, anomalyState, correctiveAction, evidence, qualityDecision, description, traceability, sector);
 		this.id = id;
+		this.businessId = businessId;
 		this.prolongationContext = prolongationContext;
 		this.childId = childId;
 		this.sector = sector;
@@ -94,7 +105,7 @@ public class Anomaly {
 		}
 		Traceability trace = this.traceability.addToCorrectedTrace(toCorrectedTrace);
 		
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, evidence, trace, qualityDecision, AnomalyState.CORRECTED, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, trace, qualityDecision, AnomalyState.CORRECTED, description);
 	}
 
 	public Anomaly transitionToResolved(EventTrace toResolvedTrace) throws IllegalTransition,IllegalTraceErasureTentative, InconsistentAnomalyStateException{
@@ -106,7 +117,7 @@ public class Anomaly {
 		}
 		Traceability trace = this.traceability.addToResolvedTrace(toResolvedTrace);
 		
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, evidence, trace, qualityDecision, AnomalyState.RESOLVED, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, trace, qualityDecision, AnomalyState.RESOLVED, description);
 	}
 	
 	public Anomaly transitionToArchived(EventTrace toArchivedTrace)throws IllegalTransition,IllegalTraceErasureTentative, InconsistentAnomalyStateException{
@@ -115,7 +126,7 @@ public class Anomaly {
 		}
 		Traceability trace = this.traceability.addToArchivedTrace(toArchivedTrace);
 		
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, evidence, trace, qualityDecision, AnomalyState.ARCHIVED, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, trace, qualityDecision, AnomalyState.ARCHIVED, description);
 	}
 	
 	public Anomaly attachDescription(String description) throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -123,7 +134,7 @@ public class Anomaly {
 			throw new IllegalAttachment("Editing the description is only permitted during the PENDING state.");
 		}
 		Description newDescription = new Description(description);
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, newDescription);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, newDescription);
 	}
 	
 	public Anomaly attachSector(Sector sector) throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -134,7 +145,7 @@ public class Anomaly {
 			throw new IllegalAttachment("Editing sector is only permitted during the PENDING state.");
 		}
 		
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 
 	public Anomaly attachCorrectiveAction (String correctiveActionId) throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -144,7 +155,7 @@ public class Anomaly {
 		
 		CorrectiveAction action = new CorrectiveAction(correctiveActionId);
 		
-		return new Anomaly(id, prolongationContext, childId, sector, action, evidence, traceability, qualityDecision, anomalyState, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, action, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachQualityDecision(QualityDecision newQualityDecision)throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -154,7 +165,7 @@ public class Anomaly {
 		if(newQualityDecision==QualityDecision.EMPTY) {
 			throw new IllegalAttachment("Quality decision can't be EMPTY.");
 		}
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, evidence, traceability, newQualityDecision, anomalyState, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, traceability, newQualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachEvidence(String evidenceId)throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -164,7 +175,7 @@ public class Anomaly {
 		
 		Evidence document = new Evidence(evidenceId);
 		
-		return new Anomaly(id, prolongationContext, childId, sector, correctiveAction, document, traceability, qualityDecision, anomalyState, description);
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, document, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly linkProlongation(UUID prolongationId)throws IllegalAttachment, InconsistentAnomalyStateException{
@@ -174,7 +185,7 @@ public class Anomaly {
 		if(this.childId != null) {
 			throw new IllegalAttachment("A prolongation ID is already attached to this anomaly.");
 		}
-		return new Anomaly(id, prolongationContext, prolongationId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
+		return new Anomaly(id, businessId, prolongationContext, prolongationId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public UUID getId() {
@@ -217,11 +228,17 @@ public class Anomaly {
 		return description;
 	}
 
-	private void verifyStructuralConsistency(UUID id, AnomalyState state, CorrectiveAction correctiveAction,
+	private void verifyStructuralConsistency(UUID id, BusinessId businessId, AnomalyState state, CorrectiveAction correctiveAction,
 			Evidence evidence, QualityDecision qualityDecision, Description description, 
 			Traceability traceability, Sector sector) throws InconsistentAnomalyStateException {
-		if(state == null || traceability == null ) {
+		if(state == null) {
 			throw new InconsistentAnomalyStateException("Cannot create anomaly without state.");
+		}
+		if(traceability == null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly without traceability.");
+		}
+		if(businessId == null) {
+			throw new InconsistentAnomalyStateException("Cannot create anomaly without businessId.");
 		}
 		switch(state) {
 			case PENDING -> verifyPendingStructure(id, evidence, description, traceability, sector);
