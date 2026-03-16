@@ -272,6 +272,28 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 
 		return query;
 	}
+	
+	@Override
+	public int getMaxSequenceByYear(int year) {
+		int maxSequence = 0;
+		try(Connection connection = openConnection()){
+			try(PreparedStatement preparedStatement = connection.prepareStatement("""
+					SELECT MAX(sequence) 
+					FROM %s
+					WHERE year = ?
+					""".formatted(tableName))){
+				preparedStatement.setInt(1, year);
+				try(ResultSet result = preparedStatement.executeQuery()){
+					if (result.next()) {
+						maxSequence = result.getInt(1);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new TechnicalException("impossible to reconstruct anomaly", e);
+		}
+		return maxSequence;
+	}
 
 	
 
