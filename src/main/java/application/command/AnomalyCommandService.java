@@ -9,11 +9,11 @@ import org.slf4j.LoggerFactory;
 import application.actor.Actor;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
-import domain.anomaly.ProlongationContext;
-import domain.anomaly.Sector;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.exception.TechnicalException;
 

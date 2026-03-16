@@ -1,4 +1,4 @@
-package domain.anomaly;
+package domain.valueobject;
 
 import java.util.UUID;
 

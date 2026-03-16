@@ -11,7 +11,9 @@ import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 
 public class Anomaly {
 	

@@ -5,11 +5,11 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
-import domain.anomaly.ProlongationContext;
-import domain.anomaly.Sector;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 
 public final class AnomalyDtoMapper {
 	

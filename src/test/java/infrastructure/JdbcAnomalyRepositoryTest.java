@@ -13,14 +13,14 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import domain.anomaly.Anomaly;
-import domain.anomaly.ProlongationContext;
-import domain.anomaly.Sector;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.repository.ConnectionConfig;
 import infrastructure.repository.JdbcAnomalyRepository;

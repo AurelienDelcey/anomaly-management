@@ -8,8 +8,6 @@ import java.util.UUID;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
-import domain.anomaly.ProlongationContext;
-import domain.anomaly.Sector;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
@@ -17,7 +15,9 @@ import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 import infrastructure.exception.TechnicalException;
 import static domain.anomaly.AnomalyConstructor.rehydrate;
 

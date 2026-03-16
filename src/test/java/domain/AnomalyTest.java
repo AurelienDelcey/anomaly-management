@@ -11,14 +11,14 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
-import domain.anomaly.ProlongationContext;
-import domain.anomaly.Sector;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 
 class AnomalyTest {
 	
@@ -77,6 +77,12 @@ class AnomalyTest {
 	void prolongationConstructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace, getValidProlongationContext()));
+	}
+	
+	@Test
+	void prolongationConstructor_ShouldThrowException_WhenProlongationContextIsNull() {
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, null));
 	}
 	
 	@Test
@@ -163,7 +169,6 @@ class AnomalyTest {
 		
 		assertNotNull(anomalyWithProlongationId.getId());
 		assertNotNull(anomalyWithProlongationId.getChildId());
-		assertNull(anomalyWithProlongationId.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyWithProlongationId.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyWithProlongationId.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyWithProlongationId.getTraceability().getCreation().instant());
@@ -330,7 +335,7 @@ class AnomalyTest {
 	}
 	
 	@Test
-	void attachProlongationId_ShouldThrowException_WhenAChildIdAlreadyExists() {
+	void linkProlongation_ShouldThrowException_WhenAChildIdAlreadyExists() {
 		Anomaly anomaly = assertDoesNotThrow(()->getValidAnomaly(AnomalyState.ARCHIVED));
 		Anomaly anomalyWithChildId = assertDoesNotThrow(()->anomaly.linkProlongation(UUID.randomUUID()));
 		assertThrows(IllegalAttachment.class, ()->anomalyWithChildId.linkProlongation(UUID.randomUUID()));
