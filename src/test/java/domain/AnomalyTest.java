@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.anomaly.ProlongationContext;
 import domain.anomaly.Sector;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
@@ -22,6 +23,7 @@ import domain.valueobject.QualityDecision;
 class AnomalyTest {
 	
 	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
+	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
@@ -32,7 +34,7 @@ class AnomalyTest {
 		
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
-		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getProlongationContext());
 		assertEquals(Sector.FORGING, anomaly.getSector());
 		assertEquals(VALID_ACTOR_ID, anomaly.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomaly.getTraceability().getCreation().instant());
@@ -52,13 +54,15 @@ class AnomalyTest {
 	
 	@Test
 	void prolongationConstructor_ShouldReturnValidAnomaly() {
-		UUID parentId = UUID.randomUUID();
+		ProlongationContext prolongationContext = getValidProlongationContext();
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, parentId);
+		Anomaly anomaly = new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
 		
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
-		assertNotNull(anomaly.getParentId());
+		assertNotNull(anomaly.getProlongationContext());
+		assertEquals(FIXED_UUID, anomaly.getProlongationContext().parentId().toString());
+		assertEquals(DESCRIPTION, anomaly.getProlongationContext().prolongationComment());
 		assertEquals(Sector.FORGING, anomaly.getSector());
 		assertEquals(VALID_ACTOR_ID, anomaly.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomaly.getTraceability().getCreation().instant());
@@ -72,7 +76,7 @@ class AnomalyTest {
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace, UUID.randomUUID()));
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
@@ -87,7 +91,7 @@ class AnomalyTest {
 		
 		assertNotNull(anomalyCorrected.getId());
 		assertNull(anomalyCorrected.getChildId());
-		assertNull(anomalyCorrected.getParentId());
+		assertNull(anomalyCorrected.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyCorrected.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyCorrected.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyCorrected.getTraceability().getCreation().instant());
@@ -111,7 +115,7 @@ class AnomalyTest {
 		
 		assertNotNull(anomalyResolved.getId());
 		assertNull(anomalyResolved.getChildId());
-		assertNull(anomalyResolved.getParentId());
+		assertNull(anomalyResolved.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyResolved.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyResolved.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyResolved.getTraceability().getCreation().instant());
@@ -135,7 +139,7 @@ class AnomalyTest {
 		
 		assertNotNull(anomalyArchived.getId());
 		assertNull(anomalyArchived.getChildId());
-		assertNull(anomalyArchived.getParentId());
+		assertNull(anomalyArchived.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyArchived.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyArchived.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyArchived.getTraceability().getCreation().instant());
@@ -159,7 +163,7 @@ class AnomalyTest {
 		
 		assertNotNull(anomalyWithProlongationId.getId());
 		assertNotNull(anomalyWithProlongationId.getChildId());
-		assertNull(anomalyWithProlongationId.getParentId());
+		assertNull(anomalyWithProlongationId.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyWithProlongationId.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyWithProlongationId.getTraceability().getCreation().actorId());
 		assertEquals(FIXED_INSTANT, anomalyWithProlongationId.getTraceability().getCreation().instant());
@@ -362,5 +366,9 @@ class AnomalyTest {
 		case RESOLVED -> createResolvedAnomaly();
 		case ARCHIVED -> createArchivedAnomaly();
 		};
+	}
+	
+	private ProlongationContext getValidProlongationContext() {
+		return new ProlongationContext(UUID.fromString(FIXED_UUID), DESCRIPTION);
 	}
 }

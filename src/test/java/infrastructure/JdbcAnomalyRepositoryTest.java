@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import domain.anomaly.Anomaly;
+import domain.anomaly.ProlongationContext;
 import domain.anomaly.Sector;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
@@ -63,7 +64,7 @@ class JdbcAnomalyRepositoryTest {
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
 		assertNull(newAnomaly.getChildId());
-		assertNull(newAnomaly.getParentId());
+		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
 		assertEquals(anomaly.getTraceability().getCreation().instant(), newAnomaly.getTraceability().getCreation().instant());
 		assertNull(newAnomaly.getTraceability().getToCorrected());
@@ -84,7 +85,7 @@ class JdbcAnomalyRepositoryTest {
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
 		assertNull(newAnomaly.getChildId());
-		assertNull(newAnomaly.getParentId());
+		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
 		assertEquals(anomaly.getTraceability().getCreation().instant(), newAnomaly.getTraceability().getCreation().instant());
 		assertEquals(anomaly.getTraceability().getToCorrected().actorId(), newAnomaly.getTraceability().getToCorrected().actorId());
@@ -106,7 +107,7 @@ class JdbcAnomalyRepositoryTest {
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
 		assertNull(newAnomaly.getChildId());
-		assertNull(newAnomaly.getParentId());
+		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
 		assertEquals(anomaly.getTraceability().getCreation().instant(), newAnomaly.getTraceability().getCreation().instant());
 		assertEquals(anomaly.getTraceability().getToCorrected().actorId(), newAnomaly.getTraceability().getToCorrected().actorId());
@@ -129,7 +130,7 @@ class JdbcAnomalyRepositoryTest {
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
 		assertNull(newAnomaly.getChildId());
-		assertNull(newAnomaly.getParentId());
+		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
 		assertEquals(anomaly.getTraceability().getCreation().instant(), newAnomaly.getTraceability().getCreation().instant());
 		assertEquals(anomaly.getTraceability().getToCorrected().actorId(), newAnomaly.getTraceability().getToCorrected().actorId());
@@ -149,7 +150,7 @@ class JdbcAnomalyRepositoryTest {
 	void saveAtomicAndFindAll_shouldReturnSameAnomalies() {
 		Anomaly parentAnomaly = assertDoesNotThrow(()->createArchivedAnomaly());
 		repo.save(parentAnomaly);
-		Anomaly childAnomaly = createPendingProlongationAnomaly(parentAnomaly.getId());
+		Anomaly childAnomaly = createPendingProlongationAnomaly(parentAnomaly.getId(), DESCRIPTION);
 		Anomaly parentAnomalyWithProlongationId = assertDoesNotThrow(()->parentAnomaly.linkProlongation(childAnomaly.getId()));
 		
 		repo.saveAtomic(parentAnomalyWithProlongationId, childAnomaly);
@@ -159,7 +160,7 @@ class JdbcAnomalyRepositoryTest {
 		
 		assertEquals(parentAnomalyWithProlongationId.getId().toString(), anomalies.get(1).getId().toString());
 		assertEquals(childAnomaly.getId(),anomalies.get(1).getChildId());
-		assertNull(anomalies.get(1).getParentId());
+		assertNull(anomalies.get(1).getProlongationContext());
 		assertEquals(parentAnomalyWithProlongationId.getTraceability().getCreation().actorId(), anomalies.get(1).getTraceability().getCreation().actorId());
 		assertEquals(parentAnomalyWithProlongationId.getTraceability().getCreation().instant(), anomalies.get(1).getTraceability().getCreation().instant());
 		assertEquals(parentAnomalyWithProlongationId.getTraceability().getToCorrected().actorId(), anomalies.get(1).getTraceability().getToCorrected().actorId());
@@ -176,7 +177,7 @@ class JdbcAnomalyRepositoryTest {
 		
 		assertEquals(childAnomaly.getId().toString(), anomalies.get(0).getId().toString());
 		assertNull(anomalies.get(0).getChildId());
-		assertEquals(parentAnomalyWithProlongationId.getId(),anomalies.get(0).getParentId());
+		assertEquals(parentAnomalyWithProlongationId.getId(),anomalies.get(0).getProlongationContext().parentId());
 		assertEquals(childAnomaly.getTraceability().getCreation().actorId(), anomalies.get(0).getTraceability().getCreation().actorId());
 		assertEquals(childAnomaly.getTraceability().getCreation().instant(), anomalies.get(0).getTraceability().getCreation().instant());
 		assertNull(anomalies.get(0).getTraceability().getToCorrected());
@@ -200,9 +201,10 @@ class JdbcAnomalyRepositoryTest {
 		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace);
 	}
 	
-	private Anomaly createPendingProlongationAnomaly(UUID parentId) {
+	private Anomaly createPendingProlongationAnomaly(UUID parentId, String comment) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
-		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, parentId);
+		ProlongationContext prolongationContext = new ProlongationContext(parentId, comment);
+		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
@@ -222,4 +224,5 @@ class JdbcAnomalyRepositoryTest {
 		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		return createResolvedAnomaly().transitionToArchived(archivedTrace);
 	}
+	
 }

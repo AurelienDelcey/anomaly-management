@@ -129,7 +129,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.transitionToCorrected(anomalyId));
 		assertSuccess(command.attachEvidence(anomalyId, VALID_DOC_ID));
 		assertSuccess(command.transitionToResolved(anomalyId));
-		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId));
+		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId, DESCRIPTION));
 		
 		QueryResult<List<AnomalyDto>> anomaliesAfterProlongation = assertDoesNotThrow(()->query.findPage(1));
 		List<AnomalyDto> listAfterProlongation = switch ( anomaliesAfterProlongation) {
