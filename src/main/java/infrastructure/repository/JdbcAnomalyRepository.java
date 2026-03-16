@@ -22,6 +22,7 @@ import domain.valueobject.Description;
 import domain.valueobject.Evidence;
 import domain.valueobject.ProlongationContext;
 import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.BusinessIdColisionException;
 import infrastructure.exception.TechnicalException;
 import static infrastructure.repository.AnomalyRepositoryMapper.mapAnomaly;
 
@@ -104,6 +105,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				}
 			}
 		}catch (SQLException e) {
+			    if ("23505".equals(e.getSQLState())) {
+			        throw new BusinessIdColisionException();
+			    }
 			log.warn("technical SQL exception when saving anomaly - anomalyId={}", anomaly.getId());
 			throw new TechnicalException("Persistence error.",e);
 		}
