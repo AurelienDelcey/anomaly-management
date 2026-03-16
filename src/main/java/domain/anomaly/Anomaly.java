@@ -191,6 +191,10 @@ public class Anomaly {
 	public UUID getId() {
 		return this.id;
 	}
+
+	public BusinessId getBusinessId() {
+		return businessId;
+	}
 	
 	public ProlongationContext getProlongationContext() {
 		return prolongationContext;

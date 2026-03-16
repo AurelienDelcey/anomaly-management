@@ -17,6 +17,7 @@ import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
+import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
@@ -56,8 +57,10 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				archived_by,
 				archived_at,
 				sector,
-				prolongation_comment
-			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+				prolongation_comment,
+				year,
+				sequence
+			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 			""".formatted(tableName);
 		this.UPDATE_STATEMENT = """
 				UPDATE %s
@@ -77,7 +80,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 					archived_by = ?,
 					archived_at = ?,
 					sector = ?,
-					prolongation_comment = ?
+					prolongation_comment = ?,
+					year = ?,
+					sequence = ?
 				WHERE id = ?;
 				""".formatted(tableName);
 	}
@@ -211,6 +216,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		PreparedStatement query = connection.prepareStatement(INSERT_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		ProlongationContext prolongationContext = anomaly.getProlongationContext();
+		BusinessId businessId = anomaly.getBusinessId();
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
@@ -238,6 +244,8 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setTimestamp(16, timestampOrNullFromEventTrace(archived));
 		query.setString(17, anomaly.getSector().name());
 		query.setString(18, prolongationContext == null ? null:prolongationContext.prolongationComment());
+		query.setInt(19, businessId == null ? null:businessId.year());
+		query.setInt(20, businessId == null ? null:businessId.sequence());
 
 		return query;
 	}
@@ -246,6 +254,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		PreparedStatement query = connection.prepareStatement(UPDATE_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		ProlongationContext prolongationContext = anomaly.getProlongationContext();
+		BusinessId businessId = anomaly.getBusinessId();
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
@@ -272,7 +281,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setTimestamp(15, timestampOrNullFromEventTrace(archived));
 		query.setString(16, anomaly.getSector().name());
 		query.setString(17, prolongationContext == null ? null:prolongationContext.prolongationComment());
-		query.setString(18, anomaly.getId().toString());
+		query.setInt(18, businessId == null ? null:businessId.year());
+		query.setInt(19, businessId == null ? null:businessId.sequence());
+		query.setString(20, anomaly.getId().toString());
 
 		return query;
 	}
