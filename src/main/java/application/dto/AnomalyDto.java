@@ -3,11 +3,12 @@ package application.dto;
 import java.time.Instant;
 
 import domain.anomaly.AnomalyState;
-import domain.anomaly.Sector;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 
 public record AnomalyDto(String id,
 		String parentId,
+		String prolongationComent,
 		String childId,
 		Sector sector,
 		String correctiveActionId,

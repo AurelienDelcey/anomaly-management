@@ -19,6 +19,7 @@ import domain.traceability.Traceability;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
+import domain.valueobject.Sector;
 
 class AnomalyConstructorTest {
 	
@@ -561,7 +562,7 @@ class AnomalyConstructorTest {
 	
 	private void assertPendingAnomaly(Anomaly anomaly) {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertNull(anomaly.getCorrectiveAction());
 		assertNull(anomaly.getEvidence());
@@ -576,7 +577,7 @@ class AnomalyConstructorTest {
 	
 	private void assertCorrectedAnomaly(Anomaly anomaly) {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
 		assertNull(anomaly.getEvidence());
@@ -591,7 +592,7 @@ class AnomalyConstructorTest {
 	
 	private void assertResolvedAnomaly(Anomaly anomaly) {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
 		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());
@@ -606,7 +607,7 @@ class AnomalyConstructorTest {
 	
 	private void assertArchivedAnomaly(Anomaly anomaly) {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
-		assertNull(anomaly.getParentId());
+		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
 		assertEquals(VALID_DOC_ID, anomaly.getEvidence().documentId());

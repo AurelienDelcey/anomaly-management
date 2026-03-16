@@ -9,10 +9,11 @@ import org.slf4j.LoggerFactory;
 import application.actor.Actor;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
-import domain.anomaly.Sector;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;
+import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.exception.TechnicalException;
 
@@ -165,13 +166,14 @@ public class AnomalyCommandService {
 		}
 	}
 	
-	public CommandResult transitionToArchivedWithProlongation (UUID anomalyId) {
+	public CommandResult transitionToArchivedWithProlongation (UUID anomalyId, String comment) {
 		try {
 			log.debug("TransitionToArchivedWithProlongation requested - anomalyId={}, actorId={}", anomalyId, actor.id());
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
 			Anomaly anomaly = repository.findById(anomalyId);
 			Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
-			Anomaly prolongation = createProlongation(archivedAnomaly.getId(), archivedAnomaly.getDescription().description(), archivedAnomaly.getSector());
+			ProlongationContext context = new ProlongationContext(archivedAnomaly.getId(), comment);
+			Anomaly prolongation = createProlongation(context, archivedAnomaly.getDescription().description(), archivedAnomaly.getSector());
 			Anomaly anomalyWithProlongationId = archivedAnomaly.linkProlongation(prolongation.getId());
 			repository.saveAtomic(anomalyWithProlongationId, prolongation);
 			log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
@@ -185,9 +187,9 @@ public class AnomalyCommandService {
 		}
 	}
 	
-	private Anomaly createProlongation (UUID parentId, String description, Sector sector) {
+	private Anomaly createProlongation (ProlongationContext prolongationContext, String description, Sector sector) {
 		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		Anomaly anomaly = new Anomaly(description, sector, trace, parentId);
+		Anomaly anomaly = new Anomaly(description, sector, trace, prolongationContext);
 		log.debug("CreateProlongation - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 		return anomaly;
 	}

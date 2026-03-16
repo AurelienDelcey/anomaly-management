@@ -27,8 +27,8 @@ import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
 import domain.anomaly.AnomalyState;
-import domain.anomaly.Sector;
 import domain.valueobject.QualityDecision;
+import domain.valueobject.Sector;
 import infrastructure.repository.ConnectionConfig;
 import infrastructure.repository.JdbcAnomalyRepository;
 
@@ -129,7 +129,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.transitionToCorrected(anomalyId));
 		assertSuccess(command.attachEvidence(anomalyId, VALID_DOC_ID));
 		assertSuccess(command.transitionToResolved(anomalyId));
-		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId));
+		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId, DESCRIPTION));
 		
 		QueryResult<List<AnomalyDto>> anomaliesAfterProlongation = assertDoesNotThrow(()->query.findPage(1));
 		List<AnomalyDto> listAfterProlongation = switch ( anomaliesAfterProlongation) {
@@ -146,6 +146,7 @@ class AnomalyCommandServiceTest {
 		assertEquals(anomalyId.toString(), parent.id());
 		assertNull(parent.parentId());
 		assertEquals(child.id(), parent.childId());
+		assertEquals(DESCRIPTION, child.prolongationComent());
 		assertEquals(AnomalyState.ARCHIVED, parent.anomalyState());
 		assertEquals(VALID_DOC_ID, parent.correctiveActionId());
 		assertEquals(QualityDecision.NA, parent.qualityDecision());
