@@ -22,6 +22,7 @@ public final class AnomalyDtoMapper {
 		Traceability traceability = anomaly.getTraceability();
 		
 		String id = stringOrNullFromUuid(anomaly.getId());
+		String businessId = anomaly.getBusinessId() == null ? null : anomaly.getBusinessId().toString();
 		String parentId = idStringOrNullFromProlongationContext(anomaly.getProlongationContext());
 		String prolongationComment = commentStringOrNullFromProlongationContext(anomaly.getProlongationContext());
 		String childId = stringOrNullFromUuid(anomaly.getChildId());
@@ -39,7 +40,7 @@ public final class AnomalyDtoMapper {
 		Instant resolvedAt = instantOrNull(traceability.getToResolved());
 		String archivedBy = actorOrNull(traceability.getToArchived());
 		Instant archivedAt = instantOrNull(traceability.getToArchived());
-		return new AnomalyDto(id, parentId, prolongationComment, childId, sector, correctiveActionId, evidenceId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
+		return new AnomalyDto(id, businessId, parentId, prolongationComment, childId, sector, correctiveActionId, evidenceId, qualityDecision, anomalyState, description, createBy, createAt, correctedBy, correctedAt, resolvedBy, resolvedAt, archivedBy, archivedAt);
 	}
 	
 	private static String actorOrNull(EventTrace trace) {

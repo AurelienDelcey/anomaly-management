@@ -18,10 +18,12 @@ import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
+import domain.valueobject.BusinessId;
 import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
 import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.BusinessIdColisionException;
 import infrastructure.repository.ConnectionConfig;
 import infrastructure.repository.JdbcAnomalyRepository;
 
@@ -32,6 +34,8 @@ class JdbcAnomalyRepositoryTest {
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
+	private final static int FIXED_YEAR = 2026;
+	private final static int FIXED_SEQUENCE = 1;
 	private static final String TABLE = "anomaly.anomalies_test";
 	private static JdbcAnomalyRepository repo;
 	private static ConnectionConfig config;
@@ -63,6 +67,8 @@ class JdbcAnomalyRepositoryTest {
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
+		assertEquals(anomaly.getBusinessId().year(), newAnomaly.getBusinessId().year());
+		assertEquals( anomaly.getBusinessId().sequence(), newAnomaly.getBusinessId().sequence());
 		assertNull(newAnomaly.getChildId());
 		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
@@ -84,6 +90,8 @@ class JdbcAnomalyRepositoryTest {
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
+		assertEquals(anomaly.getBusinessId().year(), newAnomaly.getBusinessId().year());
+		assertEquals( anomaly.getBusinessId().sequence(), newAnomaly.getBusinessId().sequence());
 		assertNull(newAnomaly.getChildId());
 		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
@@ -106,6 +114,8 @@ class JdbcAnomalyRepositoryTest {
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
+		assertEquals(anomaly.getBusinessId().year(), newAnomaly.getBusinessId().year());
+		assertEquals( anomaly.getBusinessId().sequence(), newAnomaly.getBusinessId().sequence());
 		assertNull(newAnomaly.getChildId());
 		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
@@ -129,6 +139,8 @@ class JdbcAnomalyRepositoryTest {
 		Anomaly newAnomaly = assertDoesNotThrow(()->repo.findById(anomaly.getId()));
 		
 		assertEquals(anomaly.getId().toString(), newAnomaly.getId().toString());
+		assertEquals(anomaly.getBusinessId().year(), newAnomaly.getBusinessId().year());
+		assertEquals( anomaly.getBusinessId().sequence(), newAnomaly.getBusinessId().sequence());
 		assertNull(newAnomaly.getChildId());
 		assertNull(newAnomaly.getProlongationContext());
 		assertEquals(anomaly.getTraceability().getCreation().actorId(), newAnomaly.getTraceability().getCreation().actorId());
@@ -159,6 +171,8 @@ class JdbcAnomalyRepositoryTest {
 		assertEquals(2,anomalies.size());
 		
 		assertEquals(parentAnomalyWithProlongationId.getId().toString(), anomalies.get(1).getId().toString());
+		assertEquals(parentAnomalyWithProlongationId.getBusinessId().year(), anomalies.get(1).getBusinessId().year());
+		assertEquals( parentAnomalyWithProlongationId.getBusinessId().sequence(), anomalies.get(1).getBusinessId().sequence());
 		assertEquals(childAnomaly.getId(),anomalies.get(1).getChildId());
 		assertNull(anomalies.get(1).getProlongationContext());
 		assertEquals(parentAnomalyWithProlongationId.getTraceability().getCreation().actorId(), anomalies.get(1).getTraceability().getCreation().actorId());
@@ -176,6 +190,8 @@ class JdbcAnomalyRepositoryTest {
 		assertEquals(parentAnomalyWithProlongationId.getDescription().description(), anomalies.get(1).getDescription().description());
 		
 		assertEquals(childAnomaly.getId().toString(), anomalies.get(0).getId().toString());
+		assertEquals(childAnomaly.getBusinessId().year(), anomalies.get(0).getBusinessId().year());
+		assertEquals( childAnomaly.getBusinessId().sequence(), anomalies.get(0).getBusinessId().sequence());
 		assertNull(anomalies.get(0).getChildId());
 		assertEquals(parentAnomalyWithProlongationId.getId(),anomalies.get(0).getProlongationContext().parentId());
 		assertEquals(childAnomaly.getTraceability().getCreation().actorId(), anomalies.get(0).getTraceability().getCreation().actorId());
@@ -196,15 +212,23 @@ class JdbcAnomalyRepositoryTest {
 		assertThrows(AnomalyNotFoundException.class, ()->repo.findById(UUID.randomUUID()));
 	}
 	
+	@Test
+	void save_ShouldThrowBusinessIdColisonException_WhenTheSameYearAndSequenceAlreadyExist() {
+		Anomaly anomaly = assertDoesNotThrow(()->createArchivedAnomaly());
+		repo.save(anomaly);
+		Anomaly anomaly2 = assertDoesNotThrow(()->createArchivedAnomaly());
+		assertThrows(BusinessIdColisionException.class, ()->repo.save(anomaly2));
+	}
+	
 	private Anomaly createPendingAnomaly() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace);
+		return new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace);
 	}
 	
 	private Anomaly createPendingProlongationAnomaly(UUID parentId, String comment) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
 		ProlongationContext prolongationContext = new ProlongationContext(parentId, comment);
-		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
+		return new Anomaly(getValidBusinessIdForProlongation(), DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
@@ -225,4 +249,11 @@ class JdbcAnomalyRepositoryTest {
 		return createResolvedAnomaly().transitionToArchived(archivedTrace);
 	}
 	
+	private BusinessId getValidBusinessId() {
+		return new BusinessId(FIXED_YEAR, FIXED_SEQUENCE);
+	}
+	
+	private BusinessId getValidBusinessIdForProlongation() {
+		return new BusinessId(FIXED_YEAR, FIXED_SEQUENCE+1);
+	}
 }

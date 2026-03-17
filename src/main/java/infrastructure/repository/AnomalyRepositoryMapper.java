@@ -12,6 +12,7 @@ import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
+import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
@@ -39,6 +40,10 @@ public class AnomalyRepositoryMapper {
 		UUID anomalyId = uuidOrNullFromString(id);
 		UUID anomalyChildId = uuidOrNullFromString(childId);
 		UUID anomalyParentId = uuidOrNullFromString(parentId);
+		
+		int year = result.getInt("year");
+		int sequence = result.getInt("sequence");
+		BusinessId businessId = year == 0 || sequence == 0 ? null : new BusinessId(year, sequence);
 		
 		ProlongationContext context = prolongationContextOrNull(anomalyParentId, prolongationComment);
 		
@@ -98,7 +103,7 @@ public class AnomalyRepositoryMapper {
 		};
 		
 		Anomaly anomaly = rehydrate(
-				anomalyId, context, anomalyChildId, anomalySector,
+				anomalyId, businessId, context, anomalyChildId, anomalySector,
 				anomalyCorrectiveAction, anomalyEvidence, 
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		

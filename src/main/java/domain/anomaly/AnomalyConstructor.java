@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.Traceability;
+import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
@@ -15,11 +16,11 @@ public final class AnomalyConstructor {
 	
 	private AnomalyConstructor() {}
 	
-	public static Anomaly rehydrate(UUID id, ProlongationContext prolongationContext, UUID childId, Sector sector, CorrectiveAction correctiveAction,
+	public static Anomaly rehydrate(UUID id, BusinessId businessId, ProlongationContext prolongationContext, UUID childId, Sector sector, CorrectiveAction correctiveAction,
 			Evidence evidence, Traceability traceability, QualityDecision qualityDecision,
 			AnomalyState anomalyState, Description description) throws InconsistentAnomalyStateException {
 		
-		return new Anomaly(id, prolongationContext, childId, sector,
+		return new Anomaly(id, businessId, prolongationContext, childId, sector,
 				correctiveAction, evidence, traceability,
 				qualityDecision, anomalyState, description);
 	}

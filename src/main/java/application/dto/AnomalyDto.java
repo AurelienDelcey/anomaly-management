@@ -7,6 +7,7 @@ import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
 
 public record AnomalyDto(String id,
+		String businessId,
 		String parentId,
 		String prolongationComent,
 		String childId,

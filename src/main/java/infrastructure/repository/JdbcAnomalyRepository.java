@@ -17,11 +17,13 @@ import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
+import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
 import domain.valueobject.ProlongationContext;
 import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.BusinessIdColisionException;
 import infrastructure.exception.TechnicalException;
 import static infrastructure.repository.AnomalyRepositoryMapper.mapAnomaly;
 
@@ -32,6 +34,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	private final String tableName;
 	private final String INSERT_STATEMENT ;
 	private final String UPDATE_STATEMENT ;
+	private static final int MYSQL_DUPLICATE_KEY = 1062;
 
 	public JdbcAnomalyRepository(ConnectionConfig config, String tableName) {
 		this.config = config;
@@ -55,8 +58,10 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				archived_by,
 				archived_at,
 				sector,
-				prolongation_comment
-			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+				prolongation_comment,
+				year,
+				sequence
+			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 			""".formatted(tableName);
 		this.UPDATE_STATEMENT = """
 				UPDATE %s
@@ -76,7 +81,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 					archived_by = ?,
 					archived_at = ?,
 					sector = ?,
-					prolongation_comment = ?
+					prolongation_comment = ?,
+					year = ?,
+					sequence = ?
 				WHERE id = ?;
 				""".formatted(tableName);
 	}
@@ -104,6 +111,9 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				}
 			}
 		}catch (SQLException e) {
+			if (e.getErrorCode() == MYSQL_DUPLICATE_KEY) {
+			        throw new BusinessIdColisionException();
+			    }
 			log.warn("technical SQL exception when saving anomaly - anomalyId={}", anomaly.getId());
 			throw new TechnicalException("Persistence error.",e);
 		}
@@ -207,6 +217,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		PreparedStatement query = connection.prepareStatement(INSERT_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		ProlongationContext prolongationContext = anomaly.getProlongationContext();
+		BusinessId businessId = anomaly.getBusinessId();
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
@@ -234,6 +245,8 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setTimestamp(16, timestampOrNullFromEventTrace(archived));
 		query.setString(17, anomaly.getSector().name());
 		query.setString(18, prolongationContext == null ? null:prolongationContext.prolongationComment());
+		query.setInt(19, businessId == null ? null:businessId.year());
+		query.setInt(20, businessId == null ? null:businessId.sequence());
 
 		return query;
 	}
@@ -242,6 +255,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		PreparedStatement query = connection.prepareStatement(UPDATE_STATEMENT);
 		Traceability traceability = anomaly.getTraceability();
 		ProlongationContext prolongationContext = anomaly.getProlongationContext();
+		BusinessId businessId = anomaly.getBusinessId();
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
@@ -268,9 +282,33 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setTimestamp(15, timestampOrNullFromEventTrace(archived));
 		query.setString(16, anomaly.getSector().name());
 		query.setString(17, prolongationContext == null ? null:prolongationContext.prolongationComment());
-		query.setString(18, anomaly.getId().toString());
+		query.setInt(18, businessId == null ? null:businessId.year());
+		query.setInt(19, businessId == null ? null:businessId.sequence());
+		query.setString(20, anomaly.getId().toString());
 
 		return query;
+	}
+	
+	@Override
+	public int getMaxSequenceByYear(int year) {
+		int maxSequence = 0;
+		try(Connection connection = openConnection()){
+			try(PreparedStatement preparedStatement = connection.prepareStatement("""
+					SELECT MAX(sequence) 
+					FROM %s
+					WHERE year = ?
+					""".formatted(tableName))){
+				preparedStatement.setInt(1, year);
+				try(ResultSet result = preparedStatement.executeQuery()){
+					if (result.next()) {
+						maxSequence = result.getInt(1);
+					}
+				}
+			}
+		} catch (SQLException e) {
+			throw new TechnicalException("impossible to reconstruct anomaly", e);
+		}
+		return maxSequence;
 	}
 
 	
