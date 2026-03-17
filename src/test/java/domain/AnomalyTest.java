@@ -16,6 +16,7 @@ import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
+import domain.valueobject.BusinessId;
 import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
@@ -27,6 +28,8 @@ class AnomalyTest {
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
+	private final static int FIXED_YEAR = 2026;
+	private final static int FIXED_SEQUENCE = 1;
 	
 	@Test
 	void constructor_ShouldReturnValidAnomaly() {
@@ -49,14 +52,20 @@ class AnomalyTest {
 	@Test
 	void constructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace));
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), DESCRIPTION, null, creationTrace));
+	}
+	
+	@Test
+	void constructor_ShouldThrowException_WhenBusinessIdIsNull() {
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(null, DESCRIPTION, Sector.FORGING, creationTrace));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldReturnValidAnomaly() {
 		ProlongationContext prolongationContext = getValidProlongationContext();
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
+		Anomaly anomaly = new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
 		
 		assertNotNull(anomaly.getId());
 		assertNull(anomaly.getChildId());
@@ -76,13 +85,19 @@ class AnomalyTest {
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, null, creationTrace, getValidProlongationContext()));
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), DESCRIPTION, null, creationTrace, getValidProlongationContext()));
+	}
+	
+	@Test
+	void prolongationConstructor_ShouldThrowException_WhenBusinessIdIsNull() {
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(null, DESCRIPTION, Sector.FORGING, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenProlongationContextIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace, null));
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace, null));
 	}
 	
 	@Test
@@ -96,6 +111,8 @@ class AnomalyTest {
 		
 		
 		assertNotNull(anomalyCorrected.getId());
+		assertEquals(FIXED_YEAR, anomalyCorrected.getBusinessId().year());
+		assertEquals(FIXED_SEQUENCE, anomalyCorrected.getBusinessId().sequence());
 		assertNull(anomalyCorrected.getChildId());
 		assertNull(anomalyCorrected.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyCorrected.getSector());
@@ -120,6 +137,8 @@ class AnomalyTest {
 		
 		
 		assertNotNull(anomalyResolved.getId());
+		assertEquals(FIXED_YEAR, anomalyResolved.getBusinessId().year());
+		assertEquals(FIXED_SEQUENCE, anomalyResolved.getBusinessId().sequence());
 		assertNull(anomalyResolved.getChildId());
 		assertNull(anomalyResolved.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyResolved.getSector());
@@ -144,6 +163,8 @@ class AnomalyTest {
 		
 		
 		assertNotNull(anomalyArchived.getId());
+		assertEquals(FIXED_YEAR, anomalyArchived.getBusinessId().year());
+		assertEquals(FIXED_SEQUENCE, anomalyArchived.getBusinessId().sequence());
 		assertNull(anomalyArchived.getChildId());
 		assertNull(anomalyArchived.getProlongationContext());
 		assertEquals(Sector.FORGING, anomalyArchived.getSector());
@@ -168,6 +189,8 @@ class AnomalyTest {
 		Anomaly anomalyWithProlongationId = assertDoesNotThrow(()-> anomaly.linkProlongation(UUID.randomUUID()));
 		
 		assertNotNull(anomalyWithProlongationId.getId());
+		assertEquals(FIXED_YEAR, anomalyWithProlongationId.getBusinessId().year());
+		assertEquals(FIXED_SEQUENCE, anomalyWithProlongationId.getBusinessId().sequence());
 		assertNotNull(anomalyWithProlongationId.getChildId());
 		assertEquals(Sector.FORGING, anomalyWithProlongationId.getSector());
 		assertEquals(VALID_ACTOR_ID, anomalyWithProlongationId.getTraceability().getCreation().actorId());
@@ -343,7 +366,7 @@ class AnomalyTest {
 	
 	private Anomaly createPendingAnomaly() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(DESCRIPTION, Sector.FORGING, creationTrace);
+		return new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
@@ -375,5 +398,9 @@ class AnomalyTest {
 	
 	private ProlongationContext getValidProlongationContext() {
 		return new ProlongationContext(UUID.fromString(FIXED_UUID), DESCRIPTION);
+	}
+	
+	private BusinessId getValidBusinessId() {
+		return new BusinessId(FIXED_YEAR, FIXED_SEQUENCE);
 	}
 }

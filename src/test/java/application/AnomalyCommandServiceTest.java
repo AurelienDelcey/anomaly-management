@@ -3,6 +3,7 @@ package application;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
@@ -26,9 +27,14 @@ import application.query.QueryFailure;
 import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
+import application.repository.AnomalyRepository;
+import domain.anomaly.Anomaly;
 import domain.anomaly.AnomalyState;
+import domain.exception.InconsistentAnomalyStateException;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
+import infrastructure.exception.AnomalyNotFoundException;
+import infrastructure.exception.BusinessIdColisionException;
 import infrastructure.repository.ConnectionConfig;
 import infrastructure.repository.JdbcAnomalyRepository;
 
@@ -172,6 +178,27 @@ class AnomalyCommandServiceTest {
 		};
 	}
 	
+	@Test
+	void createAnomaly_ShouldFail_WhenAllRetriesFail() {
+	    AnomalyRepository repo = new AlwaysFailingRepository();
+	    AnomalyCommandService service = new AnomalyCommandService(repo, actor);
+
+	    CommandResult result = service.createAnomaly(DESCRIPTION, Sector.FORGING);
+
+	    assertTrue(result instanceof CommandFailure);
+	}
+	
+	@Test
+	void createAnomaly_ShouldRetryAndSucceed_WhenCollisionOccursOnce() {
+	    FlakyRepository repo = new FlakyRepository();
+	    AnomalyCommandService service = new AnomalyCommandService(repo, actor);
+
+	    CommandResult result = service.createAnomaly(DESCRIPTION, Sector.FORGING);
+
+	    assertTrue(result instanceof CommandSuccess);
+	    assertEquals(2, repo.getSaveCalls());
+	}
+	
 	private void assertSuccess(CommandResult result) {
 		switch(result) {
 		case CommandSuccess rs -> {}
@@ -184,5 +211,56 @@ class AnomalyCommandServiceTest {
 		case CommandSuccess rs -> fail("Failure expected.");
 		case CommandFailure rs -> {}
 		};
+	}
+	
+	class AlwaysFailingRepository implements AnomalyRepository {
+
+	    @Override
+	    public void save(Anomaly anomaly) {
+	        throw new BusinessIdColisionException();
+	    }
+
+	    @Override
+	    public int getMaxSequenceByYear(int year) {
+	        return 1;
+	    }
+
+		@Override
+		public void saveAtomic(Anomaly anomaly1, Anomaly anomaly2) {}
+		@Override
+		public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {return null;}
+		@Override
+		public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException {return null;}
+
+	    
+	}
+	
+	class FlakyRepository implements AnomalyRepository {
+
+	    private int saveCalls = 0;
+
+	    @Override
+	    public void save(Anomaly anomaly) {
+	        saveCalls++;
+	        if (saveCalls == 1) {
+	            throw new BusinessIdColisionException();
+	        }
+	    }
+
+	    @Override
+	    public int getMaxSequenceByYear(int year) {
+	        return saveCalls == 0 ? 1 : 2;
+	    }
+
+	    public int getSaveCalls() {
+	        return saveCalls;
+	    }
+
+	    @Override
+		public void saveAtomic(Anomaly anomaly1, Anomaly anomaly2) {}
+		@Override
+		public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {return null;}
+		@Override
+		public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException {return null;}
 	}
 }
