@@ -34,6 +34,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	private final String tableName;
 	private final String INSERT_STATEMENT ;
 	private final String UPDATE_STATEMENT ;
+	private static final int MYSQL_DUPLICATE_KEY = 1062;
 
 	public JdbcAnomalyRepository(ConnectionConfig config, String tableName) {
 		this.config = config;
@@ -110,7 +111,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				}
 			}
 		}catch (SQLException e) {
-			    if ("23505".equals(e.getSQLState())) {
+			if (e.getErrorCode() == MYSQL_DUPLICATE_KEY) {
 			        throw new BusinessIdColisionException();
 			    }
 			log.warn("technical SQL exception when saving anomaly - anomalyId={}", anomaly.getId());
