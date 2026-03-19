@@ -57,7 +57,22 @@ public class AnomalyCommandService {
 		return new CommandFailure("CreateAnomaly failed: Maximum aptempt of retry to allocate a businessId");
 	}
 	
-	//TODO create attach description method
+	public CommandResult attachDescription (UUID anomalyId, String description) {
+		try {
+			log.debug("AttachDescription requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			Anomaly anomaly = repository.findById(anomalyId);
+			Anomaly newAnomaly = anomaly.attachDescription(description);
+			repository.save(newAnomaly);
+			log.info("AttachDescription succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
+			return new CommandSuccess();
+		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
+			log.warn("AttachDescription failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachDescription anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
+	}
 	
 	public CommandResult attachSector (UUID anomalyId, Sector sector) {
 		try {
