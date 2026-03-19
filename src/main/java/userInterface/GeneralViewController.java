@@ -75,7 +75,19 @@ public class GeneralViewController {
 	
 	@FXML
 	public void onClickDetails() {
+		AnomalyDto anomaly = anomalyTable.getSelectionModel().getSelectedItem();
 		
+		if (anomaly == null) {
+			return;
+		}
+		
+		//changement de vue, on passe l'anomaly a detailler en parametre... ou on injecte apres coup.
+		
+		/*FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailView.fxml"));
+		Parent view = loader.load();
+			
+		DetailController controller = loader.getController();
+		controller.setup(anomaly, queryService, commandService);*/
 	}
 	
 	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) throws InconsistentAnomalyStateException {
