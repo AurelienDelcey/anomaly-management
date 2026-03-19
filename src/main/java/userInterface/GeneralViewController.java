@@ -61,7 +61,21 @@ public class GeneralViewController {
 		
 	}
 	
-	public void setupServiceAndLoad() {
+	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) throws InconsistentAnomalyStateException {
+		this.queryService = queryService;
+		this.commandService = commandService;
 		
+		loadData();
+	}
+	
+	public void loadData() throws InconsistentAnomalyStateException {//TODO change IconsistentAnomalyStateException to runtime exeption
+		 QueryResult<List<AnomalyDto>> result = queryService.findPage(1);
+		 switch (result) {
+		 case QuerySuccess<List<AnomalyDto>> success-> {
+			 items.setAll(success.payload());
+		 }
+		 case QueryNotFound<List<AnomalyDto>> notFound-> {}//TODO nothing, empty list here
+		 case QueryFailure <List<AnomalyDto>> failure -> {}//TODO error popup
+		 };
 	}
 }
