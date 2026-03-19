@@ -131,7 +131,7 @@ public class Anomaly {
 	
 	public Anomaly attachDescription(String description) throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
-			throw new IllegalAttachment("Editing the description is only permitted during the PENDING state and only on the root anomaly.");
+			throw new IllegalAttachment("Editing description is only permitted on a root anomaly in PENDING state.");
 		}
 		Description newDescription = new Description(description);
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, newDescription);
@@ -141,8 +141,8 @@ public class Anomaly {
 		if(sector == null) {
 			throw new IllegalArgumentException("Sector cannot be null.");
 		}
-		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalAttachment("Editing sector is only permitted during the PENDING state.");
+		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+			throw new IllegalAttachment("Editing sector is only permitted on a root anomaly in PENDING state.");
 		}
 		
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);

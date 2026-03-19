@@ -359,6 +359,14 @@ class AnomalyTest {
 	
 	@ParameterizedTest
 	@EnumSource(
+			value = AnomalyState.class)
+	void attachSector_ShouldThrowException_WhenAnomalyIsProlongation(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValidProlongationAtState(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachSector(Sector.FINISHING));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
 			value = AnomalyState.class,
 			mode = EnumSource.Mode.EXCLUDE,
 			names = "PENDING")
