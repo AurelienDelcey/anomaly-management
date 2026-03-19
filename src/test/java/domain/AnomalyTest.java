@@ -341,6 +341,14 @@ class AnomalyTest {
 	
 	@ParameterizedTest
 	@EnumSource(
+			value = AnomalyState.class)
+	void attachDescription_ShouldThrowException_WhenAnomalyIsProlongation(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValidProlongationAtState(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachDescription(OTHER_DESCRIPTION));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
 			value = AnomalyState.class,
 			mode = EnumSource.Mode.EXCLUDE,
 			names = "PENDING")
@@ -383,6 +391,11 @@ class AnomalyTest {
 		assertThrows(IllegalAttachment.class, ()->anomalyWithChildId.linkProlongation(UUID.randomUUID()));
 	}
 	
+	private Anomaly createProlongation() {
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		return new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace, getValidProlongationContext());
+	}
+	
 	private Anomaly createPendingAnomaly() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		return new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace);
@@ -395,9 +408,22 @@ class AnomalyTest {
 		return anomaly.transitionToCorrected(correctedTrace);
 	}
 	
+	private Anomaly createCorrectedProlongation() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
+		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		Anomaly anomaly = createProlongation().attachCorrectiveAction(VALID_DOC_ID);
+		anomaly = anomaly.attachQualityDecision(QualityDecision.NA);
+		return anomaly.transitionToCorrected(correctedTrace);
+	}
+	
 	private Anomaly createResolvedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Anomaly anomaly = createCorrectedAnomaly().attachEvidence(VALID_DOC_ID);
+		return anomaly.transitionToResolved(resolvedTrace);
+	}
+	
+	private Anomaly createResolvedProlongation() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
+		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		Anomaly anomaly = createCorrectedProlongation().attachEvidence(VALID_DOC_ID);
 		return anomaly.transitionToResolved(resolvedTrace);
 	}
 	
@@ -406,12 +432,26 @@ class AnomalyTest {
 		return createResolvedAnomaly().transitionToArchived(archivedTrace);
 	}
 	
+	private Anomaly createArchivedProlongation() throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment, InconsistentAnomalyStateException {
+		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		return createResolvedProlongation().transitionToArchived(archivedTrace);
+	}
+	
 	private Anomaly getValidAnomaly(AnomalyState state) throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment, InconsistentAnomalyStateException {
 		return switch(state) {
 		case PENDING -> createPendingAnomaly();
 		case CORRECTED -> createCorrectedAnomaly();
 		case RESOLVED -> createResolvedAnomaly();
 		case ARCHIVED -> createArchivedAnomaly();
+		};
+	}
+	
+	private Anomaly getValidProlongationAtState(AnomalyState state) throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment, InconsistentAnomalyStateException {
+		return switch(state) {
+		case PENDING -> createProlongation();
+		case CORRECTED -> createCorrectedProlongation();
+		case RESOLVED -> createResolvedProlongation();
+		case ARCHIVED -> createArchivedProlongation();
 		};
 	}
 	

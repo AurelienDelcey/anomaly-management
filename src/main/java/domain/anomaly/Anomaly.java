@@ -130,8 +130,8 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachDescription(String description) throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalAttachment("Editing the description is only permitted during the PENDING state.");
+		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+			throw new IllegalAttachment("Editing the description is only permitted during the PENDING state and only on the root anomaly.");
 		}
 		Description newDescription = new Description(description);
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, correctiveAction, evidence, traceability, qualityDecision, anomalyState, newDescription);
