@@ -1,5 +1,7 @@
 package application.command;
 
-public record CommandSuccess() implements CommandResult{
+import java.util.UUID;
+
+public record CommandSuccess(UUID anomalyId) implements CommandResult{
 
 }
