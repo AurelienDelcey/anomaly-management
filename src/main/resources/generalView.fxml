@@ -18,31 +18,31 @@
             <VBox alignment="CENTER_LEFT" prefHeight="73.0" prefWidth="115.0">
                <children>
                   <Label prefHeight="18.0" prefWidth="60.0" text="Sort by:" />
-                  <ComboBox prefWidth="150.0" promptText="Default" />
+                  <ComboBox fx:id="sortCombo" prefWidth="150.0" promptText="Default" />
                </children>
             </VBox>
-            <CheckBox alignment="BOTTOM_CENTER" mnemonicParsing="false" prefHeight="44.0" prefWidth="115.0" text="Hide archived" />
-            <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="26.0" text="Refresh" />
+            <CheckBox fx:id="hideArchivedCheckBox" alignment="BOTTOM_CENTER" mnemonicParsing="false" prefHeight="44.0" prefWidth="115.0" text="Hide archived" />
+            <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#onClickRefresh" prefHeight="26.0" prefWidth="26.0" text="Refresh" />
             <Region prefHeight="44.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
-            <Button alignment="BOTTOM_CENTER" mnemonicParsing="false" text="Create" />
+            <Button fx:id="createButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#onClickCreate" text="Create" />
          </children>
          <VBox.margin>
             <Insets />
          </VBox.margin>
       </HBox>
-      <TableView prefHeight="593.0" prefWidth="953.0" VBox.vgrow="ALWAYS">
+      <TableView fx:id="anomalyTable" prefHeight="593.0" prefWidth="953.0" VBox.vgrow="ALWAYS">
         <columns>
-          <TableColumn prefWidth="90.0" text="ID" />
-          <TableColumn prefWidth="72.0" text="SECTOR" />
-            <TableColumn prefWidth="90.0" text="STATE" />
-            <TableColumn prefWidth="497.0" text="DESCRIPTION" />
-            <TableColumn minWidth="0.0" prefWidth="89.0" text="CREATED at" />
-            <TableColumn prefWidth="114.0" text="CREATED by" />
+          <TableColumn fx:id="idColumn" editable="false" prefWidth="90.0" sortable="false" text="ID" />
+          <TableColumn fx:id="sectorColumn" editable="false" prefWidth="72.0" sortable="false" text="SECTOR" />
+            <TableColumn fx:id="stateColumn" editable="false" prefWidth="90.0" sortable="false" text="STATE" />
+            <TableColumn fx:id="descriptionColumn" editable="false" prefWidth="497.0" sortable="false" text="DESCRIPTION" />
+            <TableColumn fx:id="createdAtColumn" editable="false" minWidth="0.0" prefWidth="89.0" sortType="DESCENDING" sortable="false" text="CREATED at" />
+            <TableColumn fx:id="createdByColumn" editable="false" prefWidth="114.0" sortable="false" text="CREATED by" />
         </columns>
       </TableView>
       <HBox alignment="CENTER_RIGHT" prefHeight="32.0" prefWidth="953.0">
          <children>
-            <Button mnemonicParsing="false" prefHeight="37.0" prefWidth="94.0" text="View details" />
+            <Button fx:id="detailsButton" mnemonicParsing="false" onAction="#onClickDetails" prefHeight="37.0" prefWidth="94.0" text="View details" />
          </children>
       </HBox>
    </children>
