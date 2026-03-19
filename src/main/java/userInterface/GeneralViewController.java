@@ -38,16 +38,22 @@ public class GeneralViewController {
 	
 	@FXML
 	public void initialize() {
-	
+		this.anomalyTable.setItems(items);
 	}
 	
 	@FXML
 	public void onClickCreate() {
+		CommandResult result = commandService.createAnomaly("coucou", Sector.FORGING);
 		
+		switch(result) {
+		case CommandSuccess success ->{}//TODO refresh using query with payload (UUID new anomaly)
+		case CommandFailure failure ->{}//TODO popup error message
+		}
 	}
 	
 	@FXML
-	public void onClickRefresh() {
+	public void onClickRefresh() throws InconsistentAnomalyStateException {
+		loadData();
 	}
 	
 	@FXML
