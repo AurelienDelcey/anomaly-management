@@ -26,6 +26,7 @@ class AnomalyTest {
 	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
 	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
 	private final static String DESCRIPTION = "anomalyTest";
+	private final static String OTHER_DESCRIPTION = "otherAnomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static int FIXED_YEAR = 2026;
@@ -217,11 +218,19 @@ class AnomalyTest {
 	}
 	
 	@Test
+	void attachDescription_ShouldReturnAnomalyWithCorrectDescription(){
+		Anomaly anomaly = assertDoesNotThrow(()-> createPendingAnomaly());
+		
+		Anomaly anomalyWithNewDescription = assertDoesNotThrow(()->anomaly.attachDescription(OTHER_DESCRIPTION));
+		assertEquals(OTHER_DESCRIPTION, anomalyWithNewDescription.getDescription().description());
+	}
+	
+	@Test
 	void attachSector_ShouldReturnAnomalyWithCorrectSector(){
 		Anomaly anomaly = assertDoesNotThrow(()-> createPendingAnomaly());
 		
-		Anomaly anomalyWithCorrectiveAction = assertDoesNotThrow(()->anomaly.attachSector(Sector.FINISHING));
-		assertEquals(Sector.FINISHING, anomalyWithCorrectiveAction.getSector());
+		Anomaly anomalyWithSector = assertDoesNotThrow(()->anomaly.attachSector(Sector.FINISHING));
+		assertEquals(Sector.FINISHING, anomalyWithSector.getSector());
 	}
 	
 	@Test
@@ -318,6 +327,16 @@ class AnomalyTest {
 	void attachCorrectiveAction_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
 		Anomaly anomaly = assertDoesNotThrow(()-> getValidAnomaly(state));
 		assertThrows(IllegalAttachment.class, ()->anomaly.attachCorrectiveAction(VALID_DOC_ID));
+	}
+	
+	@ParameterizedTest
+	@EnumSource(
+			value = AnomalyState.class,
+			mode = EnumSource.Mode.EXCLUDE,
+			names = "PENDING")
+	void attachDescription_ShouldThrowException_WhenAnomalyStateIsNotPending(AnomalyState state) {
+		Anomaly anomaly = assertDoesNotThrow(()-> getValidAnomaly(state));
+		assertThrows(IllegalAttachment.class, ()->anomaly.attachDescription(OTHER_DESCRIPTION));
 	}
 	
 	@ParameterizedTest
