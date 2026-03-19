@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
 import application.command.AnomalyCommandService;
 import application.command.CommandFailure;
@@ -56,11 +57,13 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickCreate() {
+	public void onClickCreate() throws InconsistentAnomalyStateException {
 		CommandResult result = commandService.createAnomaly("coucou", Sector.FORGING);
 		
 		switch(result) {
-		case CommandSuccess success ->{}//TODO refresh using query with payload (UUID new anomaly)
+		case CommandSuccess success ->{
+			updateCommand(success.anomalyId());
+		}
 		case CommandFailure failure ->{}//TODO popup error message
 		}
 	}
@@ -93,9 +96,9 @@ public class GeneralViewController {
 		 };
 	}
 	
-	public void bindTableColumns() {
+	private void bindTableColumns() {
 		idColumn.setCellValueFactory(cell ->
-        new SimpleStringProperty(cell.getValue().businessId().toString()));
+        new SimpleStringProperty(cell.getValue().businessId()));
 		
 		sectorColumn.setCellValueFactory(cell ->
         new SimpleStringProperty(cell.getValue().sector().toString()));
@@ -110,6 +113,25 @@ public class GeneralViewController {
         new SimpleStringProperty(LocalDateTime.ofInstant(cell.getValue().createdAt(), ZoneId.systemDefault()).format(formatter)));
 		
 		createdByColumn.setCellValueFactory(cell ->
-        new SimpleStringProperty(cell.getValue().createdBy().toString()));
+        new SimpleStringProperty(cell.getValue().createdBy()));
 	}
+	
+	private void updateCommand(UUID anomalyId) throws InconsistentAnomalyStateException {
+		QueryResult<AnomalyDto> result = queryService.findById(anomalyId);
+		
+		switch (result) {
+		 case QuerySuccess<AnomalyDto> success-> {
+			 AnomalyDto anomaly = success.payload();
+			 int index = items.indexOf(anomaly);
+			 if(index >= 0) {
+				 items.set(index, anomaly);
+			 }else {
+				 items.set(0,anomaly);
+			 }
+		 }
+		 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
+		 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
+		 };
+	}
+	
 }

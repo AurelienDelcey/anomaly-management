@@ -26,4 +26,18 @@ public record AnomalyDto(String id,
 		String archivedBy,
 		Instant archivedAt) {
 
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+	    if (!(o instanceof AnomalyDto other)) return false;
+	    return id.equals(other.id());
+	}
+
+	    @Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
+	
+	
+
 }
