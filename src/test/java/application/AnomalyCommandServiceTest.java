@@ -29,10 +29,8 @@ import application.query.QueryResult;
 import application.query.QuerySuccess;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
-import domain.anomaly.AnomalyState;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.valueobject.QualityDecision;
-import domain.valueobject.Sector;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.exception.BusinessIdColisionException;
 import infrastructure.repository.ConnectionConfig;
@@ -43,8 +41,12 @@ class AnomalyCommandServiceTest {
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
+	private final static String SECTOR = "FORGING";
+	private final static String MACHINE = "MACHINE_1";
 	private final static int PRIVILEGE = 0;
-	private static final String TABLE = "anomaly.anomalies_test";
+	private final static int QUANTITY = 50;
+	private final static int ORDER = 99999;
+	private final static String TABLE = "anomaly.anomalies_test";
 	private AnomalyCommandService command;
 	private AnomalyQueryService query;
 	private JdbcAnomalyRepository repo;
@@ -72,7 +74,7 @@ class AnomalyCommandServiceTest {
 
 	@Test
 	void shouldCompleteAnomalyLifecycle() {
-		assertSuccess(command.createAnomaly(DESCRIPTION, Sector.FORGING));
+		assertSuccess(command.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
@@ -97,16 +99,16 @@ class AnomalyCommandServiceTest {
 		assertEquals(anomalyId.toString(), anomalyDto.id());
 		assertNull(anomalyDto.parentId());
 		assertNull(anomalyDto.childId());
-		assertEquals(AnomalyState.ARCHIVED, anomalyDto.anomalyState());
+		assertEquals("ARCHIVED", anomalyDto.anomalyState());
 		assertEquals(VALID_DOC_ID, anomalyDto.correctiveActionId());
-		assertEquals(QualityDecision.NA, anomalyDto.qualityDecision());
+		assertEquals("NA", anomalyDto.qualityDecision());
 		assertEquals(VALID_DOC_ID, anomalyDto.evidenceId());
 		assertEquals(DESCRIPTION, anomalyDto.description());
 	}
 	
 	@Test
 	void shouldRejectInvalidTransition() {
-		assertSuccess(command.createAnomaly(DESCRIPTION, Sector.FORGING));
+		assertSuccess(command.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
@@ -121,7 +123,7 @@ class AnomalyCommandServiceTest {
 	
 	@Test
 	void transitionToArchivedWithProlongation() {
-		assertSuccess(command.createAnomaly(DESCRIPTION, Sector.FORGING));
+		assertSuccess(command.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE));
 		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
@@ -153,17 +155,17 @@ class AnomalyCommandServiceTest {
 		assertNull(parent.parentId());
 		assertEquals(child.id(), parent.childId());
 		assertEquals(DESCRIPTION, child.prolongationComent());
-		assertEquals(AnomalyState.ARCHIVED, parent.anomalyState());
+		assertEquals("ARCHIVED", parent.anomalyState());
 		assertEquals(VALID_DOC_ID, parent.correctiveActionId());
-		assertEquals(QualityDecision.NA, parent.qualityDecision());
+		assertEquals("NA", parent.qualityDecision());
 		assertEquals(VALID_DOC_ID, parent.evidenceId());
 		assertEquals(DESCRIPTION, parent.description());
 		
 		assertEquals(parent.id(), child.parentId());
 		assertNull(child.childId());
-		assertEquals(AnomalyState.PENDING, child.anomalyState());
+		assertEquals("PENDING", child.anomalyState());
 		assertNull(child.correctiveActionId());
-		assertEquals(QualityDecision.EMPTY, child.qualityDecision());
+		assertEquals("EMPTY", child.qualityDecision());
 		assertNull(child.evidenceId());
 		assertEquals(DESCRIPTION, child.description());
 	}
@@ -183,7 +185,7 @@ class AnomalyCommandServiceTest {
 	    AnomalyRepository repo = new AlwaysFailingRepository();
 	    AnomalyCommandService service = new AnomalyCommandService(repo, actor);
 
-	    CommandResult result = service.createAnomaly(DESCRIPTION, Sector.FORGING);
+	    CommandResult result = service.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE);
 
 	    assertTrue(result instanceof CommandFailure);
 	}
@@ -193,7 +195,7 @@ class AnomalyCommandServiceTest {
 	    FlakyRepository repo = new FlakyRepository();
 	    AnomalyCommandService service = new AnomalyCommandService(repo, actor);
 
-	    CommandResult result = service.createAnomaly(DESCRIPTION, Sector.FORGING);
+	    CommandResult result = service.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE);
 
 	    assertTrue(result instanceof CommandSuccess);
 	    assertEquals(2, repo.getSaveCalls());

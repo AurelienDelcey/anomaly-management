@@ -20,6 +20,9 @@ import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.Machine;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.Sector;
 
 class AnomalyConstructorTest {
@@ -31,11 +34,14 @@ class AnomalyConstructorTest {
 	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
 	private final static int FIXED_YEAR = 2026;
 	private final static int FIXED_SEQUENCE = 1;
+	private final static int QUANTITY = 50;
+	private final static int ORDER = 99999;
 
 	@Test
 	void rehydrateAnomalyInPendingState_withValidData_shouldReturnValidAnomaly() {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
-					UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,null,
+					UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+					getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
 					createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 					createValidDescription())
 		);
@@ -48,6 +54,7 @@ class AnomalyConstructorTest {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
 					UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 					createValidCorrectiveAction(),
+					getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 					null,
 					createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
 					createValidDescription())
@@ -61,6 +68,7 @@ class AnomalyConstructorTest {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
 					UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 					createValidCorrectiveAction(),
+					getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 					createValidEvidence(),
 					createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 					createValidDescription())
@@ -74,6 +82,7 @@ class AnomalyConstructorTest {
 		Anomaly anomaly = assertDoesNotThrow(()->rehydrate(
 					UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 					createValidCorrectiveAction(),
+					getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 					createValidEvidence(),
 					createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 					createValidDescription())
@@ -85,7 +94,8 @@ class AnomalyConstructorTest {
 	@Test
 	void rehydrateAnomaly_shouldThrowException_WhenStateIsMissing() {
 		assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-				null, getValidBusinessId(), null, null, Sector.FORGING, null, null,
+				null, getValidBusinessId(), null, null, Sector.FORGING, null,
+				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
 				createValidTraceabilityAtState(PENDING), EMPTY, PENDING,
 				createValidDescription())
 				);
@@ -97,7 +107,8 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), null, null, null, Sector.FORGING, null, null,
+						UUID.fromString(FIXED_UUID), null, null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
 						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 						createValidDescription())
 						);
@@ -106,6 +117,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), null, null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
 						createValidDescription())
@@ -115,6 +127,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), null, null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						createValidDescription())
@@ -124,6 +137,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), null, null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						createValidDescription())
@@ -134,11 +148,149 @@ class AnomalyConstructorTest {
 	
 	@ParameterizedTest
 	@EnumSource(value = AnomalyState.class)
+	void rehydrateAnomaly_shouldThrowException_WhenProductionOrderIsMissing(AnomalyState state) {
+		switch(state) {
+			case PENDING ->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), null, Machine.MACHINE_1, null,
+						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
+						createValidDescription())
+						);
+			}
+			case CORRECTED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						getValidQuantity(), null, Machine.MACHINE_1,
+						null,
+						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
+						createValidDescription())
+						);
+			}
+			case RESOLVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						getValidQuantity(), null, Machine.MACHINE_1,
+						createValidEvidence(),
+						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidDescription())
+						);
+			}
+			case ARCHIVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						getValidQuantity(), null, Machine.MACHINE_1,
+						createValidEvidence(),
+						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
+						createValidDescription())
+						);
+			}
+		}
+	}
+	
+	@ParameterizedTest
+	@EnumSource(value = AnomalyState.class)
+	void rehydrateAnomaly_shouldThrowException_WhenMachineIsMissing(AnomalyState state) {
+		switch(state) {
+			case PENDING ->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), null, null,
+						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
+						createValidDescription())
+						);
+			}
+			case CORRECTED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), null,
+						null,
+						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
+						createValidDescription())
+						);
+			}
+			case RESOLVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), null,
+						createValidEvidence(),
+						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidDescription())
+						);
+			}
+			case ARCHIVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), null,
+						createValidEvidence(),
+						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
+						createValidDescription())
+						);
+			}
+		}
+	}
+	
+	@ParameterizedTest
+	@EnumSource(value = AnomalyState.class)
+	void rehydrateAnomaly_shouldThrowException_WhenImpactedQuantityIsMissing(AnomalyState state) {
+		switch(state) {
+			case PENDING ->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						null, getValideProductionOrder(), Machine.MACHINE_1, null,
+						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
+						createValidDescription())
+						);
+			}
+			case CORRECTED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						null, getValideProductionOrder(), Machine.MACHINE_1,
+						null,
+						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
+						createValidDescription())
+						);
+			}
+			case RESOLVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						null, getValideProductionOrder(), Machine.MACHINE_1,
+						createValidEvidence(),
+						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidDescription())
+						);
+			}
+			case ARCHIVED->{
+				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
+						createValidCorrectiveAction(),
+						null, getValideProductionOrder(), Machine.MACHINE_1,
+						createValidEvidence(),
+						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
+						createValidDescription())
+						);
+			}
+		}
+	}
+	
+	
+	
+	@ParameterizedTest
+	@EnumSource(value = AnomalyState.class)
 	void rehydrateAnomaly_shouldThrowException_WhenDescriptionIsMissing(AnomalyState state) {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null, null,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null, 
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
 						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 						null)
 						);
@@ -147,6 +299,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
 						null)
@@ -156,6 +309,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						null)
@@ -165,6 +319,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						null)
@@ -179,7 +334,8 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, null, null, null,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, null, null, 
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
 						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
 						createValidDescription())
 						);
@@ -188,6 +344,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, null,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
 						createValidDescription())
@@ -197,6 +354,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, null,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
 						createValidDescription())
@@ -206,6 +364,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, null,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						createValidDescription())
@@ -220,8 +379,9 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,null,
-						null,EMPTY,PENDING,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
+						null, EMPTY, PENDING,
 						createValidDescription())
 						);
 			}
@@ -229,8 +389,8 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
-						null,
-						null,NA,CORRECTED,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
+						null, null, NA, CORRECTED,
 						createValidDescription())
 						);
 			}
@@ -238,8 +398,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						null,NA,RESOLVED,
+						null, NA, RESOLVED,
 						createValidDescription())
 						);
 			}
@@ -247,8 +408,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						null,NA,ARCHIVED,
+						null, NA, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -261,8 +423,9 @@ class AnomalyConstructorTest {
 		switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						null, getValidBusinessId(), null, null, Sector.FORGING,null,null,
-						createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
+						null, getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
+						createValidTraceabilityAtState(PENDING), EMPTY, PENDING,
 						createValidDescription())
 						);
 			}
@@ -270,6 +433,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						null, getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
 						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
 						createValidDescription())
@@ -279,8 +443,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						null, getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidTraceabilityAtState(RESOLVED), NA, RESOLVED,
 						createValidDescription())
 						);
 			}
@@ -288,6 +453,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						null, getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
 						createValidDescription())
@@ -308,6 +474,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
 						createValidTraceabilityAtState(CORRECTED),EMPTY,CORRECTED,
 						createValidDescription())
@@ -317,6 +484,7 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
 						createValidTraceabilityAtState(RESOLVED),EMPTY,RESOLVED,
 						createValidDescription())
@@ -326,8 +494,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(ARCHIVED),EMPTY,ARCHIVED,
+						createValidTraceabilityAtState(ARCHIVED), EMPTY, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -344,24 +513,27 @@ class AnomalyConstructorTest {
 			case PENDING ->{}
 			case CORRECTED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,null,
-						createValidTraceabilityAtState(CORRECTED),NA,CORRECTED,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
+						createValidTraceabilityAtState(CORRECTED), NA, CORRECTED,
 						createValidDescription())
 						);
 			}
 			case RESOLVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidTraceabilityAtState(RESOLVED), NA, RESOLVED,
 						createValidDescription())
 						);
 			}
 			case ARCHIVED->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
+						createValidTraceabilityAtState(ARCHIVED), NA, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -381,8 +553,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
-						createValidTraceabilityAtState(RESOLVED),NA,RESOLVED,
+						createValidTraceabilityAtState(RESOLVED), NA, RESOLVED,
 						createValidDescription())
 						);
 			}
@@ -390,8 +563,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
-						createValidTraceabilityAtState(ARCHIVED),NA,ARCHIVED,
+						createValidTraceabilityAtState(ARCHIVED), NA, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -402,8 +576,9 @@ class AnomalyConstructorTest {
 	void rehydrateAnomalyPending_shouldThrowException_WhenEvidence() {
 		assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 				UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,
+				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 				createValidEvidence(),
-				createValidTraceabilityAtState(PENDING),EMPTY,PENDING,
+				createValidTraceabilityAtState(PENDING), EMPTY, PENDING,
 				createValidDescription())
 				);
 	}
@@ -420,8 +595,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
-						createValidTraceabilityAtState(PENDING),NA,CORRECTED,
+						createValidTraceabilityAtState(PENDING), NA, CORRECTED,
 						createValidDescription())
 						);
 			}
@@ -429,8 +605,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(PENDING),NA,RESOLVED,
+						createValidTraceabilityAtState(PENDING), NA, RESOLVED,
 						createValidDescription())
 						);
 			}
@@ -438,8 +615,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(PENDING),NA,ARCHIVED,
+						createValidTraceabilityAtState(PENDING), NA, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -455,8 +633,9 @@ class AnomalyConstructorTest {
 			switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,null,
-						createValidTraceabilityAtState(CORRECTED),EMPTY,PENDING,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
+						createValidTraceabilityAtState(CORRECTED), EMPTY, PENDING,
 						createValidDescription())
 						);
 			}
@@ -465,8 +644,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(CORRECTED),NA,RESOLVED,
+						createValidTraceabilityAtState(CORRECTED), NA, RESOLVED,
 						createValidDescription())
 						);
 			}
@@ -474,8 +654,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(CORRECTED),NA,ARCHIVED,
+						createValidTraceabilityAtState(CORRECTED), NA, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -491,8 +672,9 @@ class AnomalyConstructorTest {
 			switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,null,
-						createValidTraceabilityAtState(RESOLVED),EMPTY,PENDING,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, null,
+						createValidTraceabilityAtState(RESOLVED), EMPTY, PENDING,
 						createValidDescription())
 						);
 			}
@@ -500,8 +682,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
-						createValidTraceabilityAtState(RESOLVED),NA,CORRECTED,
+						createValidTraceabilityAtState(RESOLVED), NA, CORRECTED,
 						createValidDescription())
 						);
 			}
@@ -510,8 +693,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(RESOLVED),NA,ARCHIVED,
+						createValidTraceabilityAtState(RESOLVED), NA, ARCHIVED,
 						createValidDescription())
 						);
 			}
@@ -527,8 +711,9 @@ class AnomalyConstructorTest {
 			switch(state) {
 			case PENDING ->{
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
-						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,null,null,
-						createValidTraceabilityAtState(ARCHIVED),EMPTY,PENDING,
+						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING, null,
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,null,
+						createValidTraceabilityAtState(ARCHIVED), EMPTY, PENDING,
 						createValidDescription())
 						);
 			}
@@ -536,8 +721,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						null,
-						createValidTraceabilityAtState(ARCHIVED),NA,CORRECTED,
+						createValidTraceabilityAtState(ARCHIVED), NA, CORRECTED,
 						createValidDescription())
 						);
 			}
@@ -545,8 +731,9 @@ class AnomalyConstructorTest {
 				assertThrows(InconsistentAnomalyStateException.class, ()->rehydrate(
 						UUID.fromString(FIXED_UUID), getValidBusinessId(), null, null, Sector.FORGING,
 						createValidCorrectiveAction(),
+						getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1,
 						createValidEvidence(),
-						createValidTraceabilityAtState(ARCHIVED),NA,RESOLVED,
+						createValidTraceabilityAtState(ARCHIVED), NA, RESOLVED,
 						createValidDescription())
 						);
 			}
@@ -608,6 +795,9 @@ class AnomalyConstructorTest {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
 		assertEquals(FIXED_YEAR, anomaly.getBusinessId().year());
 		assertEquals(FIXED_SEQUENCE, anomaly.getBusinessId().sequence());
+		assertEquals(Machine.MACHINE_1, anomaly.getMachine());
+		assertEquals(ORDER, anomaly.getProductionOrder().productionOrder());
+		assertEquals(QUANTITY, anomaly.getQuantity().quantity());
 		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertNull(anomaly.getCorrectiveAction());
@@ -625,6 +815,9 @@ class AnomalyConstructorTest {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
 		assertEquals(FIXED_YEAR, anomaly.getBusinessId().year());
 		assertEquals(FIXED_SEQUENCE, anomaly.getBusinessId().sequence());
+		assertEquals(Machine.MACHINE_1, anomaly.getMachine());
+		assertEquals(ORDER, anomaly.getProductionOrder().productionOrder());
+		assertEquals(QUANTITY, anomaly.getQuantity().quantity());
 		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
@@ -642,6 +835,9 @@ class AnomalyConstructorTest {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
 		assertEquals(FIXED_YEAR, anomaly.getBusinessId().year());
 		assertEquals(FIXED_SEQUENCE, anomaly.getBusinessId().sequence());
+		assertEquals(Machine.MACHINE_1, anomaly.getMachine());
+		assertEquals(ORDER, anomaly.getProductionOrder().productionOrder());
+		assertEquals(QUANTITY, anomaly.getQuantity().quantity());
 		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
@@ -659,6 +855,9 @@ class AnomalyConstructorTest {
 		assertEquals(FIXED_UUID, anomaly.getId().toString());
 		assertEquals(FIXED_YEAR, anomaly.getBusinessId().year());
 		assertEquals(FIXED_SEQUENCE, anomaly.getBusinessId().sequence());
+		assertEquals(Machine.MACHINE_1, anomaly.getMachine());
+		assertEquals(ORDER, anomaly.getProductionOrder().productionOrder());
+		assertEquals(QUANTITY, anomaly.getQuantity().quantity());
 		assertNull(anomaly.getProlongationContext());
 		assertNull(anomaly.getChildId());
 		assertEquals(VALID_DOC_ID, anomaly.getCorrectiveAction().documentId());
@@ -674,6 +873,14 @@ class AnomalyConstructorTest {
 	
 	private BusinessId getValidBusinessId() {
 		return new BusinessId(FIXED_YEAR, FIXED_SEQUENCE);
+	}
+	
+	private ImpactedQuantity getValidQuantity() {
+		return new ImpactedQuantity(QUANTITY);
+	}
+	
+	private ProductionOrder getValideProductionOrder() {
+		return new ProductionOrder(ORDER);
 	}
 }
 

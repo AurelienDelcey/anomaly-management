@@ -15,16 +15,22 @@ import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
 import domain.traceability.EventTrace;
 import domain.valueobject.BusinessId;
+import domain.valueobject.Description;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.Machine;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.Sector;
 import infrastructure.repository.ConnectionConfig;
 import infrastructure.repository.JdbcAnomalyRepository;
 
 class BusinessIdGeneratorTest {
 	
-	private static final String TABLE = "anomaly.anomalies_test";
+	private final static String TABLE = "anomaly.anomalies_test";
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
 	private final static String DESCRIPTION = "anomalyTest";
+	private final static int QUANTITY = 50;
+	private final static int ORDER = 99999;
 	private ConnectionConfig config ;
 	private BusinessIdGenerator businessIdGenerator;
 	private AnomalyRepository repository;
@@ -72,7 +78,18 @@ class BusinessIdGeneratorTest {
 	
 	private Anomaly createAnomalyWithBusinessId(BusinessId businessId) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return assertDoesNotThrow(()->new Anomaly(businessId, DESCRIPTION, Sector.FORGING, creationTrace));
+		return assertDoesNotThrow(()->new Anomaly(businessId, getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace));
 	}
-
+	
+	private Description getValidDescription() {
+		return new Description(DESCRIPTION);
+	}
+	
+	private ImpactedQuantity getValidQuantity() {
+		return new ImpactedQuantity(QUANTITY);
+	}
+	
+	private ProductionOrder getValideProductionOrder() {
+		return new ProductionOrder(ORDER);
+	}
 }

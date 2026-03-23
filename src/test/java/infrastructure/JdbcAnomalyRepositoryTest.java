@@ -19,6 +19,10 @@ import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.EventTrace;
 import domain.valueobject.BusinessId;
+import domain.valueobject.Description;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.Machine;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
@@ -34,9 +38,11 @@ class JdbcAnomalyRepositoryTest {
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
+	private final static String TABLE = "anomaly.anomalies_test";
 	private final static int FIXED_YEAR = 2026;
 	private final static int FIXED_SEQUENCE = 1;
-	private static final String TABLE = "anomaly.anomalies_test";
+	private final static int QUANTITY = 50;
+	private final static int ORDER = 99999;
 	private static JdbcAnomalyRepository repo;
 	private static ConnectionConfig config;
 	
@@ -222,13 +228,13 @@ class JdbcAnomalyRepositoryTest {
 	
 	private Anomaly createPendingAnomaly() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(getValidBusinessId(), DESCRIPTION, Sector.FORGING, creationTrace);
+		return new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace);
 	}
 	
 	private Anomaly createPendingProlongationAnomaly(UUID parentId, String comment) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
 		ProlongationContext prolongationContext = new ProlongationContext(parentId, comment);
-		return new Anomaly(getValidBusinessIdForProlongation(), DESCRIPTION, Sector.FORGING, creationTrace, prolongationContext);
+		return new Anomaly(getValidBusinessIdForProlongation(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, prolongationContext);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
@@ -255,5 +261,17 @@ class JdbcAnomalyRepositoryTest {
 	
 	private BusinessId getValidBusinessIdForProlongation() {
 		return new BusinessId(FIXED_YEAR, FIXED_SEQUENCE+1);
+	}
+	
+	private Description getValidDescription() {
+		return new Description(DESCRIPTION);
+	}
+	
+	private ImpactedQuantity getValidQuantity() {
+		return new ImpactedQuantity(QUANTITY);
+	}
+	
+	private ProductionOrder getValideProductionOrder() {
+		return new ProductionOrder(ORDER);
 	}
 }

@@ -167,6 +167,9 @@ public class Anomaly {
 		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
 			throw new IllegalAttachment("Editing description is only permitted on a root anomaly in PENDING state.");
 		}
+		if(description == null) {
+			throw new IllegalArgumentException("Description cannot be null.");
+		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
@@ -174,19 +177,28 @@ public class Anomaly {
 		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
 			throw new IllegalAttachment("Editing machine is only permitted on a root anomaly in PENDING state.");
 		}
+		if(machine == null) {
+			throw new IllegalArgumentException("Machine cannot be null.");
+		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
-	public Anomaly attachImpactedQuantity(ImpactedQuantity quantity) throws IllegalAttachment, InconsistentAnomalyStateException{
+	public Anomaly attachImpactedQuantity(ImpactedQuantity otherQuantity) throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
 			throw new IllegalAttachment("Editing impactedQuantity is only permitted on a root anomaly in PENDING state.");
 		}
-		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
+		if(otherQuantity == null) {
+			throw new IllegalArgumentException("Impacted quantity cannot be null.");
+		}
+		return new Anomaly(id, businessId, prolongationContext, childId, sector, otherQuantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachProductionOrder(ProductionOrder productionOrder) throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
 			throw new IllegalAttachment("Editing productionOrder is only permitted on a root anomaly in PENDING state.");
+		}
+		if(productionOrder == null) {
+			throw new IllegalArgumentException("Production order cannot be null.");
 		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
