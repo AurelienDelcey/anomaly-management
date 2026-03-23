@@ -17,7 +17,6 @@ import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
 import domain.exception.InconsistentAnomalyStateException;
-import domain.valueobject.Sector;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -58,7 +57,7 @@ public class GeneralViewController {
 	
 	@FXML
 	public void onClickCreate() throws InconsistentAnomalyStateException {
-		CommandResult result = commandService.createAnomaly("coucou", Sector.FORGING);
+		CommandResult result = commandService.createAnomaly("coucou", "FORGING", 0, 12345, "MACHINE_1");
 		
 		switch(result) {
 		case CommandSuccess success ->{
@@ -113,13 +112,13 @@ public class GeneralViewController {
         new SimpleStringProperty(cell.getValue().businessId()));
 		
 		sectorColumn.setCellValueFactory(cell ->
-        new SimpleStringProperty(cell.getValue().sector().toString()));
+        new SimpleStringProperty(cell.getValue().sector()));
 		
 		descriptionColumn.setCellValueFactory(cell ->
         new SimpleStringProperty(cell.getValue().description()));
 		
 		stateColumn.setCellValueFactory(cell ->
-        new SimpleStringProperty(cell.getValue().anomalyState().toString()));
+        new SimpleStringProperty(cell.getValue().anomalyState()));
 		
 		createdAtColumn.setCellValueFactory(cell ->
         new SimpleStringProperty(LocalDateTime.ofInstant(cell.getValue().createdAt(), ZoneId.systemDefault()).format(formatter)));

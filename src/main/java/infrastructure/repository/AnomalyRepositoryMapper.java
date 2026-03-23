@@ -16,6 +16,9 @@ import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.Machine;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
@@ -36,25 +39,32 @@ public class AnomalyRepositoryMapper {
 		String state = result.getString("anomaly_state");
 		String decision = result.getString("quality_decision");
 		String sector = result.getString("sector");
+		String machine = result.getString("machine");
 	
 		UUID anomalyId = uuidOrNullFromString(id);
 		UUID anomalyChildId = uuidOrNullFromString(childId);
 		UUID anomalyParentId = uuidOrNullFromString(parentId);
 		
-		int year = result.getInt("year");
-		int sequence = result.getInt("sequence");
-		BusinessId businessId = year == 0 || sequence == 0 ? null : new BusinessId(year, sequence);
+		Integer year = getNullableInt(result,"year");
+		Integer sequence = getNullableInt(result,"sequence");
+		BusinessId businessId = year == null || sequence == null ? null : new BusinessId(year, sequence);
 		
 		ProlongationContext context = prolongationContextOrNull(anomalyParentId, prolongationComment);
 		
 		String description = result.getString("description");
-		Description anomalyDescription = description == null?null:new Description(description);
+		Description anomalyDescription = description == null ? null : new Description(description);
+		
+		Integer quantity = getNullableInt(result,"impacted_quantity");
+		ImpactedQuantity impactedQuantity = quantity == null ? null : new ImpactedQuantity(quantity);
+		
+		Integer order = getNullableInt(result,"production_order");
+		ProductionOrder productionOrder = order == null ? null : new ProductionOrder(order);
 		
 		String correctiveAction = result.getString("corrective_action_id");
-		CorrectiveAction anomalyCorrectiveAction = correctiveAction == null?null:new CorrectiveAction(correctiveAction);
+		CorrectiveAction anomalyCorrectiveAction = correctiveAction == null ? null : new CorrectiveAction(correctiveAction);
 		
 		String evidence = result.getString("proving_document_id");
-		Evidence anomalyEvidence = evidence == null?null:new Evidence(evidence);
+		Evidence anomalyEvidence = evidence == null ? null : new Evidence(evidence);
 		
 		String createdBy = result.getString("created_by");
 		Timestamp createdAt = result.getTimestamp("created_at");
@@ -77,7 +87,7 @@ public class AnomalyRepositoryMapper {
 		
 		Traceability traceability =  buildTraceability(created, corrected, resolved, archived);
 		
-		QualityDecision qualityDecision = switch(decision) {
+		QualityDecision qualityDecision = decision == null ? null : switch(decision) {
 		case "EMPTY" -> QualityDecision.EMPTY;
 		case "NA" -> QualityDecision.NA;
 		case "REPAIR" -> QualityDecision.REPAIR;
@@ -85,7 +95,7 @@ public class AnomalyRepositoryMapper {
 		default -> throw new TechnicalException("Unknown decision: " + decision);
 		};
 		
-		AnomalyState anomalyState = switch(state) {
+		AnomalyState anomalyState = state == null ? null : switch(state) {
 		case "PENDING" -> AnomalyState.PENDING;
 		case "CORRECTED" -> AnomalyState.CORRECTED; 
 		case "RESOLVED" -> AnomalyState.RESOLVED;
@@ -93,7 +103,7 @@ public class AnomalyRepositoryMapper {
 		default -> throw new TechnicalException("Unknown state: " + state);
 		};
 		
-		Sector anomalySector = switch(sector) {
+		Sector anomalySector = sector == null ? null : switch(sector) {
 		case "FORGING" -> Sector.FORGING;
 		case "FINISHING" -> Sector.FINISHING;
 		case "HEAT_TREATMENT" -> Sector.HEAT_TREATMENT;
@@ -102,9 +112,16 @@ public class AnomalyRepositoryMapper {
 		default -> throw new TechnicalException("Unknown sector: " + sector);
 		};
 		
+		Machine anomalyMachine = machine == null ? null : switch(machine) {
+		case "MACHINE_1" -> Machine.MACHINE_1;
+		case "MACHINE_2" -> Machine.MACHINE_2;
+		case "OTHER_MACHINE" -> Machine.OTHER_MACHINE;
+		default -> throw new TechnicalException("Unknown machine: " + machine);
+		};
+		
 		Anomaly anomaly = rehydrate(
 				anomalyId, businessId, context, anomalyChildId, anomalySector,
-				anomalyCorrectiveAction, anomalyEvidence, 
+				anomalyCorrectiveAction, impactedQuantity, productionOrder, anomalyMachine, anomalyEvidence, 
 				traceability, qualityDecision, anomalyState, anomalyDescription);
 		
 		return anomaly;
@@ -132,5 +149,10 @@ public class AnomalyRepositoryMapper {
 		traceability = resolved == null?traceability:traceability.addToResolvedTrace(resolved);
 		traceability = archived == null?traceability:traceability.addToArchivedTrace(archived);
 		return traceability;
+	}
+	
+	private static Integer getNullableInt(ResultSet rs, String column) throws SQLException {
+	    int value = rs.getInt(column);
+	    return rs.wasNull() ? null : value;
 	}
 }

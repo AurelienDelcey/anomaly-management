@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,8 @@ import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
 import domain.valueobject.Description;
 import domain.valueobject.Evidence;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.ProlongationContext;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.exception.BusinessIdColisionException;
@@ -60,8 +63,11 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				sector,
 				prolongation_comment,
 				year,
-				sequence
-			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+				sequence,
+				impacted_quantity,
+				production_order,
+				machine
+			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 			""".formatted(tableName);
 		this.UPDATE_STATEMENT = """
 				UPDATE %s
@@ -83,7 +89,10 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 					sector = ?,
 					prolongation_comment = ?,
 					year = ?,
-					sequence = ?
+					sequence = ?,
+					impacted_quantity = ?,
+					production_order = ?,
+					machine = ?
 				WHERE id = ?;
 				""".formatted(tableName);
 	}
@@ -221,6 +230,8 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
+		ImpactedQuantity quantity = anomaly.getQuantity();
+		ProductionOrder order = anomaly.getProductionOrder();
 		Evidence evidence = anomaly.getEvidence();
 		EventTrace created = traceability.getCreation();
 		EventTrace corrected = traceability.getToCorrected();
@@ -245,8 +256,27 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setTimestamp(16, timestampOrNullFromEventTrace(archived));
 		query.setString(17, anomaly.getSector().name());
 		query.setString(18, prolongationContext == null ? null:prolongationContext.prolongationComment());
-		query.setInt(19, businessId == null ? null:businessId.year());
-		query.setInt(20, businessId == null ? null:businessId.sequence());
+		if (businessId != null) {
+		    query.setInt(19, businessId.year());
+		} else {
+		    query.setNull(19, Types.INTEGER);
+		}
+		if (businessId != null) {
+		    query.setInt(20, businessId.sequence());
+		} else {
+		    query.setNull(20, Types.INTEGER);
+		}
+		if (quantity != null) {
+		    query.setInt(21, quantity.quantity());
+		} else {
+		    query.setNull(21, Types.INTEGER);
+		}
+		if (order != null) {
+		    query.setInt(22, order.productionOrder());
+		} else {
+		    query.setNull(22, Types.INTEGER);
+		}
+		query.setString(23, anomaly.getMachine().name());
 
 		return query;
 	}
@@ -259,6 +289,8 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		UUID childId = anomaly.getChildId();
 		Description description = anomaly.getDescription();
 		CorrectiveAction correctiveAction = anomaly.getCorrectiveAction();
+		ImpactedQuantity quantity = anomaly.getQuantity();
+		ProductionOrder order = anomaly.getProductionOrder();
 		Evidence evidence = anomaly.getEvidence();
 		EventTrace created = traceability.getCreation();
 		EventTrace corrected = traceability.getToCorrected();
@@ -282,9 +314,28 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setTimestamp(15, timestampOrNullFromEventTrace(archived));
 		query.setString(16, anomaly.getSector().name());
 		query.setString(17, prolongationContext == null ? null:prolongationContext.prolongationComment());
-		query.setInt(18, businessId == null ? null:businessId.year());
-		query.setInt(19, businessId == null ? null:businessId.sequence());
-		query.setString(20, anomaly.getId().toString());
+		if (businessId != null) {
+		    query.setInt(18, businessId.year());
+		} else {
+		    query.setNull(18, Types.INTEGER);
+		}
+		if (businessId != null) {
+		    query.setInt(19, businessId.sequence());
+		} else {
+		    query.setNull(19, Types.INTEGER);
+		}
+		if (quantity != null) {
+		    query.setInt(20, quantity.quantity());
+		} else {
+		    query.setNull(20, Types.INTEGER);
+		}
+		if (order != null) {
+		    query.setInt(21, order.productionOrder());
+		} else {
+		    query.setNull(21, Types.INTEGER);
+		}
+		query.setString(22, anomaly.getMachine().name());
+		query.setString(23, anomaly.getId().toString());
 
 		return query;
 	}

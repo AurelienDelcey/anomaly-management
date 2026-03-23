@@ -2,20 +2,19 @@ package application.dto;
 
 import java.time.Instant;
 
-import domain.anomaly.AnomalyState;
-import domain.valueobject.QualityDecision;
-import domain.valueobject.Sector;
-
 public record AnomalyDto(String id,
 		String businessId,
 		String parentId,
 		String prolongationComent,
 		String childId,
-		Sector sector,
+		String sector,
 		String correctiveActionId,
+		int productionOrder,
+		int impactedQuantity,
+		String machine,
 		String evidenceId,
-		QualityDecision qualityDecision,
-		AnomalyState anomalyState,
+		String qualityDecision,
+		String anomalyState,
 		String description,
 		String createdBy,
 		Instant createdAt,

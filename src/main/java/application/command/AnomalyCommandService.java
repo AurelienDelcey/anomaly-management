@@ -13,6 +13,10 @@ import domain.anomaly.Anomaly;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;
 import domain.valueobject.BusinessId;
+import domain.valueobject.Description;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.Machine;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
@@ -33,16 +37,31 @@ public class AnomalyCommandService {
 		this.businessIdGenerator = new BusinessIdGenerator(repository);
 	}
 	
-	public CommandResult createAnomaly (String description, Sector sector) {
+	public CommandResult createAnomaly (String description, String sector, int quantity, int productionOrder, String machine) {
 		int savingTry = 5;
 		log.debug("CreateAnomaly requested - actorId={}",actor.id()); 
 		EventTrace trace = new EventTrace(actor.id(), Instant.now());
+		Description newDescription = new Description(description);
+		ImpactedQuantity impactedQuantity = new ImpactedQuantity(quantity);
+		ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
+		Sector newSector;
+		Machine newMachine;
+		try {
+		    newSector = Sector.valueOf(sector);
+		} catch (IllegalArgumentException e) {
+		    return new CommandFailure("Invalid sector: " + sector);
+		}
+		try {
+			newMachine = Machine.valueOf(machine);
+		}catch(IllegalArgumentException e) {
+			 return new CommandFailure("Invalid Machine: " + machine);
+		}
 		
 		while(savingTry > 0) {
 			savingTry--;
 			try {
 				BusinessId businessId = businessIdGenerator.getBusinessId();
-				Anomaly anomaly = new Anomaly(businessId, description, sector, trace);
+				Anomaly anomaly = new Anomaly(businessId, newDescription, newSector, impactedQuantity, newProductionOrder, newMachine, trace);
 				repository.save(anomaly);	
 				log.info("CreateAnomaly succeeded - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 				return new CommandSuccess(anomaly.getId());
@@ -60,8 +79,9 @@ public class AnomalyCommandService {
 	public CommandResult attachDescription (UUID anomalyId, String description) {
 		try {
 			log.debug("AttachDescription requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			Description newDescription = new Description(description);
 			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachDescription(description);
+			Anomaly newAnomaly = anomaly.attachDescription(newDescription);
 			repository.save(newAnomaly);
 			log.info("AttachDescription succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess(anomalyId);
@@ -208,7 +228,8 @@ public class AnomalyCommandService {
 				Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 				ProlongationContext context = new ProlongationContext(archivedAnomaly.getId(), comment);
 				BusinessId businessId = businessIdGenerator.getBusinessId();
-				Anomaly prolongation = createProlongation(businessId, context, archivedAnomaly.getDescription().description(), archivedAnomaly.getSector());
+				Anomaly prolongation = createProlongation(businessId, context, archivedAnomaly.getDescription(), archivedAnomaly.getSector(), 
+						archivedAnomaly.getQuantity(), archivedAnomaly.getProductionOrder(), archivedAnomaly.getMachine());
 				Anomaly anomalyWithProlongationId = archivedAnomaly.linkProlongation(prolongation.getId());
 				repository.saveAtomic(anomalyWithProlongationId, prolongation);
 				log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
@@ -227,9 +248,10 @@ public class AnomalyCommandService {
 		return new CommandFailure("transitionToArchivedWithProlongation failed: Maximum aptempt of retry to allocate a businessId");
 	}
 	
-	private Anomaly createProlongation (BusinessId businessId, ProlongationContext prolongationContext, String description, Sector sector) {
+	private Anomaly createProlongation (BusinessId businessId, ProlongationContext prolongationContext, Description description, 
+			Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine) {
 		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		Anomaly anomaly = new Anomaly(businessId, description, sector, trace, prolongationContext);
+		Anomaly anomaly = new Anomaly(businessId, description, sector, quantity, productionOrder, machine, trace, prolongationContext);
 		log.debug("CreateProlongation - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 		return anomaly;
 	}
