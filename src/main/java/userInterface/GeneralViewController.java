@@ -78,6 +78,9 @@ public class GeneralViewController {
 		Scene scene = new Scene(view);
 		Stage stage = new Stage();
 		stage.setScene(scene);
+		stage.setMinWidth(406);
+		stage.setMinHeight(563);
+		stage.setResizable(false);
 		stage.show();
 	}
 	
@@ -151,7 +154,7 @@ public class GeneralViewController {
 			 if(index >= 0) {
 				 items.set(index, anomaly);
 			 }else {
-				 items.set(0,anomaly);
+				 items.add(0,anomaly);
 			 }
 		 }
 		 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup

@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
@@ -27,7 +28,7 @@ public class CreationViewController {
 	@FXML private Button cancelButton;
 	@FXML private TextField productionOrderField;
 	@FXML private TextField quantityField;
-	@FXML private TextField descriptionField;
+	@FXML private TextArea descriptionField;
 	@FXML private ComboBox<String> sectorBox;
 	@FXML private ComboBox<String> machineBox;
 	@FXML private VBox root;

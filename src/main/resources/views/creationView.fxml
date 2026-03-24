@@ -12,7 +12,7 @@
 <?import javafx.scene.text.Font?>
 
 
-<VBox fx:id="root" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="563.0" prefWidth="406.0" spacing="25.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.CreationViewController">
+<VBox fx:id="root" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="563.0" minWidth="406.0" prefHeight="563.0" prefWidth="406.0" spacing="25.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.CreationViewController">
    <children>
       <HBox alignment="CENTER" prefHeight="32.0" prefWidth="454.0">
          <children>
@@ -63,7 +63,7 @@
       <VBox spacing="5.0">
          <children>
             <Label text="Description:" />
-            <TextArea fx:id="descriptionText" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+            <TextArea fx:id="descriptionField" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
       <HBox alignment="CENTER">
