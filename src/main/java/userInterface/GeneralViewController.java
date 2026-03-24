@@ -29,6 +29,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class GeneralViewController {
@@ -71,10 +72,15 @@ public class GeneralViewController {
 		Scene scene = new Scene(view);
 		Stage stage = new Stage();
 		stage.setScene(scene);
+		
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(createButton.getScene().getWindow());
+		
 		stage.setMinWidth(406);
 		stage.setMinHeight(563);
 		stage.setResizable(false);
-		stage.show();
+		stage.showAndWait();
+		
 	}
 	
 	@FXML
