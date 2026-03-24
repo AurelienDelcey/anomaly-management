@@ -59,12 +59,7 @@ public class GeneralViewController {
 	public void onClickCreate() throws InconsistentAnomalyStateException {
 		CommandResult result = commandService.createAnomaly("coucou", "FORGING", 0, 12345, "MACHINE_1");
 		
-		switch(result) {
-		case CommandSuccess success ->{
-			updateCommand(success.anomalyId());
-		}
-		case CommandFailure failure ->{}//TODO popup error message
-		}
+		
 	}
 	
 	@FXML
