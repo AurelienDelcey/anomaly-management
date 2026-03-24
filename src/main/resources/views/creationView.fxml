@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<VBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="563.0" prefWidth="406.0" spacing="25.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.CreationViewController">
+   <children>
+      <HBox alignment="CENTER" prefHeight="32.0" prefWidth="454.0">
+         <children>
+            <Label alignment="CENTER" prefHeight="33.0" prefWidth="247.0" text="Anomaly creation">
+               <font>
+                  <Font name="System Bold" size="23.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <HBox>
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Production order:" />
+                  <TextField fx:id="productionOrderField" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox>
+         <children>
+            <VBox>
+               <children>
+                  <Label text="Sector:" />
+                  <ComboBox fx:id="sectorBox" prefWidth="150.0" />
+               </children>
+            </VBox>
+            <Region prefHeight="0.0" prefWidth="185.0" HBox.hgrow="ALWAYS" />
+            <VBox>
+               <children>
+                  <Label text="Machine:" />
+                  <ComboBox fx:id="machineBox" prefWidth="150.0" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <HBox>
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Impacted quantity:" />
+                  <TextField fx:id="quantityField" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <VBox spacing="5.0">
+         <children>
+            <Label text="Description:" />
+            <TextArea fx:id="descriptionText" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+      <HBox alignment="CENTER">
+         <children>
+            <Button fx:id="createButton" mnemonicParsing="false" onAction="#onClickCreate" text="Create" />
+            <Region prefHeight="26.0" prefWidth="10.0" HBox.hgrow="ALWAYS" />
+            <Button fx:id="createAndOpenButton" mnemonicParsing="false" onAction="#onClickCreateAndOpen" text="Create &amp; open" />
+            <Region prefHeight="26.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+            <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#onClickCancel" text="Cancel" />
+         </children>
+      </HBox>
+   </children>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <padding>
+      <Insets left="5.0" right="5.0" />
+   </padding>
+</VBox>
