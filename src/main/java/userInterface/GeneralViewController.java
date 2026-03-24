@@ -1,5 +1,6 @@
 package userInterface;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -21,11 +22,15 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Stage;
 
 public class GeneralViewController {
 	
@@ -56,10 +61,24 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickCreate() throws InconsistentAnomalyStateException {
-		CommandResult result = commandService.createAnomaly("coucou", "FORGING", 0, 12345, "MACHINE_1");
+	public void onClickCreate() throws InconsistentAnomalyStateException, IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/creationView.fxml"));
+		Parent view = loader.load();
+			
+		CreationViewController controller = loader.getController();
 		
+		controller.initController(commandService, (e)->{
+			try {
+				updateCommand(e);
+			} catch (InconsistentAnomalyStateException e1) {
+				//TODO CRASH!!! error must extend runtime
+			}
+		});
 		
+		Scene scene = new Scene(view);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		stage.show();
 	}
 	
 	@FXML

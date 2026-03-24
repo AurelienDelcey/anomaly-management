@@ -2,6 +2,8 @@ package userInterface;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 import application.command.AnomalyCommandService;
 import application.command.CommandFailure;
@@ -31,6 +33,7 @@ public class CreationViewController {
 	@FXML private VBox root;
 	
 	private AnomalyCommandService commandService;
+	private Consumer<UUID> updateCallback;
 	
 	@FXML
 	public void initialize() {
@@ -50,7 +53,7 @@ public class CreationViewController {
 									 machineBox.getValue());
 		switch(result) {
 			case CommandSuccess success ->{
-				//TODO return ID
+				updateCallback.accept(success.anomalyId());
 				onClickCancel();
 			}
 			case CommandFailure failure ->{
@@ -68,6 +71,7 @@ public class CreationViewController {
 				 machineBox.getValue());
 		switch(result) {
 			case CommandSuccess success ->{
+				updateCallback.accept(success.anomalyId());
 				onClickCancel();//TODO go to detail view.
 			}
 			case CommandFailure failure ->{
@@ -82,8 +86,9 @@ public class CreationViewController {
 		stage.close();
 	}
 	
-	public void initController(AnomalyCommandService commandService) {
+	public void initController(AnomalyCommandService commandService, Consumer<UUID> updateCallback) {
 		this.commandService = commandService;
+		this.updateCallback = updateCallback;
 	}
 	
 	private void setupBoxes() {
