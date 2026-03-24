@@ -232,7 +232,7 @@ class AnomalyCommandServiceTest {
 		@Override
 		public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {return null;}
 		@Override
-		public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException {return null;}
+		public List<Anomaly> findAll(int page)  {return null;}
 
 	    
 	}
@@ -263,6 +263,6 @@ class AnomalyCommandServiceTest {
 		@Override
 		public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {return null;}
 		@Override
-		public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException {return null;}
+		public List<Anomaly> findAll(int page)  {return null;}
 	}
 }

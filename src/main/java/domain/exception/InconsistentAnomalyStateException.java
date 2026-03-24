@@ -1,6 +1,6 @@
 package domain.exception;
 
-public class InconsistentAnomalyStateException extends DomainException{
+public class InconsistentAnomalyStateException extends RuntimeException{
 
 	private static final long serialVersionUID = 8178331756570906129L;
 

@@ -17,7 +17,6 @@ import application.query.QueryFailure;
 import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
-import domain.exception.InconsistentAnomalyStateException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -61,19 +60,13 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickCreate() throws InconsistentAnomalyStateException, IOException {
+	public void onClickCreate() throws IOException {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/creationView.fxml"));
 		Parent view = loader.load();
 			
 		CreationViewController controller = loader.getController();
 		
-		controller.initController(commandService, (e)->{
-			try {
-				updateCommand(e);
-			} catch (InconsistentAnomalyStateException e1) {
-				//TODO CRASH!!! error must extend runtime
-			}
-		});
+		controller.initController(commandService, (e)->updateCommand(e));
 		
 		Scene scene = new Scene(view);
 		Stage stage = new Stage();
@@ -85,7 +78,7 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickRefresh() throws InconsistentAnomalyStateException {
+	public void onClickRefresh() {
 		loadData();
 	}
 	
@@ -106,14 +99,14 @@ public class GeneralViewController {
 		controller.setup(anomaly, queryService, commandService);*/
 	}
 	
-	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) throws InconsistentAnomalyStateException {
+	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) {
 		this.queryService = queryService;
 		this.commandService = commandService;
 		
 		loadData();
 	}
 	
-	public void loadData() throws InconsistentAnomalyStateException {//TODO change IconsistentAnomalyStateException to runtime exeption
+	public void loadData() {
 		 QueryResult<List<AnomalyDto>> result = queryService.findPage(1);
 		 switch (result) {
 		 case QuerySuccess<List<AnomalyDto>> success-> {
@@ -144,7 +137,7 @@ public class GeneralViewController {
         new SimpleStringProperty(cell.getValue().createdBy()));
 	}
 	
-	private void updateCommand(UUID anomalyId) throws InconsistentAnomalyStateException {
+	private void updateCommand(UUID anomalyId)  {
 		QueryResult<AnomalyDto> result = queryService.findById(anomalyId);
 		
 		switch (result) {

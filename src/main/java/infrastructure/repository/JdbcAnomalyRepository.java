@@ -192,7 +192,7 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	}
 
 	@Override
-	public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException{
+	public List<Anomaly> findAll(int page) {
 		log.debug("findAll requested - page={}", page);
 		try(Connection connection = openConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""

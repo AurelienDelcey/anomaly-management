@@ -7,7 +7,6 @@ import application.dto.AnomalyDto;
 import application.dto.AnomalyDtoMapper;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
-import domain.exception.InconsistentAnomalyStateException;
 import infrastructure.exception.AnomalyNotFoundException;
 import infrastructure.exception.TechnicalException;
 
@@ -19,7 +18,7 @@ public class AnomalyQueryService {
 		this.repository = repository;
 	}
 	
-	public QueryResult<AnomalyDto> findById(UUID id)throws InconsistentAnomalyStateException {
+	public QueryResult<AnomalyDto> findById(UUID id) {
 		try {
 			AnomalyDto result = AnomalyDtoMapper.mapToDto(repository.findById(id));
 			return new QuerySuccess<AnomalyDto>(result);
@@ -30,7 +29,7 @@ public class AnomalyQueryService {
 		}
 	}
 	
-	public QueryResult<List<AnomalyDto>> findPage(int page) throws InconsistentAnomalyStateException{
+	public QueryResult<List<AnomalyDto>> findPage(int page) {
 		try {
 			List<Anomaly> anomalies = repository.findAll(page);
 			List<AnomalyDto> anomalyDtos = anomalies.stream()
