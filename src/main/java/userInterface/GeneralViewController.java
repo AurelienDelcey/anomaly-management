@@ -89,20 +89,29 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickDetails() {
+	public void onClickDetails() throws IOException {
 		AnomalyDto anomaly = anomalyTable.getSelectionModel().getSelectedItem();
 		
 		if (anomaly == null) {
 			return;
 		}
 		
-		//changement de vue, on passe l'anomaly a detailler en parametre... ou on injecte apres coup.
-		
-		/*FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailView.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailViewLayout.fxml"));
 		Parent view = loader.load();
 			
-		DetailController controller = loader.getController();
-		controller.setup(anomaly, queryService, commandService);*/
+		DetailViewLayoutController controller = loader.getController();
+		controller.initController(anomaly, commandService, queryService);
+		
+		Scene scene = new Scene(view);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(createButton.getScene().getWindow());
+		
+		stage.setMinWidth(400);
+		
+		stage.showAndWait();
 	}
 	
 	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) {

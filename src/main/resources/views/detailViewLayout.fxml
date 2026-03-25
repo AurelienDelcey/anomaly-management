@@ -10,14 +10,14 @@
 <?import javafx.scene.text.Font?>
 
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="508.0" prefWidth="368.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.DetailViewLayoutController">
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.DetailViewLayoutController">
    <bottom>
       <HBox prefHeight="0.0" prefWidth="600.0" spacing="10.0" BorderPane.alignment="CENTER">
          <children>
             <Region HBox.hgrow="ALWAYS" />
             <Button fx:id="previousAnomalyButton" mnemonicParsing="false" onAction="#onClickPrevious" text="&lt;== Prev" />
             <Button fx:id="historyButton" mnemonicParsing="false" onAction="#onClickHistory" text="History" />
-            <Button fx:id="nextButton" mnemonicParsing="false" onAction="#onClickNext" text="Next ==&gt;" />
+            <Button fx:id="nextAnomalyButton" mnemonicParsing="false" onAction="#onClickNext" text="Next ==&gt;" />
             <Region HBox.hgrow="ALWAYS" />
          </children>
          <BorderPane.margin>
