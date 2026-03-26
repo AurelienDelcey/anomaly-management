@@ -1,11 +1,14 @@
 package userInterface;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import application.command.AnomalyCommandService;
 import application.dto.AnomalyDto;
@@ -14,10 +17,13 @@ import application.query.QueryFailure;
 import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
+import domain.anomaly.AnomalyState;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -121,6 +127,72 @@ public class DetailViewLayoutController {
 	}
 	
 	private void reloadDynamicPanel(AnomalyDto newAnomaly) {
-		//TODO create different panels
+		Map<String, Function<AnomalyDto, Node>> loader = Map.of(
+				"PENDING", e->loadPendingPanel(e),
+				"CORRECTED", e->loadCorrectedPanel(e),
+				"RESOLVED", e->loadResolvedPanel(e),
+				"ARCHIVED", e->loadArchivedPanel(e)
+				);
+		root.setCenter(loader.get(newAnomaly.anomalyState()).apply(newAnomaly));
+	}
+	
+	private Node loadPendingPanel(AnomalyDto anomaly) {
+		try {
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/pendingPanel.fxml"));
+	        Node node = loader.load();
+
+	        PendingPanelController controller = loader.getController();
+	       // controller.initController(anomaly);
+
+	        return node;
+
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
+	
+	private Node loadCorrectedPanel(AnomalyDto anomaly) {
+		try {
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/correctedPanel.fxml"));
+	        Node node = loader.load();
+
+	        CorrectedPanelController controller = loader.getController();
+	       // controller.initController(anomaly);
+
+	        return node;
+
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
+	
+	private Node loadResolvedPanel(AnomalyDto anomaly) {
+		try {
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/resolvedPanel.fxml"));
+	        Node node = loader.load();
+
+	        ResolvedPanelController controller = loader.getController();
+	       // controller.initController(anomaly);
+
+	        return node;
+
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
+	
+	private Node loadArchivedPanel(AnomalyDto anomaly) {
+		try {
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/archivedPanel.fxml"));
+	        Node node = loader.load();
+
+	        ArchivedPanelController controller = loader.getController();
+	       // controller.initController(anomaly);
+
+	        return node;
+
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
 	}
 }
