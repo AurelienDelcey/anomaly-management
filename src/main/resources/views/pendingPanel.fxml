@@ -52,7 +52,7 @@
             <VBox>
                <children>
                   <Label text="Corrective action id:" />
-                  <TextField fx:id="correctiveActionTextField" onAction="#onActionCorrectiveAction" />
+                  <TextField fx:id="correctiveActionTextField" onAction="#onActionCorrectiveAction" promptText="ABC-000-DDMMYY" />
                   <Button fx:id="validationCorrectiveActionButton" mnemonicParsing="false" onAction="#onClickValidationCorrectiveAction" text="Validation" />
                </children>
             </VBox>
