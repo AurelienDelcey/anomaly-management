@@ -1,14 +1,26 @@
 package userInterface;
 
+import java.util.EnumSet;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import application.command.AnomalyCommandService;
 import application.dto.AnomalyDto;
+import domain.valueobject.Machine;
+import domain.valueobject.Sector;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
 
 public class PendingPanelController {
@@ -29,7 +41,9 @@ public class PendingPanelController {
     @FXML private ComboBox<String> machineCombo;
     @FXML private ComboBox<String> sectorCombo;
     
-    private SimpleObjectProperty<AnomalyDto> anomalyProperty;
+    private ObjectProperty<AnomalyDto> anomalyProperty;
+    private Consumer<UUID> updateCallback;
+    private AnomalyCommandService commandService;
     
     @FXML
 	public void initialize() {
@@ -101,7 +115,10 @@ public class PendingPanelController {
     	onClickCorrectProductionOrder();
     }
     
-    public void initController(AnomalyDto anomaly) {
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback) {
+    	this.anomalyProperty = anomalyProperty;
+    	this.commandService = commandService;
+    	this.updateCallback = updateCallback;
     	
     }
 

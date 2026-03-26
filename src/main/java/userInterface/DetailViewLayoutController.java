@@ -149,7 +149,7 @@ public class DetailViewLayoutController {
 	        Node node = loader.load();
 
 	        PendingPanelController controller = loader.getController();
-	       // controller.initController(anomaly);
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e));
 
 	        return node;
 
@@ -201,5 +201,18 @@ public class DetailViewLayoutController {
 	    } catch (IOException e) {
 	        throw new RuntimeException(e);
 	    }
+	}
+	
+	private void loadNewAnomaly(UUID id) {
+		QueryResult<AnomalyDto> result = queryService.findById(id);
+		
+		switch (result) {
+			 case QuerySuccess<AnomalyDto> success-> {
+				 AnomalyDto anomaly = success.payload();
+				 anomalyProperty.set(anomaly);
+			 }
+			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
+			 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
+		 };
 	}
 }
