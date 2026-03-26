@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import application.command.AnomalyCommandService;
 import application.dto.AnomalyDto;
@@ -79,7 +80,7 @@ public class DetailViewLayoutController {
 		this.queryService = queryService;
 		this.anomalyProperty.addListener((obs, old, newAnomaly) -> {
 				if (newAnomaly != null) {
-				    anomalyProperty.set(newAnomaly);
+				    reloadDynamicPanel(newAnomaly);
 				}
 		    });
 		this.anomalyProperty.set(anomaly);
@@ -133,7 +134,13 @@ public class DetailViewLayoutController {
 				"RESOLVED", e->loadResolvedPanel(e),
 				"ARCHIVED", e->loadArchivedPanel(e)
 				);
-		root.setCenter(loader.get(newAnomaly.anomalyState()).apply(newAnomaly));
+		Supplier<Node> supplier = loader.get(newAnomaly.anomalyState());
+
+		if (supplier == null) {
+		    return;//TODO POPUP ERROR
+		}
+
+		root.setCenter(supplier.get());
 	}
 	
 	private Node loadPendingPanel(AnomalyDto anomaly) {
