@@ -128,11 +128,11 @@ public class DetailViewLayoutController {
 	}
 	
 	private void reloadDynamicPanel(AnomalyDto newAnomaly) {
-		Map<String, Function<AnomalyDto, Node>> loader = Map.of(
-				"PENDING", e->loadPendingPanel(e),
-				"CORRECTED", e->loadCorrectedPanel(e),
-				"RESOLVED", e->loadResolvedPanel(e),
-				"ARCHIVED", e->loadArchivedPanel(e)
+		Map<String, Supplier<Node>> loader = Map.of(
+				"PENDING", ()->loadPendingPanel(),
+				"CORRECTED", ()->loadCorrectedPanel(),
+				"RESOLVED", ()->loadResolvedPanel(),
+				"ARCHIVED", ()->loadArchivedPanel()
 				);
 		Supplier<Node> supplier = loader.get(newAnomaly.anomalyState());
 
@@ -143,7 +143,7 @@ public class DetailViewLayoutController {
 		root.setCenter(supplier.get());
 	}
 	
-	private Node loadPendingPanel(AnomalyDto anomaly) {
+	private Node loadPendingPanel() {
 		try {
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/pendingPanel.fxml"));
 	        Node node = loader.load();
@@ -158,7 +158,7 @@ public class DetailViewLayoutController {
 	    }
 	}
 	
-	private Node loadCorrectedPanel(AnomalyDto anomaly) {
+	private Node loadCorrectedPanel() {
 		try {
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/correctedPanel.fxml"));
 	        Node node = loader.load();
@@ -173,7 +173,7 @@ public class DetailViewLayoutController {
 	    }
 	}
 	
-	private Node loadResolvedPanel(AnomalyDto anomaly) {
+	private Node loadResolvedPanel() {
 		try {
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/resolvedPanel.fxml"));
 	        Node node = loader.load();
@@ -188,7 +188,7 @@ public class DetailViewLayoutController {
 	    }
 	}
 	
-	private Node loadArchivedPanel(AnomalyDto anomaly) {
+	private Node loadArchivedPanel() {
 		try {
 	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/archivedPanel.fxml"));
 	        Node node = loader.load();
