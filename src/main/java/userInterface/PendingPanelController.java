@@ -11,6 +11,7 @@ import application.command.CommandResult;
 import application.command.CommandSuccess;
 import application.dto.AnomalyDto;
 import domain.valueobject.Machine;
+import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -55,47 +56,139 @@ public class PendingPanelController {
     
     @FXML
     void onSelectMachine() {
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	String machine = machineCombo.getSelectionModel().getSelectedItem();
+    	CommandResult result = commandService.attachMachine(id, machine);
     	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickCorrectAnomaly() {
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	CommandResult result = commandService.transitionToCorrected(id);
     	
+    	switch (result) {
+	    	case CommandSuccess success ->{
+	    		updateCallback.accept(success.anomalyId());
+	    	}
+	    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickCorrectProductionOrder() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	Integer order = Integer.valueOf(productionOrderTextField.getText());
+    	CommandResult result = commandService.attachProductionOrder(id, order);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickCorrectQuantity() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	Integer quantity = Integer.valueOf(impactedQuantityTextField.getText());
+    	CommandResult result = commandService.attachImpactedQuantity(id, quantity);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickCorrectedDescritpion() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	String text = descriptionTextArea.getText();
+    	CommandResult result = commandService.attachDescription(id, text);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickNa() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	CommandResult result = commandService.attachQualityDecision(id, QualityDecision.NA);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickRepair() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	CommandResult result = commandService.attachQualityDecision(id, QualityDecision.REPAIR);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickScrap() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	CommandResult result = commandService.attachQualityDecision(id, QualityDecision.SCRAP);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
     void onClickValidationCorrectiveAction() {
-    	if(anomalyProperty.get() == null || anomalyProperty.get().id() == null) {
+    	if(anomalyProperty.get() == null) {
     		return;//TODO popup/handle
     	}
     	UUID id = UUID.fromString(anomalyProperty.get().id());
@@ -112,7 +205,19 @@ public class PendingPanelController {
 
     @FXML
     void onSelectSector() {
-
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	String sector = sectorCombo.getSelectionModel().getSelectedItem();
+    	CommandResult result = commandService.attachSector(id, sector);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
     
     @FXML
@@ -213,7 +318,7 @@ public class PendingPanelController {
     		switch(anomalyProperty.get().qualityDecision()) {
     		case "REPAIR" -> repairButton.setSelected(true);
     		case "SCRAP" -> scrapButton.setSelected(true);
-    		case "N/A" -> naButton.setSelected(true);
+    		case "NA" -> naButton.setSelected(true);
     		default ->{}
     		}
     	}

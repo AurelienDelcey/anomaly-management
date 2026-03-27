@@ -94,11 +94,76 @@ public class AnomalyCommandService {
 		}
 	}
 	
-	public CommandResult attachSector (UUID anomalyId, Sector sector) {
+	public CommandResult attachProductionOrder (UUID anomalyId, int productionOrder) {
+		try {
+			log.debug("attachProductionOrder requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
+			Anomaly anomaly = repository.findById(anomalyId);
+			Anomaly newAnomaly = anomaly.attachProductionOrder(newProductionOrder);
+			repository.save(newAnomaly);
+			log.info("AttachProductionOrder succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
+			return new CommandSuccess(anomalyId);
+		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
+			log.warn("AttachProductionOrder failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachProductionOrder anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
+	}
+	
+	public CommandResult attachImpactedQuantity (UUID anomalyId, int quantity) {
+		try {
+			log.debug("ImpactedQuantity requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			ImpactedQuantity newImpactedQuantity = new ImpactedQuantity(quantity);
+			Anomaly anomaly = repository.findById(anomalyId);
+			Anomaly newAnomaly = anomaly.attachImpactedQuantity(newImpactedQuantity);
+			repository.save(newAnomaly);
+			log.info("AttachImpactedQuantity succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
+			return new CommandSuccess(anomalyId);
+		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
+			log.warn("AttachImpactedQuantity failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachImpactedQuantity anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
+	}
+	
+	public CommandResult attachMachine (UUID anomalyId, String machine) {
+		Machine newMachine;
+		try {
+			log.debug("AttachMachine requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			try {
+				newMachine = Machine.valueOf(machine);
+			} catch (IllegalArgumentException e) {
+			    return new CommandFailure("Invalid machine: " + machine);
+			}
+			Anomaly anomaly = repository.findById(anomalyId);
+			Anomaly newAnomaly = anomaly.attachMachine(newMachine);
+			repository.save(newAnomaly);
+			log.info("AttachMachine succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
+			return new CommandSuccess(anomalyId);
+		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
+			log.warn("AttachMachine failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("AttachMachine anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
+	}
+	
+	public CommandResult attachSector (UUID anomalyId, String sector) {
+		Sector newSector;
 		try {
 			log.debug("AttachSector requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
+			try {
+			    newSector = Sector.valueOf(sector);
+			} catch (IllegalArgumentException e) {
+			    return new CommandFailure("Invalid sector: " + sector);
+			}
 			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachSector(sector);
+			Anomaly newAnomaly = anomaly.attachSector(newSector);
 			repository.save(newAnomaly);
 			log.info("AttachSector succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
 			return new CommandSuccess(anomalyId);
