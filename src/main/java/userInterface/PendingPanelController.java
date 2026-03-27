@@ -52,12 +52,12 @@ public class PendingPanelController {
     
     @FXML
     void onSelectMachine() {
-
+    	
     }
 
     @FXML
     void onClickCorrectAnomaly() {
-
+    	
     }
 
     @FXML
@@ -120,6 +120,7 @@ public class PendingPanelController {
     	this.commandService = commandService;
     	this.updateCallback = updateCallback;
     	
+    	bindTransitionButton();
     	setupBoxes();
     	setupTextFields();
     	applyFilterOnTextField(impactedQuantityTextField);
@@ -201,5 +202,17 @@ public class PendingPanelController {
     		default ->{}
     		}
     	}
+    }
+    
+    private void bindTransitionButton() {
+    	correctAnomalyButton.disableProperty().bind(
+    			correctiveActionTextField.textProperty().isEmpty().or(
+    			impactedQuantityTextField.textProperty().isEmpty().or(
+    			productionOrderTextField.textProperty().isEmpty().or(
+    			descriptionTextArea.textProperty().isEmpty().or(
+    			machineCombo.selectionModelProperty().isNull().or(
+    			sectorCombo.selectionModelProperty().isNull().or(
+    			qualityDecisionGroup.selectedToggleProperty().isNull()))))))
+    			);
     }
 }
