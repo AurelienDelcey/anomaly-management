@@ -166,7 +166,7 @@ public class DetailViewLayoutController {
 	        Node node = loader.load();
 
 	        CorrectedPanelController controller = loader.getController();
-	       // controller.initController(anomaly);
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e));
 
 	        return node;
 

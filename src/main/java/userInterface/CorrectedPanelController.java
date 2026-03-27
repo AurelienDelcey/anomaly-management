@@ -1,5 +1,14 @@
 package userInterface;
 
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import application.command.AnomalyCommandService;
+import application.command.CommandFailure;
+import application.command.CommandResult;
+import application.command.CommandSuccess;
+import application.dto.AnomalyDto;
+import javafx.beans.property.ObjectProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -19,15 +28,94 @@ public class CorrectedPanelController {
     @FXML private Button resolveAnomalyButton;
     @FXML private Label sectorLabel;
     @FXML private Button validEvidenceButton;
-
+    
+    private ObjectProperty<AnomalyDto> anomalyProperty;
+    private Consumer<UUID> updateCallback;
+    private AnomalyCommandService commandService;
+    
     @FXML
-    void onClickResolveAnomaly(ActionEvent event) {
-
+	public void initialize() {
+		
+	}
+    
+    @FXML
+    void onClickResolveAnomaly() {
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	CommandResult result = commandService.transitionToResolved(id);
+    	
+    	switch (result) {
+	    	case CommandSuccess success ->{
+	    		updateCallback.accept(success.anomalyId());
+	    	}
+	    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML
-    void onClickValidEvidence(ActionEvent event) {
-
+    void onClickValidEvidence() {
+    	if(anomalyProperty.get() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	String text = evidenceTextField.getText();
+    	CommandResult result = commandService.attachEvidence(id, text);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
+    
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback) {
+    	this.anomalyProperty = anomalyProperty;
+    	this.commandService = commandService;
+    	this.updateCallback = updateCallback;
+    	
+    	bindTransitionButton();
+    	setupLabels();
+    }
+    
+    private void bindTransitionButton() {
+    	resolveAnomalyButton.disableProperty().bind(
+    			evidenceTextField.textProperty().isEmpty()
+    			);
+    }
+    
+    private void setupLabels() {
+    	if(anomalyProperty.get() == null) {
+    		return;
+    	}
+    	
+    	String evidence = anomalyProperty.get().evidenceId();
+    	if(evidence != null && !(evidence.isBlank())) {
+    		evidenceTextField.setText(evidence);
+    	}
+    	
+    	String correctiveAction = anomalyProperty.get().correctiveActionId();
+    	correctiveActionLabel.setText(correctiveAction);
+    	
+    	String description = anomalyProperty.get().description();
+    	descriptionTextArea.setText(description);
 
+    	Integer ProductionOrder = anomalyProperty.get().productionOrder();
+    	productionOrderLabel.setText(ProductionOrder.toString());
+    	
+    	Integer impactedQuantity = anomalyProperty.get().impactedQuantity();
+    	impactedQuantityLabel.setText(impactedQuantity.toString());
+    	
+    	String sector = anomalyProperty.get().sector();
+    	sectorLabel.setText(sector);
+    	
+    	String machine = anomalyProperty.get().machine();
+    	machineLabel.setText(machine);
+    	
+    	String qualityDecision = anomalyProperty.get().qualityDecision();
+    	qualityDecisionLabel.setText(qualityDecision);
+    }
+    
 }
