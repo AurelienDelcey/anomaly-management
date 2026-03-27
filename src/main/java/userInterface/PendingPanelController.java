@@ -6,6 +6,9 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import application.command.AnomalyCommandService;
+import application.command.CommandFailure;
+import application.command.CommandResult;
+import application.command.CommandSuccess;
 import application.dto.AnomalyDto;
 import domain.valueobject.Machine;
 import domain.valueobject.Sector;
@@ -92,7 +95,19 @@ public class PendingPanelController {
 
     @FXML
     void onClickValidationCorrectiveAction() {
-
+    	if(anomalyProperty.get() == null || anomalyProperty.get().id() == null) {
+    		return;//TODO popup/handle
+    	}
+    	UUID id = UUID.fromString(anomalyProperty.get().id());
+    	String text = correctiveActionTextField.getText();
+    	CommandResult result = commandService.attachCorrectiveAction(id, text);
+    	
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{}//TODO popup/handle
+    	};
     }
 
     @FXML

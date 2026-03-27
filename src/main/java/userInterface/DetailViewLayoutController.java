@@ -43,6 +43,7 @@ public class DetailViewLayoutController {
 	
 	private AnomalyCommandService commandService;
 	private AnomalyQueryService queryService;
+	private Consumer<AnomalyDto> updateCallback;
 	
 	private final ObjectProperty<AnomalyDto> anomalyProperty = new SimpleObjectProperty<>();
 	private final  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -75,9 +76,10 @@ public class DetailViewLayoutController {
 		//load history in modal window
 	}
 	
-	public void initController(AnomalyDto anomaly, AnomalyCommandService commandService, AnomalyQueryService queryService) {
+	public void initController(AnomalyDto anomaly, AnomalyCommandService commandService, AnomalyQueryService queryService, Consumer<AnomalyDto> updateCallback) {
 		this.commandService = commandService;
 		this.queryService = queryService;
+		this.updateCallback = updateCallback;
 		this.anomalyProperty.addListener((obs, old, newAnomaly) -> {
 				if (newAnomaly != null) {
 				    reloadDynamicPanel(newAnomaly);
@@ -209,6 +211,7 @@ public class DetailViewLayoutController {
 		switch (result) {
 			 case QuerySuccess<AnomalyDto> success-> {
 				 AnomalyDto anomaly = success.payload();
+				 updateCallback.accept(anomaly);
 				 anomalyProperty.set(anomaly);
 			 }
 			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup

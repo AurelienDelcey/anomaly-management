@@ -100,7 +100,7 @@ public class GeneralViewController {
 		Parent view = loader.load();
 			
 		DetailViewLayoutController controller = loader.getController();
-		controller.initController(anomaly, commandService, queryService);
+		controller.initController(anomaly, commandService, queryService, (e)->updateDto(e));
 		
 		Scene scene = new Scene(view);
 		Stage stage = new Stage();
@@ -158,16 +158,20 @@ public class GeneralViewController {
 		switch (result) {
 		 case QuerySuccess<AnomalyDto> success-> {
 			 AnomalyDto anomaly = success.payload();
-			 int index = items.indexOf(anomaly);
-			 if(index >= 0) {
-				 items.set(index, anomaly);
-			 }else {
-				 items.add(0,anomaly);
-			 }
+			 updateDto(anomaly);
 		 }
 		 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
 		 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
 		 };
+	}
+	
+	private void updateDto(AnomalyDto anomaly) {
+		 int index = items.indexOf(anomaly);
+		 if(index >= 0) {
+			 items.set(index, anomaly);
+		 }else {
+			 items.add(0,anomaly);
+		 }
 	}
 	
 }
