@@ -64,8 +64,13 @@ public class GeneralViewController {
 			
 		CreationViewController controller = loader.getController();
 		
-		controller.initController(commandService, (e)->updateCommand(e));
-		
+		controller.initController(commandService, (e)->updateCommand(e), (e)->{
+			try {
+				updateAndOpen(e);
+			} catch (IOException e1) {
+				//TODO handle
+			}
+		});
 		Scene scene = new Scene(view);
 		Stage stage = new Stage();
 		stage.setScene(scene);
@@ -76,7 +81,7 @@ public class GeneralViewController {
 		stage.setMinWidth(406);
 		stage.setMinHeight(563);
 		stage.setResizable(false);
-		stage.showAndWait();
+		stage.show();
 		
 	}
 	
@@ -93,22 +98,7 @@ public class GeneralViewController {
 			return;
 		}
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailViewLayout.fxml"));
-		Parent view = loader.load();
-			
-		DetailViewLayoutController controller = loader.getController();
-		controller.initController(anomaly, commandService, queryService, (e)->updateDto(e));
-		
-		Scene scene = new Scene(view);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(createButton.getScene().getWindow());
-		
-		stage.setMinWidth(400);
-		
-		stage.showAndWait();
+		openDetails(anomaly);
 	}
 	
 	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) {
@@ -171,4 +161,37 @@ public class GeneralViewController {
 		 }
 	}
 	
+	private void updateAndOpen(UUID id) throws IOException {
+	QueryResult<AnomalyDto> result = queryService.findById(id);
+			
+			switch (result) {
+			 case QuerySuccess<AnomalyDto> success-> {
+				 AnomalyDto anomaly = success.payload();
+				 updateDto(anomaly);
+				 openDetails(anomaly);
+			 }
+			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
+			 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
+			 };
+	}
+	
+	private void openDetails(AnomalyDto anomaly) throws IOException {
+		
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailViewLayout.fxml"));
+		Parent view = loader.load();
+			
+		DetailViewLayoutController controller = loader.getController();
+		controller.initController(anomaly, commandService, queryService, (e)->updateDto(e));
+		
+		Scene scene = new Scene(view);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(createButton.getScene().getWindow());
+		
+		stage.setMinWidth(400);
+		
+		stage.show();
+	}
 }

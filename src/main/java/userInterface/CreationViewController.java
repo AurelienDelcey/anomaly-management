@@ -35,6 +35,7 @@ public class CreationViewController {
 	
 	private AnomalyCommandService commandService;
 	private Consumer<UUID> updateCallback;
+	private Consumer<UUID> updateAndOpenCallback;
 	
 	@FXML
 	public void initialize() {
@@ -72,8 +73,8 @@ public class CreationViewController {
 				 machineBox.getValue());
 		switch(result) {
 			case CommandSuccess success ->{
-				updateCallback.accept(success.anomalyId());
-				onClickCancel();//TODO go to detail view.
+				updateAndOpenCallback.accept(success.anomalyId());
+				onClickCancel();
 			}
 			case CommandFailure failure ->{
 				//TODO popup error message
@@ -87,9 +88,10 @@ public class CreationViewController {
 		stage.close();
 	}
 	
-	public void initController(AnomalyCommandService commandService, Consumer<UUID> updateCallback) {
+	public void initController(AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<UUID> updateAndOpen) {
 		this.commandService = commandService;
 		this.updateCallback = updateCallback;
+		this.updateAndOpenCallback = updateAndOpen;
 	}
 	
 	private void setupBoxes() {
