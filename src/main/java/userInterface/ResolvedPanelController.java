@@ -53,6 +53,7 @@ public class ResolvedPanelController {
     		CommandResult result = commandService.transitionToArchivedWithProlongation(id, "prolongationMessage");//TODO popup for prolongationMessage
         	switch (result) {
     	    	case CommandSuccess success ->{
+    	    		updateCallback.accept(id);
     	    		updateCallback.accept(success.anomalyId());// load new prolongation directly
     	    	}
     	    	case CommandFailure failure ->{}//TODO popup/handle

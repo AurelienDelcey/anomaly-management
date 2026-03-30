@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -56,6 +57,7 @@ public class DetailViewLayoutController {
 		}
 		AnomalyDto newAnomaly = getAnomaly(UUID.fromString(anomalyProperty.get().parentId()));
 		anomalyProperty.set(newAnomaly);
+		reloadDynamicPanel(newAnomaly);
 	}
 	
 	@FXML
@@ -65,11 +67,22 @@ public class DetailViewLayoutController {
 		}
 		AnomalyDto newAnomaly = getAnomaly(UUID.fromString(anomalyProperty.get().childId()));
 		anomalyProperty.set(newAnomaly);
+		reloadDynamicPanel(newAnomaly);
 	}
 	
 	@FXML
 	public void onClickHistory() {
-		//load history in modal window
+		QueryResult<List<AnomalyDto>> result = queryService.findHistory(UUID.fromString(anomalyProperty.get().id()));
+		switch(result) {
+		case QuerySuccess<List<AnomalyDto>> success-> {
+			 List<AnomalyDto> listOfDto = success.payload();
+			 for(AnomalyDto dto : listOfDto) {
+				 System.out.println(dto.businessId()+"\n"+ dto.anomalyState());
+			 }
+		 }
+		 case QueryNotFound<List<AnomalyDto>> notFound-> {}//TODO popup
+		 case QueryFailure<List<AnomalyDto>> failure -> {}//TODO popup
+		};
 	}
 	
 	public void initController(AnomalyDto anomaly, AnomalyCommandService commandService, AnomalyQueryService queryService, Consumer<AnomalyDto> updateCallback) {

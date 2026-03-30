@@ -2,7 +2,6 @@ package domain.anomaly;
 
 import java.util.UUID;
 
-import domain.exception.InconsistentAnomalyStateException;
 import domain.traceability.Traceability;
 import domain.valueobject.BusinessId;
 import domain.valueobject.CorrectiveAction;
