@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 import application.command.AnomalyCommandService;
-import application.command.CommandFailure;
-import application.command.CommandResult;
-import application.command.CommandSuccess;
 import application.dto.AnomalyDto;
 import application.query.AnomalyQueryService;
 import application.query.QueryFailure;

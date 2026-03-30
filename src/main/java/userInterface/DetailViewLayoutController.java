@@ -76,12 +76,8 @@ public class DetailViewLayoutController {
 		this.commandService = commandService;
 		this.queryService = queryService;
 		this.updateCallback = updateCallback;
-		this.anomalyProperty.addListener((obs, old, newAnomaly) -> {
-				if (newAnomaly != null) {
-				    reloadDynamicPanel(newAnomaly);
-				}
-		    });
 		this.anomalyProperty.set(anomaly);
+		reloadDynamicPanel(anomaly);
 		bindHeader();
 		bindButtons();
 	}
@@ -137,7 +133,7 @@ public class DetailViewLayoutController {
 		if (supplier == null) {
 		    return;//TODO POPUP ERROR
 		}
-
+		
 		root.setCenter(supplier.get());
 	}
 	
@@ -208,7 +204,8 @@ public class DetailViewLayoutController {
 			 case QuerySuccess<AnomalyDto> success-> {
 				 AnomalyDto anomaly = success.payload();
 				 updateCallback.accept(anomaly);
-				 anomalyProperty.set(anomaly);
+				 this.anomalyProperty.set(anomaly);
+				 reloadDynamicPanel(anomaly);
 			 }
 			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
 			 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
