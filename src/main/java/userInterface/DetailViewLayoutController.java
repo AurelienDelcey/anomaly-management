@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -23,9 +25,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class DetailViewLayoutController {
 	
@@ -41,6 +47,7 @@ public class DetailViewLayoutController {
 	private AnomalyCommandService commandService;
 	private AnomalyQueryService queryService;
 	private Consumer<AnomalyDto> updateCallback;
+	private List<AnomalyDto> historyCache;
 	
 	private final ObjectProperty<AnomalyDto> anomalyProperty = new SimpleObjectProperty<>();
 	private final  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -71,18 +78,20 @@ public class DetailViewLayoutController {
 	}
 	
 	@FXML
-	public void onClickHistory() {
-		QueryResult<List<AnomalyDto>> result = queryService.findHistory(UUID.fromString(anomalyProperty.get().id()));
-		switch(result) {
-		case QuerySuccess<List<AnomalyDto>> success-> {
-			 List<AnomalyDto> listOfDto = success.payload();
-			 for(AnomalyDto dto : listOfDto) {
-				 System.out.println(dto.businessId()+"\n"+ dto.anomalyState());
-			 }
-		 }
-		 case QueryNotFound<List<AnomalyDto>> notFound-> {}//TODO popup
-		 case QueryFailure<List<AnomalyDto>> failure -> {}//TODO popup
-		};
+	public void onClickHistory() throws IOException {
+		if(this.historyCache == null) {
+			QueryResult<List<AnomalyDto>> result = queryService.findHistory(UUID.fromString(anomalyProperty.get().id()));
+			switch(result) {
+			case QuerySuccess<List<AnomalyDto>> success-> {
+				historyCache = new ArrayList<>(success.payload());
+				showHistory(success.payload());
+				 }
+			 case QueryNotFound<List<AnomalyDto>> notFound-> {}//TODO popup
+			 case QueryFailure<List<AnomalyDto>> failure -> {}//TODO popup
+			};
+		}else {
+			showHistory(this.historyCache);
+		}
 	}
 	
 	public void initController(AnomalyDto anomaly, AnomalyCommandService commandService, AnomalyQueryService queryService, Consumer<AnomalyDto> updateCallback) {
@@ -219,9 +228,61 @@ public class DetailViewLayoutController {
 				 updateCallback.accept(anomaly);
 				 this.anomalyProperty.set(anomaly);
 				 reloadDynamicPanel(anomaly);
+				 updateHistoryCache(anomaly);
 			 }
 			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
 			 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
 		 };
+	}
+	
+	private void updateHistoryCache(AnomalyDto anomaly) {
+		if(this.historyCache == null) {
+			return;
+		}
+		int index = this.historyCache.indexOf(anomaly);
+		if(index >= 0) {
+			 this.historyCache.set(index, anomaly);
+			 return;
+		 }
+		
+		if (anomaly.parentId() == null) {
+			return;
+		}
+		if(findParentInCache(anomaly.parentId())){
+			this.historyCache.add(anomaly);
+			return;
+		}
+		
+	}
+	
+	private boolean findParentInCache(String id) {
+		if(this.historyCache == null) {
+			return false;
+		}
+		for(AnomalyDto dto : this.historyCache) {
+			if(Objects.equals(dto.id(),id)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private void showHistory(List<AnomalyDto> list) throws IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/historyView.fxml"));
+		Parent view = loader.load();
+			
+		HistoryViewController controller = loader.getController();
+		controller.initController(list, (e)->{
+			anomalyProperty.set(e);
+			reloadDynamicPanel(e);
+		});
+		Scene scene = new Scene(view);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(root.getScene().getWindow());
+		
+		stage.show();
 	}
 }
