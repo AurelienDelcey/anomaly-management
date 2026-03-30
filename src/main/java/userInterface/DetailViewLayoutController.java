@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import application.command.AnomalyCommandService;
@@ -18,7 +16,6 @@ import application.query.QueryFailure;
 import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
-import domain.anomaly.AnomalyState;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -28,7 +25,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 
 public class DetailViewLayoutController {
 	
@@ -181,7 +177,7 @@ public class DetailViewLayoutController {
 	        Node node = loader.load();
 
 	        ResolvedPanelController controller = loader.getController();
-	       // controller.initController(anomaly);
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e));
 
 	        return node;
 
