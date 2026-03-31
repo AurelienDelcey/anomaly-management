@@ -31,6 +31,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -44,6 +45,7 @@ public class DetailViewLayoutController {
 	@FXML private Button previousAnomalyButton;
 	@FXML private Button nextAnomalyButton;
 	@FXML private Button historyButton;
+	@FXML private Button prolongationMessageButton;
 	@FXML private BorderPane root;
 	@FXML private TextArea feedbackBox;
 	
@@ -56,8 +58,26 @@ public class DetailViewLayoutController {
 	private final  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
 	@FXML
-	public void initialize() {
-		
+	public void onClickProlongationMessage() {
+		 Stage modal = new Stage();
+
+		    modal.initModality(Modality.APPLICATION_MODAL);
+		    modal.setTitle("Message");
+
+		    Label label = new Label();
+		    label.setText(anomalyProperty.get().prolongationComent());
+		    Button closeButton = new Button("Close");
+
+		    closeButton.setOnAction(e -> modal.close());
+
+		    VBox layout = new VBox(10);
+		    layout.getChildren().addAll(label, closeButton);
+		    layout.setStyle("-fx-padding: 20; -fx-alignment: center;");
+
+		    Scene scene = new Scene(layout);
+		    modal.setScene(scene);
+
+		    modal.showAndWait();
 	}
 	
 	@FXML
@@ -122,6 +142,9 @@ public class DetailViewLayoutController {
 				()-> anomalyProperty.get() ==null ? "" : anomalyProperty.get().createdBy(), anomalyProperty
 				));
 		isProlongationLabel.visibleProperty().bind(Bindings.createBooleanBinding(
+				()-> anomalyProperty.get() == null ? false : anomalyProperty.get().parentId() != null, anomalyProperty
+				));
+		prolongationMessageButton.visibleProperty().bind(Bindings.createBooleanBinding(
 				()-> anomalyProperty.get() == null ? false : anomalyProperty.get().parentId() != null, anomalyProperty
 				));
 	}

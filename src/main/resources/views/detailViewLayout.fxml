@@ -46,6 +46,7 @@
                   </Label>
                   <Label fx:id="idLabel" text="Label" />
                   <Label fx:id="isProlongationLabel" text="(prolongation)" />
+                  <Button fx:id="prolongationMessageButton" mnemonicParsing="false" onAction="#onClickProlongationMessage" text="View message" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="State:">
                      <font>
