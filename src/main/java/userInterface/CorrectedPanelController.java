@@ -30,6 +30,7 @@ public class CorrectedPanelController {
     
     private ObjectProperty<AnomalyDto> anomalyProperty;
     private Consumer<UUID> updateCallback;
+	private Consumer<String> feedbackCallback;
     private AnomalyCommandService commandService;
     
     @FXML
@@ -47,9 +48,12 @@ public class CorrectedPanelController {
     	
     	switch (result) {
 	    	case CommandSuccess success ->{
+	    		feedbackCallback.accept("Success!!");
 	    		updateCallback.accept(success.anomalyId());
 	    	}
-	    	case CommandFailure failure ->{}//TODO popup/handle
+	    	case CommandFailure failure ->{
+	    		feedbackCallback.accept(failure.message());
+	    	}//TODO popup/handle
     	};
     }
 
@@ -64,18 +68,21 @@ public class CorrectedPanelController {
     	
     	switch (result) {
     	case CommandSuccess success ->{
+    		feedbackCallback.accept("Success!!");
     		updateCallback.accept(success.anomalyId());
     	}
     	case CommandFailure failure ->{
+    		feedbackCallback.accept(failure.message());
     		setupLabels();
     	}//TODO popup/handle
     	};
     }
     
-    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback) {
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
     	this.anomalyProperty = anomalyProperty;
     	this.commandService = commandService;
     	this.updateCallback = updateCallback;
+    	this.feedbackCallback = feedbackCallback;
     	
     	bindTransitionButton();
     	setupLabels();

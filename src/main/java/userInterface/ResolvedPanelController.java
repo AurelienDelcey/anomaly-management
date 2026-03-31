@@ -33,6 +33,7 @@ public class ResolvedPanelController {
 
     private ObjectProperty<AnomalyDto> anomalyProperty;
     private Consumer<UUID> updateCallback;
+	private Consumer<String> feedbackCallback;
     private AnomalyCommandService commandService;
     
     @FXML
@@ -45,26 +46,33 @@ public class ResolvedPanelController {
         	CommandResult result = commandService.transitionToArchived(id);
         	switch (result) {
     	    	case CommandSuccess success ->{
+    	    		feedbackCallback.accept("Success!!");
     	    		updateCallback.accept(success.anomalyId());
     	    	}
-    	    	case CommandFailure failure ->{}//TODO popup/handle
+    	    	case CommandFailure failure ->{
+    	    		feedbackCallback.accept(failure.message());
+    	    	}//TODO popup/handle
         	};
     	}else if(validationGroup.getSelectedToggle() == invalidButton ) {
     		CommandResult result = commandService.transitionToArchivedWithProlongation(id, "prolongationMessage");//TODO popup for prolongationMessage
         	switch (result) {
     	    	case CommandSuccess success ->{
+    	    		feedbackCallback.accept("Success!!");
     	    		updateCallback.accept(id);
     	    		updateCallback.accept(success.anomalyId());// load new prolongation directly
     	    	}
-    	    	case CommandFailure failure ->{}//TODO popup/handle
+    	    	case CommandFailure failure ->{
+    	    		feedbackCallback.accept(failure.message());
+    	    	}//TODO popup/handle
         	};
     	}
     }
     
-    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback) {
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
     	this.anomalyProperty = anomalyProperty;
     	this.commandService = commandService;
     	this.updateCallback = updateCallback;
+    	this.feedbackCallback = feedbackCallback;
     	
     	bindTransitionButton();
     	setupLabels();

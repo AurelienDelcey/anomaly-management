@@ -29,6 +29,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -43,6 +44,7 @@ public class DetailViewLayoutController {
 	@FXML private Button nextAnomalyButton;
 	@FXML private Button historyButton;
 	@FXML private BorderPane root;
+	@FXML private TextArea feedbackBox;
 	
 	private AnomalyCommandService commandService;
 	private AnomalyQueryService queryService;
@@ -165,7 +167,7 @@ public class DetailViewLayoutController {
 	        Node node = loader.load();
 
 	        PendingPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e));
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
 
 	        return node;
 
@@ -180,7 +182,7 @@ public class DetailViewLayoutController {
 	        Node node = loader.load();
 
 	        CorrectedPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e));
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
 
 	        return node;
 
@@ -195,7 +197,7 @@ public class DetailViewLayoutController {
 	        Node node = loader.load();
 
 	        ResolvedPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e));
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
 
 	        return node;
 
@@ -284,5 +286,14 @@ public class DetailViewLayoutController {
 		stage.initOwner(root.getScene().getWindow());
 		
 		stage.show();
+	}
+	
+	private void showFeedback(String message) {
+		feedbackBox.setText(message);
+		if(message != null && message.contains("Success")) {
+			feedbackBox.setStyle("-fx-text-fill: green;");
+		}else {
+			feedbackBox.setStyle("-fx-text-fill: red;");
+		}
 	}
 }
