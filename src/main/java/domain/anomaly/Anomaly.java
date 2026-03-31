@@ -69,7 +69,7 @@ public class Anomaly {
 		this.machine = machine;
 	}
 	
-	public Anomaly(BusinessId businessId, Description description, Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine, EventTrace creationTrace, ProlongationContext prolongationContext){
+	public Anomaly(QualityDecision qualityDecision, BusinessId businessId, Description description, Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine, EventTrace creationTrace, ProlongationContext prolongationContext){
 		if(businessId == null) {
 			throw new IllegalArgumentException("businessId cannot be null.");
 		}
@@ -97,7 +97,7 @@ public class Anomaly {
 		this.anomalyState = AnomalyState.PENDING;
 		this.correctiveAction = null;
 		this.evidence = null;
-		this.qualityDecision = QualityDecision.EMPTY;
+		this.qualityDecision = qualityDecision;
 		this.description = description;
 		this.quantity = quantity;
 		this.productionOrder = productionOrder;
@@ -225,8 +225,8 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachQualityDecision(QualityDecision newQualityDecision)throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING) {
-			throw new IllegalAttachment("The state of anomaly must be PENDING to attach quality decision.");
+		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+			throw new IllegalAttachment("Editing quality decision is only permitted on a root anomaly in PENDING state.");
 		}
 		if(newQualityDecision==QualityDecision.EMPTY) {
 			throw new IllegalAttachment("Quality decision can't be EMPTY.");

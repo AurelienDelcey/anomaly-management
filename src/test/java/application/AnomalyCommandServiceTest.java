@@ -165,7 +165,7 @@ class AnomalyCommandServiceTest {
 		assertNull(child.childId());
 		assertEquals("PENDING", child.anomalyState());
 		assertNull(child.correctiveActionId());
-		assertEquals("EMPTY", child.qualityDecision());
+		assertEquals("NA", child.qualityDecision());
 		assertNull(child.evidenceId());
 		assertEquals(DESCRIPTION, child.description());
 	}

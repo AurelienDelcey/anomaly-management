@@ -100,7 +100,7 @@ class AnomalyTest {
 	void prolongationConstructor_ShouldReturnValidAnomaly() {
 		ProlongationContext prolongationContext = getValidProlongationContext();
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		Anomaly anomaly = new Anomaly(getValidBusinessId(),getValidDescription(), Sector.FORGING, 
+		Anomaly anomaly = new Anomaly(QualityDecision.NA, getValidBusinessId(),getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, prolongationContext);
 		
 		assertNotNull(anomaly.getId());
@@ -117,49 +117,49 @@ class AnomalyTest {
 		assertEquals(AnomalyState.PENDING, anomaly.getAnomalyState());
 		assertNull(anomaly.getCorrectiveAction());
 		assertNull(anomaly.getEvidence());
-		assertEquals(QualityDecision.EMPTY, anomaly.getQualityDecision());
+		assertEquals(QualityDecision.NA, anomaly.getQualityDecision());
 		assertEquals(DESCRIPTION, anomaly.getDescription().description());
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), null, 
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), null, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenBusinessIdIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(null, getValidDescription(), Sector.FORGING, 
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, null, getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenImpactedQuantityIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				null, getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenProductionOrderIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), null, Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenMachineIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), null, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenProlongationContextIsNull() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, null));
 	}
 	
@@ -581,7 +581,7 @@ class AnomalyTest {
 	
 	private Anomaly createProlongation() {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
-		return new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext());
+		return new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext());
 	}
 	
 	private Anomaly createPendingAnomaly() {
@@ -599,7 +599,6 @@ class AnomalyTest {
 	private Anomaly createCorrectedProlongation() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
 		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
 		Anomaly anomaly = createProlongation().attachCorrectiveAction(VALID_DOC_ID);
-		anomaly = anomaly.attachQualityDecision(QualityDecision.NA);
 		return anomaly.transitionToCorrected(correctedTrace);
 	}
 	

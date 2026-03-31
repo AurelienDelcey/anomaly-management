@@ -293,7 +293,7 @@ public class AnomalyCommandService {
 				Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 				ProlongationContext context = new ProlongationContext(archivedAnomaly.getId(), comment);
 				BusinessId businessId = businessIdGenerator.getBusinessId();
-				Anomaly prolongation = createProlongation(businessId, context, archivedAnomaly.getDescription(), archivedAnomaly.getSector(), 
+				Anomaly prolongation = createProlongation(archivedAnomaly.getQualityDecision(), businessId, context, archivedAnomaly.getDescription(), archivedAnomaly.getSector(), 
 						archivedAnomaly.getQuantity(), archivedAnomaly.getProductionOrder(), archivedAnomaly.getMachine());
 				Anomaly anomalyWithProlongationId = archivedAnomaly.linkProlongation(prolongation.getId());
 				repository.saveAtomic(anomalyWithProlongationId, prolongation);
@@ -313,10 +313,10 @@ public class AnomalyCommandService {
 		return new CommandFailure("transitionToArchivedWithProlongation failed: Maximum aptempt of retry to allocate a businessId");
 	}
 	
-	private Anomaly createProlongation (BusinessId businessId, ProlongationContext prolongationContext, Description description, 
+	private Anomaly createProlongation (QualityDecision qualityDecision, BusinessId businessId, ProlongationContext prolongationContext, Description description, 
 			Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine) {
 		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		Anomaly anomaly = new Anomaly(businessId, description, sector, quantity, productionOrder, machine, trace, prolongationContext);
+		Anomaly anomaly = new Anomaly(qualityDecision, businessId, description, sector, quantity, productionOrder, machine, trace, prolongationContext);
 		log.debug("CreateProlongation - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 		return anomaly;
 	}

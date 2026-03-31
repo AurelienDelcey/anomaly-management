@@ -234,7 +234,7 @@ class JdbcAnomalyRepositoryTest {
 	private Anomaly createPendingProlongationAnomaly(UUID parentId, String comment) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
 		ProlongationContext prolongationContext = new ProlongationContext(parentId, comment);
-		return new Anomaly(getValidBusinessIdForProlongation(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, prolongationContext);
+		return new Anomaly(QualityDecision.NA, getValidBusinessIdForProlongation(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, prolongationContext);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
