@@ -40,6 +40,7 @@ public class DetailViewLayoutController {
 	@FXML private Label stateLabel;
 	@FXML private Label createdAtLabel;
 	@FXML private Label createdByLabel;
+	@FXML private Label isProlongationLabel;
 	@FXML private Button previousAnomalyButton;
 	@FXML private Button nextAnomalyButton;
 	@FXML private Button historyButton;
@@ -119,6 +120,9 @@ public class DetailViewLayoutController {
 				));
 		createdByLabel.textProperty().bind(Bindings.createStringBinding(
 				()-> anomalyProperty.get() ==null ? "" : anomalyProperty.get().createdBy(), anomalyProperty
+				));
+		isProlongationLabel.visibleProperty().bind(Bindings.createBooleanBinding(
+				()-> anomalyProperty.get() == null ? false : anomalyProperty.get().parentId() != null, anomalyProperty
 				));
 	}
 	

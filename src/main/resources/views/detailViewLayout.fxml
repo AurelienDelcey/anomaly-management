@@ -45,6 +45,7 @@
                      </font>
                   </Label>
                   <Label fx:id="idLabel" text="Label" />
+                  <Label fx:id="isProlongationLabel" text="(prolongation)" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label text="State:">
                      <font>
