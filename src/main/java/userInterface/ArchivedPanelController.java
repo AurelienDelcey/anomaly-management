@@ -26,10 +26,6 @@ public class ArchivedPanelController {
     }
     
     private void setupLabels() {
-    	if(anomalyProperty.get() == null) {
-    		return;
-    	}
-    	
     	if(anomalyProperty.get().childId() == null) {
     		conclusionLabel.setText("Valid");
     	}else {

@@ -43,11 +43,18 @@ public class ResolvedPanelController {
     private AnomalyCommandService commandService;
     private String prolongationMessage;
     
-    @FXML
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
+		this.anomalyProperty = anomalyProperty;
+		this.commandService = commandService;
+		this.updateCallback = updateCallback;
+		this.feedbackCallback = feedbackCallback;
+		
+		bindTransitionButton();
+		setupLabels();
+	}
+
+	@FXML
     void onClickArchiveAnomaly() {
-    	if(anomalyProperty.get() == null) {
-    		return;//TODO popup/handle
-    	}
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	if(validationGroup.getSelectedToggle() == validButton ) {
         	CommandResult result = commandService.transitionToArchived(id);
@@ -62,10 +69,10 @@ public class ResolvedPanelController {
         	};
     	}else if(validationGroup.getSelectedToggle() == invalidButton ) {
     		getMessage();
-    		if(this.prolongationMessage==null) {
+    		if(this.prolongationMessage == null) {
     			return;
     		}
-    		CommandResult result = commandService.transitionToArchivedWithProlongation(id, this.prolongationMessage);//TODO popup for prolongationMessage
+    		CommandResult result = commandService.transitionToArchivedWithProlongation(id, this.prolongationMessage);
         	switch (result) {
     	    	case CommandSuccess success ->{
     	    		feedbackCallback.accept("Success!!");
@@ -79,36 +86,6 @@ public class ResolvedPanelController {
     	}
     }
     
-    private void getMessage() {
-    	try {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/getProlongationMessageView.fxml"));
-	        Parent view = loader.load();
-
-	        GetProlongationMessageViewController controller = loader.getController();
-	        controller.initController((e)->setProlongationMessage(e));
-	        Scene scene = new Scene(view);
-			Stage stage = new Stage();
-			stage.setScene(scene);
-			stage.initModality(Modality.APPLICATION_MODAL);
-			stage.initOwner(archiveAnomalyButton.getScene().getWindow());
-			stage.showAndWait();
-			
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
-		
-	}
-
-	public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
-    	this.anomalyProperty = anomalyProperty;
-    	this.commandService = commandService;
-    	this.updateCallback = updateCallback;
-    	this.feedbackCallback = feedbackCallback;
-    	
-    	bindTransitionButton();
-    	setupLabels();
-    }
-    
     private void bindTransitionButton() {
     	archiveAnomalyButton.disableProperty().bind(
     			validationGroup.selectedToggleProperty().isNull()
@@ -116,10 +93,6 @@ public class ResolvedPanelController {
     }
     
     private void setupLabels() {
-    	if(anomalyProperty.get() == null) {
-    		return;
-    	}
-    	
     	String evidence = anomalyProperty.get().evidenceId();
     	evidenceLabel.setText(evidence);
     	
@@ -148,6 +121,26 @@ public class ResolvedPanelController {
     private void setProlongationMessage(String message) {
     	this.prolongationMessage = message;
     }
+
+	private void getMessage() {
+		try {
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/getProlongationMessageView.fxml"));
+	        Parent view = loader.load();
+	
+	        GetProlongationMessageViewController controller = loader.getController();
+	        controller.initController((e)->setProlongationMessage(e));
+	        Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(archiveAnomalyButton.getScene().getWindow());
+			stage.showAndWait();
+			
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+		
+	}
 
 }
 

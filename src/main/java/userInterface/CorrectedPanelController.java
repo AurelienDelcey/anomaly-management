@@ -33,16 +33,19 @@ public class CorrectedPanelController {
 	private Consumer<String> feedbackCallback;
     private AnomalyCommandService commandService;
     
-    @FXML
-	public void initialize() {
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
+		this.anomalyProperty = anomalyProperty;
+		this.commandService = commandService;
+		this.updateCallback = updateCallback;
+		this.feedbackCallback = feedbackCallback;
 		
+		bindTransitionButton();
+		setupLabels();
 	}
-    
-    @FXML
+
+	@FXML
     void onClickResolveAnomaly() {
-    	if(anomalyProperty.get() == null) {
-    		return;//TODO popup/handle
-    	}
+    	
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	CommandResult result = commandService.transitionToResolved(id);
     	
@@ -53,15 +56,13 @@ public class CorrectedPanelController {
 	    	}
 	    	case CommandFailure failure ->{
 	    		feedbackCallback.accept(failure.message());
-	    	}//TODO popup/handle
+	    	}
     	};
     }
 
     @FXML
     void onClickValidEvidence() {
-    	if(anomalyProperty.get() == null) {
-    		return;//TODO popup/handle
-    	}
+    	
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	String text = evidenceTextField.getText();
     	CommandResult result = commandService.attachEvidence(id, text);
@@ -74,18 +75,8 @@ public class CorrectedPanelController {
     	case CommandFailure failure ->{
     		feedbackCallback.accept(failure.message());
     		setupLabels();
-    	}//TODO popup/handle
+    	}
     	};
-    }
-    
-    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
-    	this.anomalyProperty = anomalyProperty;
-    	this.commandService = commandService;
-    	this.updateCallback = updateCallback;
-    	this.feedbackCallback = feedbackCallback;
-    	
-    	bindTransitionButton();
-    	setupLabels();
     }
     
     private void bindTransitionButton() {
@@ -95,9 +86,6 @@ public class CorrectedPanelController {
     }
     
     private void setupLabels() {
-    	if(anomalyProperty.get() == null) {
-    		return;
-    	}
     	
     	String evidence = anomalyProperty.get().evidenceId();
     	if(evidence != null && !(evidence.isBlank())) {

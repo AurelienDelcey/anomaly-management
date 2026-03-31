@@ -26,7 +26,7 @@
             <VBox>
                <children>
                   <Label text="Production order:" />
-                  <TextField fx:id="productionOrderTextField" onAction="#onActionProductionOrder" />
+                  <TextField fx:id="productionOrderTextField" onAction="#onClickCorrectProductionOrder" />
                   <Button fx:id="correctProductionOrderButton" mnemonicParsing="false" onAction="#onClickCorrectProductionOrder" text="Correct" />
                </children>
             </VBox>
@@ -44,7 +44,7 @@
             <VBox>
                <children>
                   <Label text="Impacted quantity:" />
-                  <TextField fx:id="impactedQuantityTextField" onAction="#onActionQuantity" />
+                  <TextField fx:id="impactedQuantityTextField" onAction="#onClickCorrectQuantity" />
                   <Button fx:id="correctImpactedQuantity" mnemonicParsing="false" onAction="#onClickCorrectQuantity" text="Correct" />
                </children>
             </VBox>
@@ -52,7 +52,7 @@
             <VBox>
                <children>
                   <Label text="Corrective action id:" />
-                  <TextField fx:id="correctiveActionTextField" onAction="#onActionCorrectiveAction" promptText="ABC-000-DDMMYY" />
+                  <TextField fx:id="correctiveActionTextField" onAction="#onClickValidationCorrectiveAction" promptText="ABC-000-DDMMYY" />
                   <Button fx:id="validationCorrectiveActionButton" mnemonicParsing="false" onAction="#onClickValidationCorrectiveAction" text="Validation" />
                </children>
             </VBox>

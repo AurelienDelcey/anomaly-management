@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -57,6 +58,16 @@ public class DetailViewLayoutController {
 	private final ObjectProperty<AnomalyDto> anomalyProperty = new SimpleObjectProperty<>();
 	private final  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
+	public void initController(AnomalyDto anomaly, AnomalyCommandService commandService, AnomalyQueryService queryService, Consumer<AnomalyDto> updateCallback) {
+		this.commandService = commandService;
+		this.queryService = queryService;
+		this.updateCallback = updateCallback;
+		this.anomalyProperty.set(anomaly);
+		reloadDynamicPanel(anomaly);
+		bindHeader();
+		bindButtons();
+	}
+
 	@FXML
 	public void onClickProlongationMessage() {
 		 Stage modal = new Stage();
@@ -82,22 +93,20 @@ public class DetailViewLayoutController {
 	
 	@FXML
 	public void onClickPrevious() {
-		if(anomalyProperty.get() == null) {
-			return;
-		}
-		AnomalyDto newAnomaly = getAnomaly(UUID.fromString(anomalyProperty.get().parentId()));
-		anomalyProperty.set(newAnomaly);
-		reloadDynamicPanel(newAnomaly);
+		Optional<AnomalyDto>optAnomaly = getAnomaly(UUID.fromString(anomalyProperty.get().parentId()));
+		optAnomaly.ifPresent((newAnomaly)->{
+			anomalyProperty.set(newAnomaly);
+			reloadDynamicPanel(newAnomaly);
+		});
 	}
 	
 	@FXML
 	public void onClickNext() {
-		if(anomalyProperty.get() == null) {
-			return;
-		}
-		AnomalyDto newAnomaly = getAnomaly(UUID.fromString(anomalyProperty.get().childId()));
-		anomalyProperty.set(newAnomaly);
-		reloadDynamicPanel(newAnomaly);
+		Optional<AnomalyDto>optAnomaly = getAnomaly(UUID.fromString(anomalyProperty.get().childId()));
+		optAnomaly.ifPresent((newAnomaly)->{
+			anomalyProperty.set(newAnomaly);
+			reloadDynamicPanel(newAnomaly);
+		});
 	}
 	
 	@FXML
@@ -109,25 +118,15 @@ public class DetailViewLayoutController {
 				historyCache = new ArrayList<>(success.payload());
 				showHistory(success.payload());
 				 }
-			 case QueryNotFound<List<AnomalyDto>> notFound-> {}//TODO popup
-			 case QueryFailure<List<AnomalyDto>> failure -> {}//TODO popup
+			 case QueryNotFound<List<AnomalyDto>> notFound-> {showFeedback("History not found");}
+			 case QueryFailure<List<AnomalyDto>> failure -> {showFeedback(failure.message());}
 			};
 		}else {
 			showHistory(this.historyCache);
 		}
 	}
 	
-	public void initController(AnomalyDto anomaly, AnomalyCommandService commandService, AnomalyQueryService queryService, Consumer<AnomalyDto> updateCallback) {
-		this.commandService = commandService;
-		this.queryService = queryService;
-		this.updateCallback = updateCallback;
-		this.anomalyProperty.set(anomaly);
-		reloadDynamicPanel(anomaly);
-		bindHeader();
-		bindButtons();
-	}
-	
-	public void bindHeader() {
+	private void bindHeader() {
 		idLabel.textProperty().bind(Bindings.createStringBinding(
 				()-> anomalyProperty.get() ==null ? "" : anomalyProperty.get().businessId(), anomalyProperty
 				));
@@ -148,8 +147,8 @@ public class DetailViewLayoutController {
 				()-> anomalyProperty.get() == null ? false : anomalyProperty.get().parentId() != null, anomalyProperty
 				));
 	}
-	
-	public void bindButtons() {
+
+	private void bindButtons() {
 		previousAnomalyButton.disableProperty().bind(Bindings.createBooleanBinding(
 				()->anomalyProperty.get() == null || anomalyProperty.get().parentId() == null, anomalyProperty
 		));
@@ -160,15 +159,21 @@ public class DetailViewLayoutController {
 				()-> anomalyProperty.get() == null || (anomalyProperty.get().parentId() == null && anomalyProperty.get().childId() == null), anomalyProperty
 		));
 	}
-	
-	private AnomalyDto getAnomaly(UUID id) {
+
+	private Optional<AnomalyDto> getAnomaly(UUID id) {
 		QueryResult<AnomalyDto> result = queryService.findById(id);
 		return switch(result) {
 		case QuerySuccess<AnomalyDto> success-> {
-			 yield success.payload();
+			 yield Optional.of(success.payload());
 		 }
-		 case QueryNotFound<AnomalyDto> notFound-> {yield null;}//TODO popup
-		 case QueryFailure<AnomalyDto> failure -> {yield null;}//TODO popup
+		 case QueryNotFound<AnomalyDto> notFound-> {
+			 showFeedback("Anomaly not found");
+			 yield Optional.empty();
+			 }
+		 case QueryFailure<AnomalyDto> failure -> {
+			 showFeedback(failure.message());
+			 yield Optional.empty();
+			 }
 		};
 	}
 	
@@ -182,7 +187,8 @@ public class DetailViewLayoutController {
 		Supplier<Node> supplier = loader.get(newAnomaly.anomalyState());
 
 		if (supplier == null) {
-		    return;//TODO POPUP ERROR
+			showFeedback("Unknow state, impossible to load panel");
+		    return;
 		}
 		
 		root.setCenter(supplier.get());
@@ -259,8 +265,8 @@ public class DetailViewLayoutController {
 				 reloadDynamicPanel(anomaly);
 				 updateHistoryCache(anomaly);
 			 }
-			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
-			 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
+			 case QueryNotFound<AnomalyDto> notFound-> {showFeedback("Anomaly not found");}
+			 case QueryFailure <AnomalyDto> failure -> {showFeedback(failure.message());}
 		 };
 	}
 	

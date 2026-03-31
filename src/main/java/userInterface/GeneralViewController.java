@@ -114,7 +114,7 @@ public class GeneralViewController {
 		 case QuerySuccess<List<AnomalyDto>> success-> {
 			 items.setAll(success.payload());
 		 }
-		 case QueryNotFound<List<AnomalyDto>> notFound-> {}//TODO nothing, empty list here
+		 case QueryNotFound<List<AnomalyDto>> notFound-> {}
 		 case QueryFailure <List<AnomalyDto>> failure -> {}//TODO error popup
 		 };
 	}

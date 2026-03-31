@@ -30,6 +30,7 @@ public class GetProlongationMessageViewController {
     
     public void initController(Consumer<String> messageCallback) {
     	this.messageCallback = messageCallback;
+    	messageArea.requestFocus();
     }
 
 }

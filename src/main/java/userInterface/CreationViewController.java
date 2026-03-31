@@ -1,5 +1,6 @@
 package userInterface;
 
+import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -13,12 +14,16 @@ import domain.valueobject.Machine;
 import domain.valueobject.Sector;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class CreationViewController {
@@ -46,8 +51,14 @@ public class CreationViewController {
 		applyFilterOnTextField(productionOrderField);
 	}
 	
+	public void initController(AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<UUID> updateAndOpen) {
+		this.commandService = commandService;
+		this.updateCallback = updateCallback;
+		this.updateAndOpenCallback = updateAndOpen;
+	}
+
 	@FXML
-	public void onClickCreate() {
+	public void onClickCreate() throws IOException {
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
 									 sectorBox.getValue(), 
 									 Integer.valueOf(quantityField.getText()), 
@@ -59,13 +70,13 @@ public class CreationViewController {
 				onClickCancel();
 			}
 			case CommandFailure failure ->{
-				//TODO popup error message
+				showError(failure.message());
 			}
 		}
 	}
 	
 	@FXML
-	public void onClickCreateAndOpen() {
+	public void onClickCreateAndOpen() throws IOException {
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
 				 sectorBox.getValue(), 
 				 Integer.valueOf(quantityField.getText()), 
@@ -77,7 +88,7 @@ public class CreationViewController {
 				onClickCancel();
 			}
 			case CommandFailure failure ->{
-				//TODO popup error message
+				showError(failure.message());
 			}
 		}
 	}
@@ -86,12 +97,6 @@ public class CreationViewController {
 	public void onClickCancel() {
 		Stage stage = (Stage) root.getScene().getWindow();
 		stage.close();
-	}
-	
-	public void initController(AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<UUID> updateAndOpen) {
-		this.commandService = commandService;
-		this.updateCallback = updateCallback;
-		this.updateAndOpenCallback = updateAndOpen;
 	}
 	
 	private void setupBoxes() {
@@ -125,5 +130,22 @@ public class CreationViewController {
 			}
 		});
 		text.setTextFormatter(format);
+	}
+	
+	private void showError(String message) throws IOException {
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
+		Parent view = loader.load();
+			
+		ErrorViewController controller = loader.getController();
+		controller.initController(message);
+		
+		Scene scene = new Scene(view);
+		Stage stage = new Stage();
+		stage.setScene(scene);
+		
+		stage.initModality(Modality.APPLICATION_MODAL);
+		stage.initOwner(createButton.getScene().getWindow());
+		
+		stage.showAndWait();
 	}
 }
