@@ -66,7 +66,9 @@ public class CorrectedPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupLabels();
+    	}//TODO popup/handle
     	};
     }
     

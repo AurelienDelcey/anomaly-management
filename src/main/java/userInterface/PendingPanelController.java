@@ -65,7 +65,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -98,7 +100,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -115,7 +119,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -132,7 +138,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -148,7 +156,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -164,7 +174,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -180,7 +192,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -197,7 +211,9 @@ public class PendingPanelController {
     	case CommandSuccess success ->{
     		updateCallback.accept(success.anomalyId());
     	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+    	case CommandFailure failure ->{
+    		setupSelections();
+    	}//TODO popup/handle
     	};
     }
 
@@ -211,10 +227,12 @@ public class PendingPanelController {
     	CommandResult result = commandService.attachSector(id, sector);
     	
     	switch (result) {
-    	case CommandSuccess success ->{
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{}//TODO popup/handle
+	    	case CommandSuccess success ->{
+	    		updateCallback.accept(success.anomalyId());
+	    	}
+	    	case CommandFailure failure ->{
+	    		setupSelections();
+	    	}//TODO popup/handle
     	};
     }
     
@@ -239,12 +257,10 @@ public class PendingPanelController {
     	this.updateCallback = updateCallback;
     	
     	bindTransitionButton();
-    	setupBoxes();
-    	setupTextFields();
     	applyFilterOnTextField(impactedQuantityTextField);
     	applyFilterOnTextField(productionOrderTextField);
-    	preselectComboBoxes();
-    	preselectQualityDecision();
+    	setupBoxes();
+    	setupSelections();
     }
     
     private void setupBoxes() {
@@ -332,5 +348,11 @@ public class PendingPanelController {
     			sectorCombo.selectionModelProperty().isNull().or(
     			qualityDecisionGroup.selectedToggleProperty().isNull()))))))
     			);
+    }
+    
+    private void setupSelections() {
+    	setupTextFields();
+    	preselectComboBoxes();
+    	preselectQualityDecision();
     }
 }
