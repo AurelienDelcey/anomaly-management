@@ -1,5 +1,6 @@
 package userInterface;
 
+import java.io.IOException;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -10,11 +11,16 @@ import application.command.CommandSuccess;
 import application.dto.AnomalyDto;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class ResolvedPanelController {
 
@@ -35,6 +41,7 @@ public class ResolvedPanelController {
     private Consumer<UUID> updateCallback;
 	private Consumer<String> feedbackCallback;
     private AnomalyCommandService commandService;
+    private String prolongationMessage;
     
     @FXML
     void onClickArchiveAnomaly() {
@@ -51,24 +58,48 @@ public class ResolvedPanelController {
     	    	}
     	    	case CommandFailure failure ->{
     	    		feedbackCallback.accept(failure.message());
-    	    	}//TODO popup/handle
+    	    	}
         	};
     	}else if(validationGroup.getSelectedToggle() == invalidButton ) {
-    		CommandResult result = commandService.transitionToArchivedWithProlongation(id, "prolongationMessage");//TODO popup for prolongationMessage
+    		getMessage();
+    		if(this.prolongationMessage==null) {
+    			return;
+    		}
+    		CommandResult result = commandService.transitionToArchivedWithProlongation(id, this.prolongationMessage);//TODO popup for prolongationMessage
         	switch (result) {
     	    	case CommandSuccess success ->{
     	    		feedbackCallback.accept("Success!!");
     	    		updateCallback.accept(id);
-    	    		updateCallback.accept(success.anomalyId());// load new prolongation directly
+    	    		updateCallback.accept(success.anomalyId());
     	    	}
     	    	case CommandFailure failure ->{
     	    		feedbackCallback.accept(failure.message());
-    	    	}//TODO popup/handle
+    	    	}
         	};
     	}
     }
     
-    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
+    private void getMessage() {
+    	try {
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/getProlongationMessageView.fxml"));
+	        Parent view = loader.load();
+
+	        GetProlongationMessageViewController controller = loader.getController();
+	        controller.initController((e)->setProlongationMessage(e));
+	        Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(archiveAnomalyButton.getScene().getWindow());
+			stage.showAndWait();
+			
+	    } catch (IOException e) {
+	        throw new RuntimeException(e);
+	    }
+		
+	}
+
+	public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService, Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
     	this.anomalyProperty = anomalyProperty;
     	this.commandService = commandService;
     	this.updateCallback = updateCallback;
@@ -112,6 +143,10 @@ public class ResolvedPanelController {
     	
     	String qualityDecision = anomalyProperty.get().qualityDecision();
     	qualityDecisionLabel.setText(qualityDecision);
+    }
+    
+    private void setProlongationMessage(String message) {
+    	this.prolongationMessage = message;
     }
 
 }
