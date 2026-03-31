@@ -137,10 +137,29 @@ public class ResolvedPanelController {
 			stage.showAndWait();
 			
 	    } catch (IOException e) {
-	        throw new RuntimeException(e);
+	        e.printStackTrace();
+	        showError("Unexpected error occurred");
 	    }
-		
 	}
-
+	
+	private void showError(String message) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
+			Parent view = loader.load();
+			ErrorViewController controller = loader.getController();
+			controller.initController(message);
+			
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(archiveAnomalyButton.getScene().getWindow());
+			
+			stage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
 }
 

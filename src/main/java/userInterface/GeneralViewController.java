@@ -58,30 +58,29 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickCreate() throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/creationView.fxml"));
-		Parent view = loader.load();
+	public void onClickCreate() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/creationView.fxml"));
+			Parent view = loader.load();
+			CreationViewController controller = loader.getController();
 			
-		CreationViewController controller = loader.getController();
-		
-		controller.initController(commandService, (e)->updateCommand(e), (e)->{
-			try {
-				updateAndOpen(e);
-			} catch (IOException e1) {
-				//TODO handle
-			}
-		});
-		Scene scene = new Scene(view);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(createButton.getScene().getWindow());
-		
-		stage.setMinWidth(406);
-		stage.setMinHeight(563);
-		stage.setResizable(false);
-		stage.show();
+			controller.initController(commandService, (e)->{updateCommand(e);}, (e)->{updateAndOpen(e);});
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(createButton.getScene().getWindow());
+			
+			stage.setMinWidth(406);
+			stage.setMinHeight(563);
+			stage.setResizable(false);
+			stage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		    showError("Unexpected error occurred");
+		}
+			
 		
 	}
 	
@@ -91,7 +90,7 @@ public class GeneralViewController {
 	}
 	
 	@FXML
-	public void onClickDetails() throws IOException {
+	public void onClickDetails() {
 		AnomalyDto anomaly = anomalyTable.getSelectionModel().getSelectedItem();
 		
 		if (anomaly == null) {
@@ -114,8 +113,8 @@ public class GeneralViewController {
 		 case QuerySuccess<List<AnomalyDto>> success-> {
 			 items.setAll(success.payload());
 		 }
-		 case QueryNotFound<List<AnomalyDto>> notFound-> {}
-		 case QueryFailure <List<AnomalyDto>> failure -> {}//TODO error popup
+		 case QueryNotFound<List<AnomalyDto>> notFound-> {/*find page return empty list if nothing was found*/}
+		 case QueryFailure <List<AnomalyDto>> failure -> {showError(failure.message());}
 		 };
 	}
 	
@@ -139,7 +138,7 @@ public class GeneralViewController {
         new SimpleStringProperty(cell.getValue().createdBy()));
 	}
 	
-	private void updateCommand(UUID anomalyId)  {
+	private void updateCommand(UUID anomalyId) {
 		QueryResult<AnomalyDto> result = queryService.findById(anomalyId);
 		
 		switch (result) {
@@ -147,8 +146,8 @@ public class GeneralViewController {
 			 AnomalyDto anomaly = success.payload();
 			 updateDto(anomaly);
 		 }
-		 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
-		 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
+		 case QueryNotFound<AnomalyDto> notFound-> {showError("Anomaly not found");}
+		 case QueryFailure <AnomalyDto> failure -> {showError(failure.message());}
 		 };
 	}
 	
@@ -161,7 +160,7 @@ public class GeneralViewController {
 		 }
 	}
 	
-	private void updateAndOpen(UUID id) throws IOException {
+	private void updateAndOpen(UUID id) {
 	QueryResult<AnomalyDto> result = queryService.findById(id);
 			
 			switch (result) {
@@ -170,28 +169,53 @@ public class GeneralViewController {
 				 updateDto(anomaly);
 				 openDetails(anomaly);
 			 }
-			 case QueryNotFound<AnomalyDto> notFound-> {}//TODO popup
-			 case QueryFailure <AnomalyDto> failure -> {}//TODO error message
+			 case QueryNotFound<AnomalyDto> notFound-> {showError("Anomaly not found");}
+			 case QueryFailure <AnomalyDto> failure -> {showError(failure.message());}
 			 };
 	}
 	
-	private void openDetails(AnomalyDto anomaly) throws IOException {
+	private void openDetails(AnomalyDto anomaly) {
 		
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailViewLayout.fxml"));
-		Parent view = loader.load();
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/detailViewLayout.fxml"));
+			Parent view = loader.load();
+			DetailViewLayoutController controller = loader.getController();
+			controller.initController(anomaly, commandService, queryService, (e)->updateDto(e));
 			
-		DetailViewLayoutController controller = loader.getController();
-		controller.initController(anomaly, commandService, queryService, (e)->updateDto(e));
-		
-		Scene scene = new Scene(view);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(createButton.getScene().getWindow());
-		
-		stage.setMinWidth(400);
-		
-		stage.show();
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(createButton.getScene().getWindow());
+			
+			stage.setMinWidth(400);
+			
+			stage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		    showError("Unexpected error occurred");
+		}
+			
+	}
+	
+	private void showError(String message) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
+			Parent view = loader.load();
+			ErrorViewController controller = loader.getController();
+			controller.initController(message);
+			
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(createButton.getScene().getWindow());
+			
+			stage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
 	}
 }

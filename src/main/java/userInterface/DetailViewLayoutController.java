@@ -110,7 +110,7 @@ public class DetailViewLayoutController {
 	}
 	
 	@FXML
-	public void onClickHistory() throws IOException {
+	public void onClickHistory() {
 		if(this.historyCache == null) {
 			QueryResult<List<AnomalyDto>> result = queryService.findHistory(UUID.fromString(anomalyProperty.get().id()));
 			switch(result) {
@@ -204,9 +204,11 @@ public class DetailViewLayoutController {
 
 	        return node;
 
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
+		 } catch (IOException e) {
+		        e.printStackTrace();
+		        showError("Unexpected error occurred");
+		 }
+		 return null;
 	}
 	
 	private Node loadCorrectedPanel() {
@@ -219,9 +221,11 @@ public class DetailViewLayoutController {
 
 	        return node;
 
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
+		 } catch (IOException e) {
+		        e.printStackTrace();
+		        showError("Unexpected error occurred");
+		 }
+		 return null;
 	}
 	
 	private Node loadResolvedPanel() {
@@ -234,9 +238,11 @@ public class DetailViewLayoutController {
 
 	        return node;
 
-	    } catch (IOException e) {
-	        throw new RuntimeException(e);
-	    }
+		 } catch (IOException e) {
+		        e.printStackTrace();
+		        showError("Unexpected error occurred");
+		 }
+		 return null;
 	}
 	
 	private Node loadArchivedPanel() {
@@ -250,8 +256,10 @@ public class DetailViewLayoutController {
 	        return node;
 
 	    } catch (IOException e) {
-	        throw new RuntimeException(e);
+	        e.printStackTrace();
+	        showError("Unexpected error occurred");
 	    }
+		return null;
 	}
 	
 	private void loadNewAnomaly(UUID id) {
@@ -302,23 +310,27 @@ public class DetailViewLayoutController {
 		return false;
 	}
 
-	private void showHistory(List<AnomalyDto> list) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/historyView.fxml"));
-		Parent view = loader.load();
+	private void showHistory(List<AnomalyDto> list) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/historyView.fxml"));
+			Parent view = loader.load();
+			HistoryViewController controller = loader.getController();
+			controller.initController(list, (e)->{
+				anomalyProperty.set(e);
+				reloadDynamicPanel(e);
+			});
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
 			
-		HistoryViewController controller = loader.getController();
-		controller.initController(list, (e)->{
-			anomalyProperty.set(e);
-			reloadDynamicPanel(e);
-		});
-		Scene scene = new Scene(view);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(root.getScene().getWindow());
-		
-		stage.show();
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(root.getScene().getWindow());
+			
+			stage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+			showError("Unexpected error occurred");
+		}
 	}
 	
 	private void showFeedback(String message) {
@@ -328,5 +340,26 @@ public class DetailViewLayoutController {
 		}else {
 			feedbackBox.setStyle("-fx-text-fill: red;");
 		}
+	}
+	
+	private void showError(String message) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
+			Parent view = loader.load();
+			ErrorViewController controller = loader.getController();
+			controller.initController(message);
+			
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(root.getScene().getWindow());
+			
+			stage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+		}	
 	}
 }

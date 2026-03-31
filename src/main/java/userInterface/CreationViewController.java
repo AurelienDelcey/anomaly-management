@@ -58,7 +58,7 @@ public class CreationViewController {
 	}
 
 	@FXML
-	public void onClickCreate() throws IOException {
+	public void onClickCreate() {
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
 									 sectorBox.getValue(), 
 									 Integer.valueOf(quantityField.getText()), 
@@ -76,7 +76,7 @@ public class CreationViewController {
 	}
 	
 	@FXML
-	public void onClickCreateAndOpen() throws IOException {
+	public void onClickCreateAndOpen() {
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
 				 sectorBox.getValue(), 
 				 Integer.valueOf(quantityField.getText()), 
@@ -132,20 +132,23 @@ public class CreationViewController {
 		text.setTextFormatter(format);
 	}
 	
-	private void showError(String message) throws IOException {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
-		Parent view = loader.load();
+	private void showError(String message) {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
+			Parent view = loader.load();
+			ErrorViewController controller = loader.getController();
+			controller.initController(message);
 			
-		ErrorViewController controller = loader.getController();
-		controller.initController(message);
-		
-		Scene scene = new Scene(view);
-		Stage stage = new Stage();
-		stage.setScene(scene);
-		
-		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.initOwner(createButton.getScene().getWindow());
-		
-		stage.showAndWait();
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(createButton.getScene().getWindow());
+			
+			stage.showAndWait();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
 	}
 }
