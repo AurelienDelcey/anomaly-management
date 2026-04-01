@@ -55,6 +55,13 @@ public class GeneralViewController {
 	public void initialize() {
 		this.anomalyTable.setItems(items);
 		bindTableColumns();
+		setDoubleClick();
+		this.anomalyTable.setOnKeyPressed(event -> {
+			switch(event.getCode()) {
+			case ENTER -> onClickDetails();
+			default -> {}
+			};
+		});
 	}
 	
 	@FXML
@@ -100,6 +107,14 @@ public class GeneralViewController {
 		openDetails(anomaly);
 	}
 	
+	private void setDoubleClick() {
+		this.anomalyTable.setOnMouseClicked(e->{
+			if(e.getClickCount() == 2) {
+				onClickDetails();
+			}
+		});
+	}
+
 	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) {
 		this.queryService = queryService;
 		this.commandService = commandService;

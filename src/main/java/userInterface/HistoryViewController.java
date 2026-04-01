@@ -34,6 +34,8 @@ public class HistoryViewController {
     	        }
     	    }
     	});
+    	setDoubleClick();
+    	setEntrePressed();
     }
     
     @FXML
@@ -44,5 +46,22 @@ public class HistoryViewController {
     	    Stage stage = (Stage) anomalyListView.getScene().getWindow();
     	    stage.close();
     	}
+    }
+    
+    private void setDoubleClick() {
+    	this.anomalyListView.setOnMouseClicked(e->{
+    		if(e.getClickCount() == 2) {
+    			onClickOpen();
+    		}
+    	});
+    }
+    
+    private void setEntrePressed() {
+    	this.anomalyListView.setOnKeyPressed(event->{
+    		switch(event.getCode()) {
+    		case ENTER -> onClickOpen();
+			default -> {}
+    		};
+    	});
     }
 }
