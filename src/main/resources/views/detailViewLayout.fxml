@@ -28,7 +28,7 @@
             </HBox>
             <HBox alignment="CENTER">
                <children>
-                  <TextArea fx:id="feedbackBox" editable="false" maxHeight="70.0" />
+                  <TextArea fx:id="feedbackBox" editable="false" maxHeight="50.0" />
                </children>
             </HBox>
          </children>

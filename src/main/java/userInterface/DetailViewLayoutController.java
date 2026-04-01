@@ -326,6 +326,9 @@ public class DetailViewLayoutController {
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.initOwner(root.getScene().getWindow());
 			
+			stage.setMinWidth(70);
+			stage.setMinHeight(400);
+			
 			stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();

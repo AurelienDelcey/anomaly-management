@@ -204,7 +204,8 @@ public class GeneralViewController {
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.initOwner(createButton.getScene().getWindow());
 			
-			stage.setMinWidth(400);
+			stage.setMinWidth(600);
+			stage.setMinHeight(650);
 			
 			stage.show();
 		} catch (IOException e) {
