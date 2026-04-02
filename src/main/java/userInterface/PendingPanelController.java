@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import application.command.AnomalyCommandService;
 import application.command.CommandFailure;
@@ -65,34 +66,13 @@ public class PendingPanelController {
     void onSelectMachine() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	String machine = machineCombo.getSelectionModel().getSelectedItem();
-    	CommandResult result = commandService.attachMachine(id, machine);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	handleAction(()->commandService.attachMachine(id, machine));
     }
 
     @FXML
     void onClickCorrectAnomaly() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	CommandResult result = commandService.transitionToCorrected(id);
-    	
-    	switch (result) {
-	    	case CommandSuccess success ->{
-	    		feedbackCallback.accept("Success!!");
-	    		updateCallback.accept(success.anomalyId());
-	    	}
-	    	case CommandFailure failure ->{
-	    		feedbackCallback.accept(failure.message());
-	    	}
-    	};
+    	handleAction(()->commandService.transitionToCorrected(id));
     }
 
     @FXML
@@ -100,18 +80,7 @@ public class PendingPanelController {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	Optional<Integer> order = getIntFromString(productionOrderTextField.getText());
     	order.ifPresent((e)->{	
-    		CommandResult result = commandService.attachProductionOrder(id, e);
-    		
-    		switch (result) {
-    		case CommandSuccess success ->{
-    			feedbackCallback.accept("Success!!");
-    			updateCallback.accept(success.anomalyId());
-    		}
-    		case CommandFailure failure ->{
-    			setupSelections();
-    			feedbackCallback.accept(failure.message());
-    		}
-    		};
+    		handleAction(()->commandService.attachProductionOrder(id, e));
     	});
     }
 
@@ -120,18 +89,7 @@ public class PendingPanelController {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	Optional<Integer> quantity = getIntFromString(impactedQuantityTextField.getText());
     	quantity.ifPresent((e)->{
-    		CommandResult result = commandService.attachImpactedQuantity(id, e);
-    		
-    		switch (result) {
-    		case CommandSuccess success ->{
-    			feedbackCallback.accept("Success!!");
-    			updateCallback.accept(success.anomalyId());
-    		}
-    		case CommandFailure failure ->{
-    			setupSelections();
-    			feedbackCallback.accept(failure.message());
-    		}
-    		};
+    		handleAction(()->commandService.attachImpactedQuantity(id, e));
     	});
     }
 
@@ -139,105 +97,39 @@ public class PendingPanelController {
     void onClickCorrectedDescritpion() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	String text = descriptionTextArea.getText();
-    	CommandResult result = commandService.attachDescription(id, text);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	handleAction(()->commandService.attachDescription(id, text));
     }
 
     @FXML
     void onClickNa() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	CommandResult result = commandService.attachQualityDecision(id, QualityDecision.NA);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	handleAction(()->commandService.attachQualityDecision(id, QualityDecision.NA));
     }
 
     @FXML
     void onClickRepair() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	CommandResult result = commandService.attachQualityDecision(id, QualityDecision.REPAIR);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	handleAction(()->commandService.attachQualityDecision(id, QualityDecision.REPAIR));
     }
     
     @FXML
     void onClickScrap() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	CommandResult result = commandService.attachQualityDecision(id, QualityDecision.SCRAP);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	handleAction(()->commandService.attachQualityDecision(id, QualityDecision.SCRAP));
     }
 
     @FXML
     void onClickValidationCorrectiveAction() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	String text = correctiveActionTextField.getText();
-    	CommandResult result = commandService.attachCorrectiveAction(id, text);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	handleAction(()->commandService.attachCorrectiveAction(id, text));
     }
 
     @FXML
     void onSelectSector() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
     	String sector = sectorCombo.getSelectionModel().getSelectedItem();
-    	CommandResult result = commandService.attachSector(id, sector);
-    	
-    	switch (result) {
-	    	case CommandSuccess success ->{
-	    		feedbackCallback.accept("Success!!");
-	    		updateCallback.accept(success.anomalyId());
-	    	}
-	    	case CommandFailure failure ->{
-	    		setupSelections();
-	    		feedbackCallback.accept(failure.message());
-	    	}
-    	};
+    	handleAction(()->commandService.attachSector(id, sector));
     }
     
     private void setupBoxes() {
@@ -349,4 +241,18 @@ public class PendingPanelController {
 		}
 		return result;
 	}
+    
+    private void handleAction(Supplier<CommandResult> action) {
+    	CommandResult result = action.get();
+    	switch (result) {
+    	case CommandSuccess success ->{
+    		feedbackCallback.accept("Success!!");
+    		updateCallback.accept(success.anomalyId());
+    	}
+    	case CommandFailure failure ->{
+    		setupSelections();
+    		feedbackCallback.accept(failure.message());
+    	}
+    	};
+    }
 }
