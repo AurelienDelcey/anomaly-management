@@ -155,7 +155,7 @@ public class CreationViewController {
 			
 			stage.initModality(Modality.APPLICATION_MODAL);
 			stage.initOwner(createButton.getScene().getWindow());
-			
+			stage.setMinWidth(400);
 			stage.showAndWait();
 		} catch (IOException e) {
 			e.printStackTrace();

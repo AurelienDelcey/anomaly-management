@@ -40,21 +40,21 @@ public class AnomalyCommandService {
 	public CommandResult createAnomaly (String description, String sector, int quantity, int productionOrder, String machine) {
 		int savingTry = 5;
 		log.debug("CreateAnomaly requested - actorId={}",actor.id()); 
-		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		Description newDescription = new Description(description);
-		ImpactedQuantity impactedQuantity = new ImpactedQuantity(quantity);
-		ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
+		EventTrace trace;
+		Description newDescription;
+		ImpactedQuantity impactedQuantity;
+		ProductionOrder newProductionOrder;
 		Sector newSector;
 		Machine newMachine;
 		try {
+			trace = new EventTrace(actor.id(), Instant.now());
+			newDescription = new Description(description);
+			impactedQuantity = new ImpactedQuantity(quantity);
+			newProductionOrder = new ProductionOrder(productionOrder);
 		    newSector = Sector.valueOf(sector);
-		} catch (IllegalArgumentException e) {
-		    return new CommandFailure("Invalid sector: " + sector);
-		}
-		try {
 			newMachine = Machine.valueOf(machine);
 		}catch(IllegalArgumentException e) {
-			 return new CommandFailure("Invalid Machine: " + machine);
+			 return new CommandFailure(e.getMessage());
 		}
 		
 		while(savingTry > 0) {
@@ -77,19 +77,31 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult attachDescription (UUID anomalyId, String description) {
-		Description newDescription = new Description(description);
-		return handleCommand("AttachDescription", anomalyId, (e)->e.attachDescription(newDescription));
+		try {
+			Description newDescription = new Description(description);
+			return handleCommand("AttachDescription", anomalyId, (e)->e.attachDescription(newDescription));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult attachProductionOrder (UUID anomalyId, int productionOrder) {
-		ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
-		return handleCommand("AttachProductionOrder", anomalyId, (e)->e.attachProductionOrder(newProductionOrder));
+		try {
+			ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
+			return handleCommand("AttachProductionOrder", anomalyId, (e)->e.attachProductionOrder(newProductionOrder));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
 			
 	}
 	
 	public CommandResult attachImpactedQuantity (UUID anomalyId, int quantity) {
-		ImpactedQuantity newQuantity = new ImpactedQuantity(quantity);
-		return handleCommand("AttachImpactedQuantity", anomalyId, (e)->e.attachImpactedQuantity(newQuantity));
+		try {
+			ImpactedQuantity newQuantity = new ImpactedQuantity(quantity);
+			return handleCommand("AttachImpactedQuantity", anomalyId, (e)->e.attachImpactedQuantity(newQuantity));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult attachMachine (UUID anomalyId, String machine) {
@@ -111,8 +123,12 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult transitionToCorrected (UUID anomalyId) {
-		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		return handleCommand("TransitionToCorrected", anomalyId, (e)->e.transitionToCorrected(trace));
+		try {
+			EventTrace trace = new EventTrace(actor.id(), Instant.now());
+			return handleCommand("TransitionToCorrected", anomalyId, (e)->e.transitionToCorrected(trace));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult attachEvidence (UUID anomalyId, String docId) {
@@ -120,13 +136,21 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult transitionToResolved (UUID anomalyId) {
-		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		return handleCommand("TransitionToResolved", anomalyId, (e)->e.transitionToResolved(trace));
+		try {
+			EventTrace trace = new EventTrace(actor.id(), Instant.now());
+			return handleCommand("TransitionToResolved", anomalyId, (e)->e.transitionToResolved(trace));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult transitionToArchived (UUID anomalyId) {
-		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(trace));
+		try {
+			EventTrace trace = new EventTrace(actor.id(), Instant.now());
+			return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(trace));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
 	}
 	
 	public CommandResult transitionToArchivedWithProlongation (UUID anomalyId, String comment) {
