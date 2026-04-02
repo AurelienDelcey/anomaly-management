@@ -3,6 +3,7 @@ package userInterface;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -59,11 +60,17 @@ public class CreationViewController {
 
 	@FXML
 	public void onClickCreate() {
+		Optional<Integer> quantity = getIntFromString(quantityField.getText());
+		Optional<Integer> productionOrder = getIntFromString(productionOrderField.getText()); 
+		
+		if(quantity.isEmpty() || productionOrder.isEmpty()) {
+			return;
+		}
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
-									 sectorBox.getValue(), 
-									 Integer.valueOf(quantityField.getText()), 
-									 Integer.valueOf(productionOrderField.getText()), 
-									 machineBox.getValue());
+															sectorBox.getValue(), 
+															quantity.get(), 
+															productionOrder.get(), 
+															machineBox.getValue());
 		switch(result) {
 			case CommandSuccess success ->{
 				updateCallback.accept(success.anomalyId());
@@ -78,7 +85,7 @@ public class CreationViewController {
 	@FXML
 	public void onClickCreateAndOpen() {
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
-				 sectorBox.getValue(), 
+				 sectorBox.getValue(),
 				 Integer.valueOf(quantityField.getText()), 
 				 Integer.valueOf(productionOrderField.getText()), 
 				 machineBox.getValue());
@@ -123,7 +130,10 @@ public class CreationViewController {
 	
 	private void applyFilterOnTextField(TextField text) {
 		TextFormatter<String> format = new TextFormatter<>(i->{
-			if(i.getControlNewText().matches("[0-9]*")) {
+			if(i.getControlNewText().length() >= 6) {
+				i.setText("");
+				return i;
+			}else if(i.getControlNewText().matches("[0-9]*")) {
 				return i;
 			}else {
 				return null;
@@ -150,5 +160,19 @@ public class CreationViewController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
+	}
+	
+	private Optional<Integer> getIntFromString(String text) {
+		if(text == null || text.isBlank()) {
+			showError("Cannot handle an empty field.");
+			return Optional.empty();
+		}
+		Optional<Integer> result = Optional.empty();
+		try {
+			result = Optional.of(Integer.valueOf(text));
+		}catch(Exception e) {
+			showError("Entry must be a positive number, smaller than 1 million.");
+		}
+		return result;
 	}
 }

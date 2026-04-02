@@ -2,6 +2,7 @@ package userInterface;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -97,37 +98,41 @@ public class PendingPanelController {
     @FXML
     void onClickCorrectProductionOrder() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	Integer order = Integer.valueOf(productionOrderTextField.getText());
-    	CommandResult result = commandService.attachProductionOrder(id, order);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	Optional<Integer> order = getIntFromString(productionOrderTextField.getText());
+    	order.ifPresent((e)->{	
+    		CommandResult result = commandService.attachProductionOrder(id, e);
+    		
+    		switch (result) {
+    		case CommandSuccess success ->{
+    			feedbackCallback.accept("Success!!");
+    			updateCallback.accept(success.anomalyId());
+    		}
+    		case CommandFailure failure ->{
+    			setupSelections();
+    			feedbackCallback.accept(failure.message());
+    		}
+    		};
+    	});
     }
 
     @FXML
     void onClickCorrectQuantity() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	Integer quantity = Integer.valueOf(impactedQuantityTextField.getText());
-    	CommandResult result = commandService.attachImpactedQuantity(id, quantity);
-    	
-    	switch (result) {
-    	case CommandSuccess success ->{
-    		feedbackCallback.accept("Success!!");
-    		updateCallback.accept(success.anomalyId());
-    	}
-    	case CommandFailure failure ->{
-    		setupSelections();
-    		feedbackCallback.accept(failure.message());
-    	}
-    	};
+    	Optional<Integer> quantity = getIntFromString(impactedQuantityTextField.getText());
+    	quantity.ifPresent((e)->{
+    		CommandResult result = commandService.attachImpactedQuantity(id, e);
+    		
+    		switch (result) {
+    		case CommandSuccess success ->{
+    			feedbackCallback.accept("Success!!");
+    			updateCallback.accept(success.anomalyId());
+    		}
+    		case CommandFailure failure ->{
+    			setupSelections();
+    			feedbackCallback.accept(failure.message());
+    		}
+    		};
+    	});
     }
 
     @FXML
@@ -181,7 +186,7 @@ public class PendingPanelController {
     	}
     	};
     }
-
+    
     @FXML
     void onClickScrap() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
@@ -276,7 +281,10 @@ public class PendingPanelController {
     
     private void applyFilterOnTextField(TextField text) {
 		TextFormatter<String> format = new TextFormatter<>(i->{
-			if(i.getControlNewText().matches("[0-9]*")) {
+			if(i.getControlNewText().length() >= 6) {
+				i.setText("");
+				return i;
+			}else if(i.getControlNewText().matches("[0-9]*")) {
 				return i;
 			}else {
 				return null;
@@ -327,4 +335,18 @@ public class PendingPanelController {
     	preselectComboBoxes();
     	preselectQualityDecision();
     }
+    
+    private Optional<Integer> getIntFromString(String text) {
+		if(text == null || text.isBlank()) {
+			feedbackCallback.accept("Cannot handle an empty field.");
+			return Optional.empty();
+		}
+		Optional<Integer> result = Optional.empty();
+		try {
+			result = Optional.of(Integer.valueOf(text));
+		}catch(Exception e) {
+			feedbackCallback.accept("Entry must be a positive number, smaller than 1 million.");
+		}
+		return result;
+	}
 }
