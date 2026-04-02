@@ -15,7 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-public class CorrectedPanelController {
+public class CorrectedPanelController implements Panel{
 
     @FXML private Label correctiveActionLabel;
     @FXML private TextArea descriptionTextArea;

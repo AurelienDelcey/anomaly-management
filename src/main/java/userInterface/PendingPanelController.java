@@ -26,7 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleGroup;
 
-public class PendingPanelController {
+public class PendingPanelController implements Panel{
 
     @FXML private Button correctAnomalyButton;
     @FXML private Button correctImpactedQuantity;

@@ -1,12 +1,16 @@
 package userInterface;
 
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import application.command.AnomalyCommandService;
 import application.dto.AnomalyDto;
 import javafx.beans.property.ObjectProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 
-public class ArchivedPanelController {
+public class ArchivedPanelController implements Panel{
 
     @FXML private Label conclusionLabel;
     @FXML private Label correctiveActionLabel;
@@ -20,7 +24,8 @@ public class ArchivedPanelController {
     
     private ObjectProperty<AnomalyDto> anomalyProperty;
     
-    public void initController(ObjectProperty<AnomalyDto> anomalyProperty) {
+    public void initController(ObjectProperty<AnomalyDto> anomalyProperty, AnomalyCommandService commandService,
+			Consumer<UUID> updateCallback, Consumer<String> feedbackCallback) {
     	this.anomalyProperty = anomalyProperty;
     	setupLabels();
     }

@@ -22,7 +22,7 @@ import javafx.scene.control.ToggleGroup;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class ResolvedPanelController {
+public class ResolvedPanelController implements Panel{
 
     @FXML private Label correctiveActionLabel;
     @FXML private TextArea descriptionTextArea;

@@ -202,10 +202,10 @@ public class DetailViewLayoutController {
 	
 	private void reloadDynamicPanel(AnomalyDto newAnomaly) {
 		Map<String, Supplier<Node>> loader = Map.of(
-				"PENDING", ()->loadPendingPanel(),
-				"CORRECTED", ()->loadCorrectedPanel(),
-				"RESOLVED", ()->loadResolvedPanel(),
-				"ARCHIVED", ()->loadArchivedPanel()
+				"PENDING", ()->loadPanel("/views/pendingPanel.fxml"),
+				"CORRECTED", ()->loadPanel("/views/correctedPanel.fxml"),
+				"RESOLVED", ()->loadPanel("/views/resolvedPanel.fxml"),
+				"ARCHIVED", ()->loadPanel("/views/archivedPanel.fxml")
 				);
 		Supplier<Node> supplier = loader.get(newAnomaly.anomalyState());
 
@@ -213,76 +213,7 @@ public class DetailViewLayoutController {
 			showFeedback("Unknow state, impossible to load panel");
 		    return;
 		}
-		
 		root.setCenter(supplier.get());
-	}
-	
-	private Node loadPendingPanel() {
-		try {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/pendingPanel.fxml"));
-	        Node node = loader.load();
-
-	        PendingPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
-
-	        return node;
-
-		 } catch (IOException e) {
-		        e.printStackTrace();
-		        showError("Unexpected error occurred");
-		 }
-		 return null;
-	}
-	
-	private Node loadCorrectedPanel() {
-		try {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/correctedPanel.fxml"));
-	        Node node = loader.load();
-
-	        CorrectedPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
-
-	        return node;
-
-		 } catch (IOException e) {
-		        e.printStackTrace();
-		        showError("Unexpected error occurred");
-		 }
-		 return null;
-	}
-	
-	private Node loadResolvedPanel() {
-		try {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/resolvedPanel.fxml"));
-	        Node node = loader.load();
-
-	        ResolvedPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
-
-	        return node;
-
-		 } catch (IOException e) {
-		        e.printStackTrace();
-		        showError("Unexpected error occurred");
-		 }
-		 return null;
-	}
-	
-	private Node loadArchivedPanel() {
-		try {
-	        FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/archivedPanel.fxml"));
-	        Node node = loader.load();
-
-	        ArchivedPanelController controller = loader.getController();
-	        controller.initController(anomalyProperty);
-
-	        return node;
-
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        showError("Unexpected error occurred");
-	    }
-		return null;
 	}
 	
 	private void loadNewAnomaly(UUID id) {
@@ -355,37 +286,34 @@ public class DetailViewLayoutController {
 			stage.show();
 		} catch (IOException e) {
 			e.printStackTrace();
-			showError("Unexpected error occurred");
+			showFeedback("Unexpected error occurred");
 		}
 	}
 	
 	private void showFeedback(String message) {
-		feedbackBox.setText(message);
 		if(message != null && message.contains("Success")) {
+			feedbackBox.setText("Anomaly successfully updated.");
 			feedbackBox.setStyle("-fx-text-fill: green;");
 		}else {
+			feedbackBox.setText(message);
 			feedbackBox.setStyle("-fx-text-fill: red;");
 		}
 	}
 	
-	private void showError(String message) {
+	private Node loadPanel(String fxmlPath) {
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/errorView.fxml"));
-			Parent view = loader.load();
-			ErrorViewController controller = loader.getController();
-			controller.initController(message);
-			
-			Scene scene = new Scene(view);
-			Stage stage = new Stage();
-			stage.setScene(scene);
-			
-			stage.initModality(Modality.APPLICATION_MODAL);
-			stage.initOwner(root.getScene().getWindow());
-			
-			stage.showAndWait();
-		} catch (IOException e) {
-			e.printStackTrace();
-			
-		}	
+	        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+	        Node node = loader.load();
+
+	        Panel controller = loader.getController();
+	        controller.initController(anomalyProperty, commandService, (e)->loadNewAnomaly(e), (e)->showFeedback(e));
+
+	        return node;
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        showFeedback("Unexpected error occurred");
+	    }
+		return null;
 	}
 }

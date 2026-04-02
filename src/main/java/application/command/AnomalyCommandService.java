@@ -93,12 +93,12 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult attachMachine (UUID anomalyId, String machine) {
-		Machine newMachine = Machine.valueOf(machine);//TODO reintorduir les enums metier directement dans l'ui
+		Machine newMachine = Machine.valueOf(machine);//TODO reintroduire les enums metier directement dans l'ui
 		return handleCommand("AttachMachine", anomalyId, (e)->e.attachMachine(newMachine));
 	}
 	
 	public CommandResult attachSector (UUID anomalyId, String sector) {
-		Sector newSector = Sector.valueOf(sector);//TODO reintorduir les enums metier directement dans l'ui
+		Sector newSector = Sector.valueOf(sector);
 		return handleCommand("AttachSector", anomalyId, (e)->e.attachSector(newSector));
 	}
 	
