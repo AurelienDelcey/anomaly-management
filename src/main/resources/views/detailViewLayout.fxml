@@ -12,19 +12,27 @@
 
 <BorderPane fx:id="root" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.DetailViewLayoutController">
    <bottom>
-      <VBox spacing="10.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
          <BorderPane.margin>
             <Insets bottom="5.0" />
          </BorderPane.margin>
          <children>
-            <HBox prefHeight="0.0" prefWidth="600.0" spacing="10.0">
+            <HBox alignment="CENTER" prefHeight="0.0" prefWidth="600.0" spacing="10.0">
                <children>
+                  <Region HBox.hgrow="ALWAYS" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Button fx:id="previousAnomalyButton" mnemonicParsing="false" onAction="#onClickPrevious" text="&lt;== Prev" />
                   <Button fx:id="historyButton" mnemonicParsing="false" onAction="#onClickHistory" text="History" />
                   <Button fx:id="nextAnomalyButton" mnemonicParsing="false" onAction="#onClickNext" text="Next ==&gt;" />
                   <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="traceabilityButton" mnemonicParsing="false" onAction="#onClickTraceability" text="Traceability" />
                </children>
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+               <padding>
+                  <Insets left="30.0" right="30.0" />
+               </padding>
             </HBox>
             <HBox alignment="CENTER">
                <children>

@@ -126,6 +126,29 @@ public class DetailViewLayoutController {
 		}
 	}
 	
+	@FXML
+	public void onClickTraceability() {
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/traceabilityView.fxml"));
+			Parent view = loader.load();
+			TraceabilityViewController controller = loader.getController();
+			controller.initController(anomalyProperty);
+			Scene scene = new Scene(view);
+			Stage stage = new Stage();
+			stage.setScene(scene);
+			
+			stage.initModality(Modality.APPLICATION_MODAL);
+			stage.initOwner(root.getScene().getWindow());
+			
+			stage.setMinWidth(400);
+			
+			stage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+			showFeedback("Unexpected error occurred");
+		}
+	}
+	
 	private void bindHeader() {
 		idLabel.textProperty().bind(Bindings.createStringBinding(
 				()-> anomalyProperty.get() ==null ? "" : anomalyProperty.get().businessId(), anomalyProperty
