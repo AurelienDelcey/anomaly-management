@@ -12,7 +12,7 @@ public interface AnomalyRepository {
 	public void save(Anomaly anomaly);
 	public void saveAtomic(Anomaly anomaly1, Anomaly anomaly2);
 	public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException;
-	public List<Anomaly> findAll(int page) throws InconsistentAnomalyStateException;
+	public List<Anomaly> findAll(int page) ;
 	public int getMaxSequenceByYear(int year);
 	
 }

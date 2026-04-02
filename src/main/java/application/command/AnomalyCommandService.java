@@ -13,6 +13,10 @@ import domain.anomaly.Anomaly;
 import domain.exception.DomainException;
 import domain.traceability.EventTrace;
 import domain.valueobject.BusinessId;
+import domain.valueobject.Description;
+import domain.valueobject.ImpactedQuantity;
+import domain.valueobject.Machine;
+import domain.valueobject.ProductionOrder;
 import domain.valueobject.ProlongationContext;
 import domain.valueobject.QualityDecision;
 import domain.valueobject.Sector;
@@ -33,16 +37,31 @@ public class AnomalyCommandService {
 		this.businessIdGenerator = new BusinessIdGenerator(repository);
 	}
 	
-	public CommandResult createAnomaly (String description, Sector sector) {
+	public CommandResult createAnomaly (String description, String sector, int quantity, int productionOrder, String machine) {
 		int savingTry = 5;
 		log.debug("CreateAnomaly requested - actorId={}",actor.id()); 
-		EventTrace trace = new EventTrace(actor.id(), Instant.now());
+		EventTrace trace;
+		Description newDescription;
+		ImpactedQuantity impactedQuantity;
+		ProductionOrder newProductionOrder;
+		Sector newSector;
+		Machine newMachine;
+		try {
+			trace = new EventTrace(actor.id(), Instant.now());
+			newDescription = new Description(description);
+			impactedQuantity = new ImpactedQuantity(quantity);
+			newProductionOrder = new ProductionOrder(productionOrder);
+		    newSector = Sector.valueOf(sector);
+			newMachine = Machine.valueOf(machine);
+		}catch(IllegalArgumentException e) {
+			 return new CommandFailure(e.getMessage());
+		}
 		
 		while(savingTry > 0) {
 			savingTry--;
 			try {
 				BusinessId businessId = businessIdGenerator.getBusinessId();
-				Anomaly anomaly = new Anomaly(businessId, description, sector, trace);
+				Anomaly anomaly = new Anomaly(businessId, newDescription, newSector, impactedQuantity, newProductionOrder, newMachine, trace);
 				repository.save(anomaly);	
 				log.info("CreateAnomaly succeeded - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 				return new CommandSuccess(anomaly.getId());
@@ -59,139 +78,77 @@ public class AnomalyCommandService {
 	
 	public CommandResult attachDescription (UUID anomalyId, String description) {
 		try {
-			log.debug("AttachDescription requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachDescription(description);
-			repository.save(newAnomaly);
-			log.info("AttachDescription succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
-			log.warn("AttachDescription failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("AttachDescription anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			Description newDescription = new Description(description);
+			return handleCommand("AttachDescription", anomalyId, (e)->e.attachDescription(newDescription));
+		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
 	
-	public CommandResult attachSector (UUID anomalyId, Sector sector) {
+	public CommandResult attachProductionOrder (UUID anomalyId, int productionOrder) {
 		try {
-			log.debug("AttachSector requested - anomalyId={}, actorId={}", anomalyId, actor.id()); 
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachSector(sector);
-			repository.save(newAnomaly);
-			log.info("AttachSector succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | TechnicalException | IllegalArgumentException e) {
-			log.warn("AttachSector failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("AttachSector anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
+			return handleCommand("AttachProductionOrder", anomalyId, (e)->e.attachProductionOrder(newProductionOrder));
+		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
+			
+	}
+	
+	public CommandResult attachImpactedQuantity (UUID anomalyId, int quantity) {
+		try {
+			ImpactedQuantity newQuantity = new ImpactedQuantity(quantity);
+			return handleCommand("AttachImpactedQuantity", anomalyId, (e)->e.attachImpactedQuantity(newQuantity));
+		} catch (IllegalArgumentException e) {
+			return new CommandFailure(e.getMessage());
+		}
+	}
+	
+	public CommandResult attachMachine (UUID anomalyId, String machine) {
+		Machine newMachine = Machine.valueOf(machine);//TODO reintroduire les enums metier directement dans l'ui
+		return handleCommand("AttachMachine", anomalyId, (e)->e.attachMachine(newMachine));
+	}
+	
+	public CommandResult attachSector (UUID anomalyId, String sector) {
+		Sector newSector = Sector.valueOf(sector);
+		return handleCommand("AttachSector", anomalyId, (e)->e.attachSector(newSector));
 	}
 	
 	public CommandResult attachCorrectiveAction (UUID anomalyId, String docId) {
-		try {
-			log.debug("AttachCorrectiveAction requested - anomalyId={}, actorId={}", anomalyId, actor.id());
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachCorrectiveAction(docId);
-			repository.save(newAnomaly);
-			log.info("AttachCorrectiveAction succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
-			log.warn("AttachCorrectiveAction failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("AttachCorrectiveAction anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("AttachCorrectiveAction", anomalyId, (e)->e.attachCorrectiveAction(docId));
 	}
 	
 	public CommandResult attachQualityDecision (UUID anomalyId, QualityDecision decision) {
-		try {
-			log.debug("AttachQualityDecision requested - anomalyId={}, actorId={}", anomalyId, actor.id());
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachQualityDecision(decision);
-			repository.save(newAnomaly);
-			log.info("AttachQualityDecision succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | TechnicalException e) {
-			log.warn("AttachQualityDecision failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("AttachQualityDecision anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("AttachQualityDecision", anomalyId, (e)->e.attachQualityDecision(decision));
 	}
 	
 	public CommandResult transitionToCorrected (UUID anomalyId) {
 		try {
-			log.debug("TransitionToCorrected requested - anomalyId={}, actorId={}", anomalyId, actor.id());
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.transitionToCorrected(trace);
-			repository.save(newAnomaly);
-			log.info("TransitionToCorrected succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
-			log.warn("TransitionToCorrected failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("TransitionToCorrected anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return handleCommand("TransitionToCorrected", anomalyId, (e)->e.transitionToCorrected(trace));
+		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
 	
 	public CommandResult attachEvidence (UUID anomalyId, String docId) {
-		try {
-			log.debug("AttachEvidence requested - anomalyId={}, actorId={}", anomalyId, actor.id());
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.attachEvidence(docId);
-			repository.save(newAnomaly);
-			log.info("AttachEvidence succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
-			log.warn("AttachEvidence failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("AttachEvidence anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("AttachEvidence", anomalyId, (e)->e.attachEvidence(docId));
 	}
 	
 	public CommandResult transitionToResolved (UUID anomalyId) {
 		try {
-			log.debug("TransitionToResolved requested - anomalyId={}, actorId={}", anomalyId, actor.id());
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.transitionToResolved(trace);
-			repository.save(newAnomaly);
-			log.info("TransitionToResolved succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
-			log.warn("TransitionToResolved failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("TransitionToResolved anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return handleCommand("TransitionToResolved", anomalyId, (e)->e.transitionToResolved(trace));
+		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
 	
 	public CommandResult transitionToArchived (UUID anomalyId) {
 		try {
-			log.debug("TransitionToArchived requested - anomalyId={}, actorId={}", anomalyId, actor.id());
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
-			Anomaly anomaly = repository.findById(anomalyId);
-			Anomaly newAnomaly = anomaly.transitionToArchived(trace);
-			repository.save(newAnomaly);
-			log.info("TransitionToArchived succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
-			return new CommandSuccess(anomalyId);
-		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
-			log.warn("TransitionToArchived failed - anomalyId={}, reason={}", anomalyId, e.getMessage());
-			return new CommandFailure(e.getMessage());
-		} catch (AnomalyNotFoundException e) {
-			log.warn("TransitionToArchived anomaly not found in command service- anomalyId={}, reason={}", anomalyId, e.getMessage());
+			return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(trace));
+		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
 		}
 	}
@@ -208,7 +165,8 @@ public class AnomalyCommandService {
 				Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 				ProlongationContext context = new ProlongationContext(archivedAnomaly.getId(), comment);
 				BusinessId businessId = businessIdGenerator.getBusinessId();
-				Anomaly prolongation = createProlongation(businessId, context, archivedAnomaly.getDescription().description(), archivedAnomaly.getSector());
+				Anomaly prolongation = createProlongation(archivedAnomaly.getQualityDecision(), businessId, context, archivedAnomaly.getDescription(), archivedAnomaly.getSector(), 
+						archivedAnomaly.getQuantity(), archivedAnomaly.getProductionOrder(), archivedAnomaly.getMachine());
 				Anomaly anomalyWithProlongationId = archivedAnomaly.linkProlongation(prolongation.getId());
 				repository.saveAtomic(anomalyWithProlongationId, prolongation);
 				log.info("TransitionToArchivedWithProlongation succeeded - anomalyId={}, actorId={}", anomalyId, actor.id());
@@ -227,10 +185,28 @@ public class AnomalyCommandService {
 		return new CommandFailure("transitionToArchivedWithProlongation failed: Maximum aptempt of retry to allocate a businessId");
 	}
 	
-	private Anomaly createProlongation (BusinessId businessId, ProlongationContext prolongationContext, String description, Sector sector) {
+	private Anomaly createProlongation (QualityDecision qualityDecision, BusinessId businessId, ProlongationContext prolongationContext, Description description, 
+			Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine) {
 		EventTrace trace = new EventTrace(actor.id(), Instant.now());
-		Anomaly anomaly = new Anomaly(businessId, description, sector, trace, prolongationContext);
+		Anomaly anomaly = new Anomaly(qualityDecision, businessId, description, sector, quantity, productionOrder, machine, trace, prolongationContext);
 		log.debug("CreateProlongation - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 		return anomaly;
+	}
+	
+	private CommandResult handleCommand(String logLabel, UUID anomalyId, CommandHandler command) {
+		try {
+			log.debug("{} requested - anomalyId={}, actorId={}", logLabel, anomalyId, actor.id());
+			Anomaly anomaly = repository.findById(anomalyId);
+			Anomaly newAnomaly = command.execute(anomaly);
+			repository.save(newAnomaly);
+			log.info("{} succeeded - anomalyId={}, actorId={}", logLabel, anomalyId, actor.id());
+			return new CommandSuccess(anomalyId);
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
+			log.warn("{} failed - anomalyId={}, reason={}", logLabel, anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		} catch (AnomalyNotFoundException e) {
+			log.warn("{} anomaly not found in command service- anomalyId={}, reason={}", logLabel, anomalyId, e.getMessage());
+			return new CommandFailure(e.getMessage());
+		}
 	}
 }

@@ -2,20 +2,19 @@ package application.dto;
 
 import java.time.Instant;
 
-import domain.anomaly.AnomalyState;
-import domain.valueobject.QualityDecision;
-import domain.valueobject.Sector;
-
 public record AnomalyDto(String id,
 		String businessId,
 		String parentId,
 		String prolongationComent,
 		String childId,
-		Sector sector,
+		String sector,
 		String correctiveActionId,
+		int productionOrder,
+		int impactedQuantity,
+		String machine,
 		String evidenceId,
-		QualityDecision qualityDecision,
-		AnomalyState anomalyState,
+		String qualityDecision,
+		String anomalyState,
 		String description,
 		String createdBy,
 		Instant createdAt,
@@ -25,5 +24,19 @@ public record AnomalyDto(String id,
 		Instant resolvedAt,
 		String archivedBy,
 		Instant archivedAt) {
+
+	@Override
+	public boolean equals(Object o) {
+	    if (this == o) return true;
+	    if (!(o instanceof AnomalyDto other)) return false;
+	    return id.equals(other.id());
+	}
+
+	    @Override
+	public int hashCode() {
+		return this.id.hashCode();
+	}
+	
+	
 
 }
