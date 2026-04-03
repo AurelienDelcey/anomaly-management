@@ -28,7 +28,7 @@
                </children>
             </VBox>
             <CheckBox fx:id="hideArchivedCheckBox" alignment="BOTTOM_CENTER" mnemonicParsing="false" prefHeight="44.0" prefWidth="115.0" text="Hide archived" />
-            <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#onClickRefresh" prefHeight="26.0" prefWidth="26.0" text="Refresh" />
+            <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#onClickRefresh" prefHeight="26.0" prefWidth="26.0" />
             <Region prefHeight="44.0" prefWidth="100.0" HBox.hgrow="ALWAYS" />
             <Button fx:id="createButton" alignment="BOTTOM_CENTER" mnemonicParsing="false" onAction="#onClickCreate" text="Create">
                <HBox.margin>
