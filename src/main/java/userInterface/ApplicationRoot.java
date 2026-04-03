@@ -3,6 +3,7 @@ package userInterface;
 import java.net.URL;
 
 import application.actor.Actor;
+import application.actor.Role;
 import application.command.AnomalyCommandService;
 import application.query.AnomalyQueryService;
 import application.repository.AnomalyRepository;
@@ -27,7 +28,7 @@ public class ApplicationRoot extends Application{
 	@Override
 	public void init() throws Exception {
 		
-		this.actor = new Actor("0000", 1);
+		this.actor = new Actor("0000", Role.SUPERVISOR);
 		this.config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
 		this.repository = new JdbcAnomalyRepository(this.config, "anomaly.anomalies_test");
 		this.commandService = new AnomalyCommandService(this.repository, this.actor) ;

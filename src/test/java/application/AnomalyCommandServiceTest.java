@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import application.actor.Actor;
+import application.actor.Role;
 import application.command.AnomalyCommandService;
 import application.command.CommandFailure;
 import application.command.CommandResult;
@@ -43,7 +44,7 @@ class AnomalyCommandServiceTest {
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static String SECTOR = "FORGING";
 	private final static String MACHINE = "MACHINE_1";
-	private final static int PRIVILEGE = 0;
+	private final static Role PRIVILEGE = Role.SUPERVISOR;
 	private final static int QUANTITY = 50;
 	private final static int ORDER = 99999;
 	private final static String TABLE = "anomaly.anomalies_test";

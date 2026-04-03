@@ -38,6 +38,9 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult createAnomaly (String description, String sector, int quantity, int productionOrder, String machine) {
+		if(!this.actor.role().canModify()) {
+			return new CommandFailure("Invalid privilege level, please contact your supervisor.");
+		}
 		int savingTry = 5;
 		log.debug("CreateAnomaly requested - actorId={}",actor.id()); 
 		EventTrace trace;
@@ -145,6 +148,9 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult transitionToArchived (UUID anomalyId) {
+		if(!this.actor.role().canArchive()) {
+			return new CommandFailure("Invalid privilege level, please contact your supervisor.");
+		}
 		try {
 			EventTrace trace = new EventTrace(actor.id(), Instant.now());
 			return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(trace));
@@ -154,8 +160,10 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult transitionToArchivedWithProlongation (UUID anomalyId, String comment) {
+		if(!this.actor.role().canArchive()) {
+			return new CommandFailure("Invalid privilege level, please contact your supervisor.");
+		}
 		int savingTry = 5;
-		
 		while(savingTry > 0) {
 		savingTry--;	
 			try {
@@ -194,6 +202,9 @@ public class AnomalyCommandService {
 	}
 	
 	private CommandResult handleCommand(String logLabel, UUID anomalyId, CommandHandler command) {
+		if(!this.actor.role().canModify()) {
+			return new CommandFailure("Invalid privilege level, please contact your supervisor.");
+		}
 		try {
 			log.debug("{} requested - anomalyId={}, actorId={}", logLabel, anomalyId, actor.id());
 			Anomaly anomaly = repository.findById(anomalyId);
@@ -201,7 +212,7 @@ public class AnomalyCommandService {
 			repository.save(newAnomaly);
 			log.info("{} succeeded - anomalyId={}, actorId={}", logLabel, anomalyId, actor.id());
 			return new CommandSuccess(anomalyId);
-		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
+		} catch (DomainException | TechnicalException e) {
 			log.warn("{} failed - anomalyId={}, reason={}", logLabel, anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		} catch (AnomalyNotFoundException e) {
