@@ -14,10 +14,11 @@ class TraceabilityTest {
 	
 	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
 	private static final String VALID_ACTOR_ID = "0000";
+	private final static String VALID_ACTOR_NAME = "Dupont";
 
 	@Test
 	void constructor_ShouldReturnValidTraceability() {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		Traceability trace = new Traceability(creationTrace);
 		
 		assertNotNull(trace.getCreation());
@@ -110,7 +111,7 @@ class TraceabilityTest {
 	}
 	
 	private EventTrace getValidEventTrace() {
-		return new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		return new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 	}
 	private Traceability getValidTraceability() {
 		return new Traceability(getValidEventTrace());

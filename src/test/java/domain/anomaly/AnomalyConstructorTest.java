@@ -32,6 +32,7 @@ class AnomalyConstructorTest {
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
+	private final static String VALID_ACTOR_NAME = "Dupont";
 	private final static int FIXED_YEAR = 2026;
 	private final static int FIXED_SEQUENCE = 1;
 	private final static int QUANTITY = 50;
@@ -742,7 +743,7 @@ class AnomalyConstructorTest {
 	}
 	
 	private EventTrace createValidTrace () {
-		return new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		return new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 	}
 	
 	private CorrectiveAction createValidCorrectiveAction() {

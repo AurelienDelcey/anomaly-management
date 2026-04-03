@@ -66,8 +66,12 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 				sequence,
 				impacted_quantity,
 				production_order,
-				machine
-			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+				machine,
+				created_name,
+				corrected_name,
+				resolved_name,
+				archived_name
+			) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 			""".formatted(tableName);
 		this.UPDATE_STATEMENT = """
 				UPDATE %s
@@ -92,7 +96,11 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 					sequence = ?,
 					impacted_quantity = ?,
 					production_order = ?,
-					machine = ?
+					machine = ?,
+					created_name = ?,
+					corrected_name = ?,
+					resolved_name = ?,
+					archived_name = ?
 				WHERE id = ?;
 				""".formatted(tableName);
 	}
@@ -246,13 +254,13 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setString(6, correctiveAction == null ? null:correctiveAction.documentId());
 		query.setString(7, anomaly.getQualityDecision().name());
 		query.setString(8, evidence == null ? null:evidence.documentId());
-		query.setString(9, stringOrNullFromEventTrace(created));
+		query.setString(9, idOrNullFromEventTrace(created));
 		query.setTimestamp(10, timestampOrNullFromEventTrace(created));
-		query.setString(11, stringOrNullFromEventTrace(corrected));
+		query.setString(11, idOrNullFromEventTrace(corrected));
 		query.setTimestamp(12, timestampOrNullFromEventTrace(corrected));
-		query.setString(13, stringOrNullFromEventTrace(resolved));
+		query.setString(13, idOrNullFromEventTrace(resolved));
 		query.setTimestamp(14, timestampOrNullFromEventTrace(resolved));
-		query.setString(15, stringOrNullFromEventTrace(archived));
+		query.setString(15, idOrNullFromEventTrace(archived));
 		query.setTimestamp(16, timestampOrNullFromEventTrace(archived));
 		query.setString(17, anomaly.getSector().name());
 		query.setString(18, prolongationContext == null ? null:prolongationContext.prolongationComment());
@@ -277,7 +285,10 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		    query.setNull(22, Types.INTEGER);
 		}
 		query.setString(23, anomaly.getMachine().name());
-
+		query.setString(24, nameOrNullFromEventTrace(created));
+		query.setString(25, nameOrNullFromEventTrace(corrected));
+		query.setString(26, nameOrNullFromEventTrace(resolved));
+		query.setString(27, nameOrNullFromEventTrace(archived));
 		return query;
 	}
 	
@@ -304,13 +315,13 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		query.setString(5, correctiveAction == null ? null:correctiveAction.documentId());
 		query.setString(6, anomaly.getQualityDecision().name());
 		query.setString(7, evidence == null ? null:evidence.documentId());
-		query.setString(8, stringOrNullFromEventTrace(created));
+		query.setString(8, idOrNullFromEventTrace(created));
 		query.setTimestamp(9, timestampOrNullFromEventTrace(created));
-		query.setString(10, stringOrNullFromEventTrace(corrected));
+		query.setString(10, idOrNullFromEventTrace(corrected));
 		query.setTimestamp(11, timestampOrNullFromEventTrace(corrected));
-		query.setString(12, stringOrNullFromEventTrace(resolved));
+		query.setString(12, idOrNullFromEventTrace(resolved));
 		query.setTimestamp(13, timestampOrNullFromEventTrace(resolved));
-		query.setString(14, stringOrNullFromEventTrace(archived));
+		query.setString(14, idOrNullFromEventTrace(archived));
 		query.setTimestamp(15, timestampOrNullFromEventTrace(archived));
 		query.setString(16, anomaly.getSector().name());
 		query.setString(17, prolongationContext == null ? null:prolongationContext.prolongationComment());
@@ -335,7 +346,11 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		    query.setNull(21, Types.INTEGER);
 		}
 		query.setString(22, anomaly.getMachine().name());
-		query.setString(23, anomaly.getId().toString());
+		query.setString(23, nameOrNullFromEventTrace(created));
+		query.setString(24, nameOrNullFromEventTrace(corrected));
+		query.setString(25, nameOrNullFromEventTrace(resolved));
+		query.setString(26, nameOrNullFromEventTrace(archived));
+		query.setString(27, anomaly.getId().toString());
 
 		return query;
 	}
@@ -380,8 +395,12 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 		return id == null ? null : id.toString();
 	}
 	
-	private String stringOrNullFromEventTrace(EventTrace trace) {
+	private String idOrNullFromEventTrace(EventTrace trace) {
 		return trace == null ? null : trace.actorId();
+	}
+	
+	private String nameOrNullFromEventTrace(EventTrace trace) {
+		return trace == null ? null : trace.name();
 	}
 	
 	private Timestamp timestampOrNullFromEventTrace(EventTrace trace) {

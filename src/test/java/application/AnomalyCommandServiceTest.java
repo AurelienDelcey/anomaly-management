@@ -44,6 +44,7 @@ class AnomalyCommandServiceTest {
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static String SECTOR = "FORGING";
 	private final static String MACHINE = "MACHINE_1";
+	private final static String ACTOR_NAME = "Dupont";
 	private final static Role PRIVILEGE = Role.SUPERVISOR;
 	private final static int QUANTITY = 50;
 	private final static int ORDER = 99999;
@@ -56,7 +57,7 @@ class AnomalyCommandServiceTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		this.actor = new Actor(VALID_ACTOR_ID, PRIVILEGE);
+		this.actor = new Actor(VALID_ACTOR_ID, ACTOR_NAME, PRIVILEGE);
 		this.config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
 		this.repo= new JdbcAnomalyRepository(config,TABLE);
 		this.command = new AnomalyCommandService(repo, actor);

@@ -39,6 +39,7 @@ class JdbcAnomalyRepositoryTest {
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static String TABLE = "anomaly.anomalies_test";
+	private final static String VALID_ACTOR_NAME = "Dupont";
 	private final static int FIXED_YEAR = 2026;
 	private final static int FIXED_SEQUENCE = 1;
 	private final static int QUANTITY = 50;
@@ -227,31 +228,31 @@ class JdbcAnomalyRepositoryTest {
 	}
 	
 	private Anomaly createPendingAnomaly() {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		return new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace);
 	}
 	
 	private Anomaly createPendingProlongationAnomaly(UUID parentId, String comment) {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT_LATER);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT_LATER);
 		ProlongationContext prolongationContext = new ProlongationContext(parentId, comment);
 		return new Anomaly(QualityDecision.NA, getValidBusinessIdForProlongation(), getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, prolongationContext);
 	}
 	
 	private Anomaly createCorrectedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
-		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace correctedTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		Anomaly anomaly = createPendingAnomaly().attachCorrectiveAction(VALID_DOC_ID);
 		anomaly = anomaly.attachQualityDecision(QualityDecision.NA);
 		return anomaly.transitionToCorrected(correctedTrace);
 	}
 	
 	private Anomaly createResolvedAnomaly() throws IllegalAttachment, IllegalTransition, IllegalTraceErasureTentative, InconsistentAnomalyStateException {
-		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace resolvedTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		Anomaly anomaly = createCorrectedAnomaly().attachEvidence(VALID_DOC_ID);
 		return anomaly.transitionToResolved(resolvedTrace);
 	}
 	
 	private Anomaly createArchivedAnomaly() throws IllegalTransition, IllegalTraceErasureTentative, IllegalAttachment, InconsistentAnomalyStateException {
-		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace archivedTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		return createResolvedAnomaly().transitionToArchived(archivedTrace);
 	}
 	

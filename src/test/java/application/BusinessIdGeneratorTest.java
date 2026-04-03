@@ -27,6 +27,7 @@ class BusinessIdGeneratorTest {
 	
 	private final static String TABLE = "anomaly.anomalies_test";
 	private final static String VALID_ACTOR_ID = "0000";
+	private final static String VALID_ACTOR_NAME = "Dupont";
 	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
 	private final static String DESCRIPTION = "anomalyTest";
 	private final static int QUANTITY = 50;
@@ -77,7 +78,7 @@ class BusinessIdGeneratorTest {
 	}
 	
 	private Anomaly createAnomalyWithBusinessId(BusinessId businessId) {
-		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, FIXED_INSTANT);
+		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		return assertDoesNotThrow(()->new Anomaly(businessId, getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace));
 	}
 	

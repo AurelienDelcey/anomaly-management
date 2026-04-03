@@ -50,7 +50,7 @@ public class AnomalyCommandService {
 		Sector newSector;
 		Machine newMachine;
 		try {
-			trace = new EventTrace(actor.id(), Instant.now());
+			trace = getTrace();
 			newDescription = new Description(description);
 			impactedQuantity = new ImpactedQuantity(quantity);
 			newProductionOrder = new ProductionOrder(productionOrder);
@@ -127,7 +127,7 @@ public class AnomalyCommandService {
 	
 	public CommandResult transitionToCorrected (UUID anomalyId) {
 		try {
-			EventTrace trace = new EventTrace(actor.id(), Instant.now());
+			EventTrace trace = getTrace();
 			return handleCommand("TransitionToCorrected", anomalyId, (e)->e.transitionToCorrected(trace));
 		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
@@ -140,7 +140,7 @@ public class AnomalyCommandService {
 	
 	public CommandResult transitionToResolved (UUID anomalyId) {
 		try {
-			EventTrace trace = new EventTrace(actor.id(), Instant.now());
+			EventTrace trace = getTrace();
 			return handleCommand("TransitionToResolved", anomalyId, (e)->e.transitionToResolved(trace));
 		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
@@ -152,7 +152,7 @@ public class AnomalyCommandService {
 			return new CommandFailure("Invalid privilege level, please contact your supervisor.");
 		}
 		try {
-			EventTrace trace = new EventTrace(actor.id(), Instant.now());
+			EventTrace trace = getTrace();
 			return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(trace));
 		} catch (IllegalArgumentException e) {
 			return new CommandFailure(e.getMessage());
@@ -168,7 +168,7 @@ public class AnomalyCommandService {
 		savingTry--;	
 			try {
 				log.debug("TransitionToArchivedWithProlongation requested - anomalyId={}, actorId={}", anomalyId, actor.id());
-				EventTrace trace = new EventTrace(actor.id(), Instant.now());
+				EventTrace trace = getTrace();
 				Anomaly anomaly = repository.findById(anomalyId);
 				Anomaly archivedAnomaly = anomaly.transitionToArchived(trace);
 				ProlongationContext context = new ProlongationContext(archivedAnomaly.getId(), comment);
@@ -195,7 +195,7 @@ public class AnomalyCommandService {
 	
 	private Anomaly createProlongation (QualityDecision qualityDecision, BusinessId businessId, ProlongationContext prolongationContext, Description description, 
 			Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine) {
-		EventTrace trace = new EventTrace(actor.id(), Instant.now());
+		EventTrace trace = getTrace();
 		Anomaly anomaly = new Anomaly(qualityDecision, businessId, description, sector, quantity, productionOrder, machine, trace, prolongationContext);
 		log.debug("CreateProlongation - anomalyId={}, actorId={}", anomaly.getId(), actor.id());
 		return anomaly;
@@ -219,5 +219,9 @@ public class AnomalyCommandService {
 			log.warn("{} anomaly not found in command service- anomalyId={}, reason={}", logLabel, anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		}
+	}
+	
+	private EventTrace getTrace() {
+		return new EventTrace(actor.id(), actor.name(), Instant.now());
 	}
 }

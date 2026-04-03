@@ -67,12 +67,16 @@ public class AnomalyRepositoryMapper {
 		Evidence anomalyEvidence = evidence == null ? null : new Evidence(evidence);
 		
 		String createdBy = result.getString("created_by");
+		String createdName = result.getString("created_name");
 		Timestamp createdAt = result.getTimestamp("created_at");
 		String correctedBy = result.getString("corrected_by");
+		String correctedName = result.getString("corrected_name");
 		Timestamp correctedAt = result.getTimestamp("corrected_at");
 		String resolvedBy = result.getString("resolved_by");
+		String resolvedName = result.getString("resolved_name");
 		Timestamp resolvedAt = result.getTimestamp("resolved_at");
 		String archivedBy = result.getString("archived_by");
+		String archivedName = result.getString("archived_name");
 		Timestamp archivedAt = result.getTimestamp("archived_at");
 		
 		Instant createdInstant = instantOrNullFromTimestamp(createdAt);
@@ -80,10 +84,10 @@ public class AnomalyRepositoryMapper {
 		Instant resolvedInstant = instantOrNullFromTimestamp(resolvedAt);
 		Instant archivedInstant = instantOrNullFromTimestamp(archivedAt);
 		
-		EventTrace created = new EventTrace(createdBy, createdInstant);
-		EventTrace corrected = eventTraceOrNull(correctedBy, correctedInstant);
-		EventTrace resolved = eventTraceOrNull(resolvedBy, resolvedInstant);
-		EventTrace archived = eventTraceOrNull(archivedBy, archivedInstant);
+		EventTrace created = new EventTrace(createdBy, createdName, createdInstant);
+		EventTrace corrected = eventTraceOrNull(correctedBy, correctedName, correctedInstant);
+		EventTrace resolved = eventTraceOrNull(resolvedBy, resolvedName, resolvedInstant);
+		EventTrace archived = eventTraceOrNull(archivedBy, archivedName, archivedInstant);
 		
 		Traceability traceability =  buildTraceability(created, corrected, resolved, archived);
 		
@@ -135,8 +139,8 @@ public class AnomalyRepositoryMapper {
 		return timestamp == null ? null : timestamp.toInstant();
 	}
 	
-	private static EventTrace eventTraceOrNull(String actor, Instant instant) {
-		return instant == null || actor == null ? null : new EventTrace(actor, instant);
+	private static EventTrace eventTraceOrNull(String actor, String name, Instant instant) {
+		return instant == null || actor == null || name == null ? null : new EventTrace(actor, name, instant);
 	}
 	
 	private static ProlongationContext prolongationContextOrNull(UUID parentId, String comment) {

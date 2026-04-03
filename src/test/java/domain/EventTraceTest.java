@@ -15,22 +15,23 @@ class EventTraceTest {
 	
 	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
 	private static final String VALID_ACTOR_ID = "0000";
+	private final static String VALID_ACTOR_NAME = "Dupont";
 
 	@ParameterizedTest
 	@NullAndEmptySource
 	@ValueSource(strings = {""," ","  ","\n"})
 	void eventTrace_ShouldThrowException_WhenActorIdIsInvalid(String actor) {
-		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(actor, FIXED_INSTANT));
+		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(actor, VALID_ACTOR_NAME, FIXED_INSTANT));
 	}
 	
 	@Test
 	void eventTrace_ShouldThrowException_WhenInstantIsNull() {
-		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(VALID_ACTOR_ID, null));
+		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, null));
 	}
 	
 	@Test
 	void eventTrace_ShouldReturnValidEventTrace() {
-		EventTrace trace = new EventTrace(VALID_ACTOR_ID,FIXED_INSTANT);
+		EventTrace trace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
 		assertEquals(VALID_ACTOR_ID, trace.actorId());
 		assertEquals(FIXED_INSTANT, trace.instant());
 	}

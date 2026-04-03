@@ -50,7 +50,7 @@ public final class AnomalyDtoMapper {
 	}
 	
 	private static String actorOrNull(EventTrace trace) {
-	    return trace == null ? null : trace.actorId();
+	    return trace == null ? null : trace.idFormat();
 	}
 
 	private static Instant instantOrNull(EventTrace trace) {
