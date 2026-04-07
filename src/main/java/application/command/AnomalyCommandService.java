@@ -80,41 +80,23 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult attachDescription (UUID anomalyId, String description) {
-		try {
-			Description newDescription = new Description(description);
-			return handleCommand("AttachDescription", anomalyId, (e)->e.attachDescription(newDescription));
-		} catch (IllegalArgumentException e) {
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("AttachDescription", anomalyId, (e)->e.attachDescription(new Description(description)));
 	}
 	
 	public CommandResult attachProductionOrder (UUID anomalyId, int productionOrder) {
-		try {
-			ProductionOrder newProductionOrder = new ProductionOrder(productionOrder);
-			return handleCommand("AttachProductionOrder", anomalyId, (e)->e.attachProductionOrder(newProductionOrder));
-		} catch (IllegalArgumentException e) {
-			return new CommandFailure(e.getMessage());
-		}
-			
+		return handleCommand("AttachProductionOrder", anomalyId, (e)->e.attachProductionOrder(new ProductionOrder(productionOrder)));
 	}
 	
 	public CommandResult attachImpactedQuantity (UUID anomalyId, int quantity) {
-		try {
-			ImpactedQuantity newQuantity = new ImpactedQuantity(quantity);
-			return handleCommand("AttachImpactedQuantity", anomalyId, (e)->e.attachImpactedQuantity(newQuantity));
-		} catch (IllegalArgumentException e) {
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("AttachImpactedQuantity", anomalyId, (e)->e.attachImpactedQuantity(new ImpactedQuantity(quantity)));
 	}
 	
 	public CommandResult attachMachine (UUID anomalyId, String machine) {
-		Machine newMachine = Machine.valueOf(machine);//TODO reintroduire les enums metier directement dans l'ui
-		return handleCommand("AttachMachine", anomalyId, (e)->e.attachMachine(newMachine));
+		return handleCommand("AttachMachine", anomalyId, (e)->e.attachMachine(Machine.valueOf(machine)));
 	}
 	
 	public CommandResult attachSector (UUID anomalyId, String sector) {
-		Sector newSector = Sector.valueOf(sector);
-		return handleCommand("AttachSector", anomalyId, (e)->e.attachSector(newSector));
+		return handleCommand("AttachSector", anomalyId, (e)->e.attachSector(Sector.valueOf(sector)));
 	}
 	
 	public CommandResult attachCorrectiveAction (UUID anomalyId, String docId) {
@@ -126,12 +108,7 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult transitionToCorrected (UUID anomalyId) {
-		try {
-			EventTrace trace = getTrace();
-			return handleCommand("TransitionToCorrected", anomalyId, (e)->e.transitionToCorrected(trace));
-		} catch (IllegalArgumentException e) {
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("TransitionToCorrected", anomalyId, (e)->e.transitionToCorrected(getTrace()));
 	}
 	
 	public CommandResult attachEvidence (UUID anomalyId, String docId) {
@@ -139,24 +116,14 @@ public class AnomalyCommandService {
 	}
 	
 	public CommandResult transitionToResolved (UUID anomalyId) {
-		try {
-			EventTrace trace = getTrace();
-			return handleCommand("TransitionToResolved", anomalyId, (e)->e.transitionToResolved(trace));
-		} catch (IllegalArgumentException e) {
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("TransitionToResolved", anomalyId, (e)->e.transitionToResolved(getTrace()));
 	}
 	
 	public CommandResult transitionToArchived (UUID anomalyId) {
 		if(!this.actor.role().canArchive()) {
 			return new CommandFailure("Invalid privilege level, please contact your supervisor.");
 		}
-		try {
-			EventTrace trace = getTrace();
-			return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(trace));
-		} catch (IllegalArgumentException e) {
-			return new CommandFailure(e.getMessage());
-		}
+		return handleCommand("TransitionToArchived", anomalyId, (e)->e.transitionToArchived(getTrace()));
 	}
 	
 	public CommandResult transitionToArchivedWithProlongation (UUID anomalyId, String comment) {
@@ -212,7 +179,7 @@ public class AnomalyCommandService {
 			repository.save(newAnomaly);
 			log.info("{} succeeded - anomalyId={}, actorId={}", logLabel, anomalyId, actor.id());
 			return new CommandSuccess(anomalyId);
-		} catch (DomainException | TechnicalException e) {
+		} catch (DomainException | IllegalArgumentException | TechnicalException e) {
 			log.warn("{} failed - anomalyId={}, reason={}", logLabel, anomalyId, e.getMessage());
 			return new CommandFailure(e.getMessage());
 		} catch (AnomalyNotFoundException e) {
