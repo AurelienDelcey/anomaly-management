@@ -218,7 +218,10 @@ public class GeneralViewController {
 		 QueryResult<List<AnomalyDto>> result = queryService.findByContext(queryContextProperty.get());
 		 switch (result) {
 		 case QuerySuccess<List<AnomalyDto>> success-> {
-			 items.setAll(success.payload());
+			 List<AnomalyDto> payload = success.payload();
+
+			 hasNext.set(payload.size() > 50);
+			 items.setAll(payload.stream().limit(50).toList());
 		 }
 		 case QueryNotFound<List<AnomalyDto>> notFound-> {/*find page return empty list if nothing was found*/}
 		 case QueryFailure <List<AnomalyDto>> failure -> {showError(failure.message());}
