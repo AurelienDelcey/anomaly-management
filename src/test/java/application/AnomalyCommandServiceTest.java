@@ -24,10 +24,12 @@ import application.command.CommandResult;
 import application.command.CommandSuccess;
 import application.dto.AnomalyDto;
 import application.query.AnomalyQueryService;
+import application.query.QueryContext;
 import application.query.QueryFailure;
 import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
+import application.query.SortingSelection;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
 import domain.exception.InconsistentAnomalyStateException;
@@ -49,6 +51,7 @@ class AnomalyCommandServiceTest {
 	private final static int QUANTITY = 50;
 	private final static int ORDER = 99999;
 	private final static String TABLE = "anomaly.anomalies_test";
+	private final static QueryContext CONTEXT = new QueryContext(true, SortingSelection.DATE, 1);
 	private AnomalyCommandService command;
 	private AnomalyQueryService query;
 	private JdbcAnomalyRepository repo;
@@ -77,7 +80,7 @@ class AnomalyCommandServiceTest {
 	@Test
 	void shouldCompleteAnomalyLifecycle() {
 		assertSuccess(command.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE));
-		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
+		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findByContext(CONTEXT));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -111,7 +114,7 @@ class AnomalyCommandServiceTest {
 	@Test
 	void shouldRejectInvalidTransition() {
 		assertSuccess(command.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE));
-		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
+		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findByContext(CONTEXT));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -126,7 +129,7 @@ class AnomalyCommandServiceTest {
 	@Test
 	void transitionToArchivedWithProlongation() {
 		assertSuccess(command.createAnomaly(DESCRIPTION, SECTOR, QUANTITY, ORDER, MACHINE));
-		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findPage(1));
+		QueryResult<List<AnomalyDto>> anomalies = assertDoesNotThrow(()->query.findByContext(CONTEXT));
 			List<AnomalyDto> list = switch (anomalies) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -141,7 +144,7 @@ class AnomalyCommandServiceTest {
 		assertSuccess(command.transitionToResolved(anomalyId));
 		assertSuccess(command.transitionToArchivedWithProlongation(anomalyId, DESCRIPTION));
 		
-		QueryResult<List<AnomalyDto>> anomaliesAfterProlongation = assertDoesNotThrow(()->query.findPage(1));
+		QueryResult<List<AnomalyDto>> anomaliesAfterProlongation = assertDoesNotThrow(()->query.findByContext(CONTEXT));
 		List<AnomalyDto> listAfterProlongation = switch ( anomaliesAfterProlongation) {
 		    case QuerySuccess<List<AnomalyDto>> ls -> ls.payload();
 		    case QueryNotFound<List<AnomalyDto>> nf -> fail("Created anomaly not found.");
@@ -234,7 +237,7 @@ class AnomalyCommandServiceTest {
 		@Override
 		public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {return null;}
 		@Override
-		public List<Anomaly> findAll(int page)  {return null;}
+		public List<Anomaly> findByContext(QueryContext context)  {return null;}
 
 	    
 	}
@@ -265,6 +268,6 @@ class AnomalyCommandServiceTest {
 		@Override
 		public Anomaly findById(UUID id) throws AnomalyNotFoundException, InconsistentAnomalyStateException {return null;}
 		@Override
-		public List<Anomaly> findAll(int page)  {return null;}
+		public List<Anomaly> findByContext(QueryContext context)  {return null;}
 	}
 }

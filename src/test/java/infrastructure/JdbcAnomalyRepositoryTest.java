@@ -12,6 +12,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import application.query.QueryContext;
+import application.query.SortingSelection;
 import domain.anomaly.Anomaly;
 import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
@@ -40,6 +42,7 @@ class JdbcAnomalyRepositoryTest {
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static String TABLE = "anomaly.anomalies_test";
 	private final static String VALID_ACTOR_NAME = "Dupont";
+	private final static QueryContext CONTEXT = new QueryContext(true, SortingSelection.DATE, 1);
 	private final static int FIXED_YEAR = 2026;
 	private final static int FIXED_SEQUENCE = 1;
 	private final static int QUANTITY = 50;
@@ -173,7 +176,7 @@ class JdbcAnomalyRepositoryTest {
 		Anomaly parentAnomalyWithProlongationId = assertDoesNotThrow(()->parentAnomaly.linkProlongation(childAnomaly.getId()));
 		
 		repo.saveAtomic(parentAnomalyWithProlongationId, childAnomaly);
-		List<Anomaly> anomalies = assertDoesNotThrow(()->repo.findAll(1));
+		List<Anomaly> anomalies = assertDoesNotThrow(()->repo.findByContext(CONTEXT));
 		
 		assertEquals(2,anomalies.size());
 		

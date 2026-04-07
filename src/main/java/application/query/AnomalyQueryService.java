@@ -30,9 +30,9 @@ public class AnomalyQueryService {
 		}
 	}
 	
-	public QueryResult<List<AnomalyDto>> findPage(int page) {
+	public QueryResult<List<AnomalyDto>> findByContext(QueryContext queryContext) {
 		try {
-			List<Anomaly> anomalies = repository.findAll(page);
+			List<Anomaly> anomalies = repository.findByContext(queryContext);
 			List<AnomalyDto> anomalyDtos = anomalies.stream()
 					.map(AnomalyDtoMapper::mapToDto)
 					.toList();

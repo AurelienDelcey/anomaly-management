@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import application.query.QueryContext;
 import application.repository.AnomalyRepository;
 import domain.anomaly.Anomaly;
 import domain.exception.IllegalTraceErasureTentative;
@@ -200,31 +202,40 @@ public class JdbcAnomalyRepository implements AnomalyRepository{
 	}
 
 	@Override
-	public List<Anomaly> findAll(int page) {
-		log.debug("findAll requested - page={}", page);
+	public List<Anomaly> findByContext(QueryContext context) {
+		log.debug("findByContext requested - page={}", context.page());
 		try(Connection connection = openConnection()){
 			try(PreparedStatement preparedStatement = connection.prepareStatement("""
 					SELECT * FROM %s
-					ORDER BY created_at DESC
-					LIMIT 50
+					%s
+					ORDER BY %s DESC
+					LIMIT 51
 					OFFSET ?
-					""".formatted(tableName))){
-				preparedStatement.setInt(1, 50*(page-1));
+					""".formatted(tableName, applyArchivedStateFilter(context.includeArchived()), 
+							context.sortingSelection().getFormatForQueries()))){
+				preparedStatement.setInt(1, 50*(context.page()-1));
 				try(ResultSet result = preparedStatement.executeQuery()){
 					List<Anomaly> anomalies = new ArrayList<>();
 					while(result.next()) {
 						anomalies.add(mapAnomaly(result));
 					}
-					log.debug("findAll success - page={}", page);
+					log.debug("findByContext success - page={}", context.page());
 					return anomalies;
 				}
 			}
 		} catch (SQLException | IllegalTraceErasureTentative e) {
-			log.warn("findAll failure for SQL technical exception- page={}", page);
+			log.warn("findByContext failure for SQL technical exception- page={}", context.page());
 			throw new TechnicalException("impossible to reconstruct anomaly", e);
 		}
 	}
 	
+	private String applyArchivedStateFilter(boolean includeArchived) {
+		if(includeArchived) {
+			return "";
+		}
+		return "WHERE anomaly_state != 'ARCHIVED'";
+	}
+
 	private Connection openConnection() throws SQLException {
 		Connection connection = DriverManager.getConnection(config.url(), config.user(), config.password());
 		return connection;

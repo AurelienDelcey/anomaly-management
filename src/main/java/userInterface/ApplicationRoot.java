@@ -33,10 +33,7 @@ public class ApplicationRoot extends Application{
 		this.repository = new JdbcAnomalyRepository(this.config, "anomaly.anomalies_test");
 		this.commandService = new AnomalyCommandService(this.repository, this.actor) ;
 		this.queryService = new AnomalyQueryService(this.repository);
-		
 	}
-
-
 
 	@Override
 	public void start(Stage stage) throws Exception {
