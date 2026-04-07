@@ -1,6 +1,10 @@
 package userInterface;
 
 import java.net.URL;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import application.actor.Actor;
 import application.actor.Role;
@@ -22,17 +26,38 @@ public class ApplicationRoot extends Application{
 	private AnomalyRepository repository;
 	private Actor actor;
 	private ConnectionConfig config;
+	private static final Logger log = LoggerFactory.getLogger(ApplicationRoot.class);
 	
 	
 
 	@Override
 	public void init() throws Exception {
-		
-		this.actor = new Actor("0000", "Dupont", Role.SUPERVISOR);
+		Parameters params = getParameters();
+		Map<String, String> argsMap = params.getNamed();
+
+		String name = argsMap.get("name");
+		String role = argsMap.get("role");
+		String id = argsMap.get("id");
+
+		if(name != null && role != null && id != null) {
+		    try {
+		        this.actor = new Actor(id, name, Role.valueOf(role.toUpperCase()));
+		    } catch (IllegalArgumentException e) {
+		        log.warn("Invalid arguments format, default actor activated", e);
+		        setDefaultActor();
+		    }
+		} else {
+		    log.warn("Missing arguments, default actor activated");
+		    setDefaultActor();
+		}
 		this.config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
 		this.repository = new JdbcAnomalyRepository(this.config, "anomaly.anomalies_test");
 		this.commandService = new AnomalyCommandService(this.repository, this.actor) ;
 		this.queryService = new AnomalyQueryService(this.repository);
+	}
+	
+	private void setDefaultActor() {
+		this.actor = new Actor("0000", "Dupont", Role.SUPERVISOR);
 	}
 
 	@Override
