@@ -4,16 +4,24 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
 import application.command.AnomalyCommandService;
 import application.dto.AnomalyDto;
 import application.query.AnomalyQueryService;
+import application.query.QueryContext;
 import application.query.QueryFailure;
 import application.query.QueryNotFound;
 import application.query.QueryResult;
 import application.query.QuerySuccess;
+import application.query.SortingSelection;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,6 +32,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.Tooltip;
@@ -37,8 +46,11 @@ public class GeneralViewController {
 	@FXML private Button createButton;
 	@FXML private Button refreshButton;
 	@FXML private Button detailsButton;
+	@FXML private Button nextPageButton;
+	@FXML private Button previousPageButton;
 	@FXML private ComboBox<String> sortCombo;
 	@FXML private CheckBox hideArchivedCheckBox;
+	@FXML private Label pageLabel;
 	
 	@FXML private TableColumn<AnomalyDto, String> idColumn;
 	@FXML private TableColumn<AnomalyDto, String> sectorColumn;
@@ -47,18 +59,25 @@ public class GeneralViewController {
 	@FXML private TableColumn<AnomalyDto, String> createdByColumn;
 	@FXML private TableColumn<AnomalyDto, String> createdAtColumn;
 	
+	private final QueryContext defaultQueryContext = new QueryContext(true, SortingSelection.DATE, 1);
 	private final ObservableList<AnomalyDto> items = FXCollections.observableArrayList();
-	private final  DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private final ObjectProperty<QueryContext> queryContextProperty = new SimpleObjectProperty<>();
+	private final BooleanProperty hasNext = new SimpleBooleanProperty();
+	private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
 	private AnomalyQueryService queryService;
 	private AnomalyCommandService commandService;
 	
 	@FXML
 	public void initialize() {
+		this.queryContextProperty.set(defaultQueryContext);
 		this.anomalyTable.setItems(items);
 		bindTableColumns();
 		setDoubleClick();
 		setRefreshButton();
+		setSortCombo();
+		bindPageButtons();
+		setPageLabel();
 		this.anomalyTable.setOnKeyPressed(event -> {
 			switch(event.getCode()) {
 			case ENTER -> onClickDetails();
@@ -67,6 +86,61 @@ public class GeneralViewController {
 		});
 	}
 	
+	private void setPageLabel() {
+		pageLabel.textProperty().bind(Bindings.createStringBinding(
+				()->String.valueOf(queryContextProperty.get().page()),
+				queryContextProperty));
+	}
+
+	private void bindPageButtons() {
+		previousPageButton.disableProperty().bind(Bindings.createBooleanBinding(
+				()->queryContextProperty.get().page()<=1,
+				queryContextProperty));
+		nextPageButton.disableProperty().bind(hasNext.not());
+	}
+	
+	@FXML
+	public void onClickNext() {
+		queryContextProperty.set(new QueryContext(this.queryContextProperty.get().includeArchived(), 
+				this.queryContextProperty.get().sortingSelection(), 
+				this.queryContextProperty.get().page()+1));
+		loadData();
+	}
+	
+	@FXML
+	public void onClickPrevious() {
+		queryContextProperty.set(new QueryContext(this.queryContextProperty.get().includeArchived(), 
+				this.queryContextProperty.get().sortingSelection(), 
+				this.queryContextProperty.get().page()-1));
+		loadData();
+	}
+
+	@FXML
+	public void onSelectSortingOption() {
+		SortingSelection selection = SortingSelection.valueOf(sortCombo.getSelectionModel().getSelectedItem());
+		this.queryContextProperty.set(new QueryContext(this.queryContextProperty.get().includeArchived(), 
+				selection, 
+				this.queryContextProperty.get().page()));
+		loadData();
+	}
+	
+	@FXML
+	public void onHideArchived() {
+		boolean hideArchived = !(hideArchivedCheckBox.isSelected());
+		this.queryContextProperty.set(new QueryContext(hideArchived, 
+				this.queryContextProperty.get().sortingSelection(), 
+				this.queryContextProperty.get().page()));
+		loadData();
+	}
+	
+	private void setSortCombo() {
+		EnumSet<SortingSelection> sortingSelections = EnumSet.allOf(SortingSelection.class);
+		List<String> list = sortingSelections.stream()
+			    .map(Enum::name)
+			    .toList();
+		sortCombo.setItems(FXCollections.observableArrayList(list));
+	}
+
 	private void setRefreshButton() {
 		SVGPath icon = new SVGPath();
 		icon.setContent("M13.836 2.477a.75.75 0 0 1"
@@ -141,7 +215,7 @@ public class GeneralViewController {
 	}
 	
 	public void loadData() {
-		 QueryResult<List<AnomalyDto>> result = queryService.findPage(1);
+		 QueryResult<List<AnomalyDto>> result = queryService.findByContext(queryContextProperty.get());
 		 switch (result) {
 		 case QuerySuccess<List<AnomalyDto>> success-> {
 			 items.setAll(success.payload());
