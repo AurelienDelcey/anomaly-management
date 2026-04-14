@@ -7,6 +7,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 import domain.exception.IllegalTraceErasureTentative;
+import domain.exception.InvalidValueException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 
@@ -32,7 +33,7 @@ class TraceabilityTest {
 	
 	@Test
 	void constructor_ShouldReturnException_WhenCreationTraceIsNull() {
-		assertThrows(IllegalArgumentException.class, ()-> new Traceability(null));
+		assertThrows(InvalidValueException.class, ()-> new Traceability(null));
 	}
 	
 	@Test

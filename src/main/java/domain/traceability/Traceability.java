@@ -1,6 +1,7 @@
 package domain.traceability;
 
 import domain.exception.IllegalTraceErasureTentative;
+import domain.exception.InvalidValueException;
 
 public class Traceability {
 	
@@ -11,7 +12,7 @@ public class Traceability {
 	
 	public Traceability(EventTrace creation) {
 		if(creation == null) {
-			throw new IllegalArgumentException("Creation trace cannot be null.");
+			throw new InvalidValueException("Creation trace cannot be null.");
 		}
 		this.creation = creation;
 		this.toCorrected = null;

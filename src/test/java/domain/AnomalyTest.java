@@ -15,6 +15,7 @@ import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
+import domain.exception.InvalidValueException;
 import domain.traceability.EventTrace;
 import domain.valueobject.BusinessId;
 import domain.valueobject.Description;
@@ -65,35 +66,35 @@ class AnomalyTest {
 	@Test
 	void constructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), null, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), null, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace));
 	}
 	
 	@Test
 	void constructor_ShouldThrowException_WhenBusinessIdIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(null, getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(null, getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace));
 	}
 	
 	@Test
 	void constructor_ShouldThrowException_WhenImpactedQuantityIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				null, getValideProductionOrder(), Machine.MACHINE_1, creationTrace));
 	}
 	
 	@Test
 	void constructor_ShouldThrowException_WhenProductionOrderIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), null, Machine.MACHINE_1, creationTrace));
 	}
 	
 	@Test
 	void constructor_ShouldThrowException_WhenMachineIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), null, creationTrace));
 	}
 	
@@ -125,42 +126,42 @@ class AnomalyTest {
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenSectorIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), null, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), null, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenBusinessIdIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, null, getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(QualityDecision.NA, null, getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenImpactedQuantityIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				null, getValideProductionOrder(), Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenProductionOrderIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), null, Machine.MACHINE_1, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenMachineIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), null, creationTrace, getValidProlongationContext()));
 	}
 	
 	@Test
 	void prolongationConstructor_ShouldThrowException_WhenProlongationContextIsNull() {
 		EventTrace creationTrace = getEventTrace();
-		assertThrows(IllegalArgumentException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
+		assertThrows(InvalidValueException.class, ()-> new Anomaly(QualityDecision.NA, getValidBusinessId(), getValidDescription(), Sector.FORGING, 
 				getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace, null));
 	}
 	
@@ -334,31 +335,31 @@ class AnomalyTest {
 	@Test
 	void attachSector_ShouldThrowException_WhenSectorIsNull() {
 	    Anomaly anomaly = createPendingAnomaly();
-	    assertThrows(IllegalArgumentException.class, () -> anomaly.attachSector(null));
+	    assertThrows(InvalidValueException.class, () -> anomaly.attachSector(null));
 	}
 	
 	@Test
 	void attachDescription_ShouldThrowException_WhenDescriptionIsNull() {
 	    Anomaly anomaly = createPendingAnomaly();
-	    assertThrows(IllegalArgumentException.class, () -> anomaly.attachDescription(null));
+	    assertThrows(InvalidValueException.class, () -> anomaly.attachDescription(null));
 	}
 	
 	@Test
 	void attachImpactedQuantity_ShouldThrowException_WhenImpactedQuantityIsNull() {
 	    Anomaly anomaly = createPendingAnomaly();
-	    assertThrows(IllegalArgumentException.class, () -> anomaly.attachImpactedQuantity(null));
+	    assertThrows(InvalidValueException.class, () -> anomaly.attachImpactedQuantity(null));
 	}
 	
 	@Test
 	void attachProductionOrder_ShouldThrowException_WhenProductionOrderIsNull() {
 	    Anomaly anomaly = createPendingAnomaly();
-	    assertThrows(IllegalArgumentException.class, () -> anomaly.attachProductionOrder(null));
+	    assertThrows(InvalidValueException.class, () -> anomaly.attachProductionOrder(null));
 	}
 	
 	@Test
 	void attachMachine_ShouldThrowException_WhenMachineIsNull() {
 	    Anomaly anomaly = createPendingAnomaly();
-	    assertThrows(IllegalArgumentException.class, () -> anomaly.attachMachine(null));
+	    assertThrows(InvalidValueException.class, () -> anomaly.attachMachine(null));
 	}
 	
 	@Test

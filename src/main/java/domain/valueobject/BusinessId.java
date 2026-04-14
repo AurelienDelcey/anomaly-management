@@ -2,15 +2,18 @@ package domain.valueobject;
 
 import java.time.Year;
 
+import domain.exception.InvalidValueException;
+
+
 public record BusinessId(int year, int sequence) {
 
     public BusinessId {
         if (year < 2026 || year > Year.now().getValue()) {
-            throw new IllegalArgumentException("Invalid year in business ID.");
+            throw new InvalidValueException("Invalid year in business ID.");
         }
 
         if (sequence <= 0) {
-            throw new IllegalArgumentException("Sequence must be positive.");
+            throw new InvalidValueException("Sequence must be positive.");
         }
     }
 

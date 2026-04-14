@@ -1,6 +1,6 @@
 package domain.exception;
 
-public abstract class DomainException extends Exception{
+public abstract class DomainException extends RuntimeException{
 
 	private static final long serialVersionUID = 7342351339768992529L;
 

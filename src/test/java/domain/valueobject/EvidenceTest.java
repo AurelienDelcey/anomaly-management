@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import domain.exception.InvalidValueException;
+
 class EvidenceTest {
 
 	@ParameterizedTest
@@ -16,7 +18,7 @@ class EvidenceTest {
 			"AAA-00-","AAA-00-1234567","AAA00091991",
 			"AAA-0-12345"})
 	void evidence_ShouldThrowException_WhenTheDocumentIdIsInvalid(String docId) {
-		assertThrows(IllegalArgumentException.class, ()->new Evidence(docId));
+		assertThrows(InvalidValueException.class, ()->new Evidence(docId));
 	}
 	
 	@Test

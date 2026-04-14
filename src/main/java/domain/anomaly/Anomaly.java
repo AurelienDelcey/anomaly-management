@@ -6,6 +6,7 @@ import domain.exception.IllegalAttachment;
 import domain.exception.IllegalTraceErasureTentative;
 import domain.exception.IllegalTransition;
 import domain.exception.InconsistentAnomalyStateException;
+import domain.exception.InvalidValueException;
 import domain.traceability.EventTrace;
 import domain.traceability.Traceability;
 import domain.valueobject.BusinessId;
@@ -39,19 +40,19 @@ public class Anomaly {
 	
 	public Anomaly(BusinessId businessId, Description description, Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine, EventTrace creationTrace){
 		if(businessId == null) {
-			throw new IllegalArgumentException("businessId cannot be null.");
+			throw new InvalidValueException("businessId cannot be null.");
 		}
 		if(sector == null) {
-			throw new IllegalArgumentException("Sector cannot be null.");
+			throw new InvalidValueException("Sector cannot be null.");
 		}
 		if(quantity == null) {
-			throw new IllegalArgumentException("quantity cannot be null.");
+			throw new InvalidValueException("quantity cannot be null.");
 		}
 		if(productionOrder == null) {
-			throw new IllegalArgumentException("productionOrder cannot be null.");
+			throw new InvalidValueException("productionOrder cannot be null.");
 		}
 		if(machine == null) {
-			throw new IllegalArgumentException("machine cannot be null.");
+			throw new InvalidValueException("machine cannot be null.");
 		}
 		this.id = UUID.randomUUID();
 		this.businessId = businessId;
@@ -71,22 +72,22 @@ public class Anomaly {
 	
 	public Anomaly(QualityDecision qualityDecision, BusinessId businessId, Description description, Sector sector, ImpactedQuantity quantity, ProductionOrder productionOrder, Machine machine, EventTrace creationTrace, ProlongationContext prolongationContext){
 		if(businessId == null) {
-			throw new IllegalArgumentException("businessId cannot be null.");
+			throw new InvalidValueException("businessId cannot be null.");
 		}
 		if(sector == null) {
-			throw new IllegalArgumentException("Sector cannot be null.");
+			throw new InvalidValueException("Sector cannot be null.");
 		}
 		if(quantity == null) {
-			throw new IllegalArgumentException("quantity cannot be null.");
+			throw new InvalidValueException("quantity cannot be null.");
 		}
 		if(productionOrder == null) {
-			throw new IllegalArgumentException("productionOrder cannot be null.");
+			throw new InvalidValueException("productionOrder cannot be null.");
 		}
 		if(machine == null) {
-			throw new IllegalArgumentException("machine cannot be null.");
+			throw new InvalidValueException("machine cannot be null.");
 		}
 		if(prolongationContext == null) {
-			throw new IllegalArgumentException("prolongationContext cannot be null.");
+			throw new InvalidValueException("prolongationContext cannot be null.");
 		}
 		this.id = UUID.randomUUID();
 		this.businessId = businessId;
@@ -168,7 +169,7 @@ public class Anomaly {
 			throw new IllegalAttachment("Editing description is only permitted on a root anomaly in PENDING state.");
 		}
 		if(description == null) {
-			throw new IllegalArgumentException("Description cannot be null.");
+			throw new InvalidValueException("Description cannot be null.");
 		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
@@ -178,7 +179,7 @@ public class Anomaly {
 			throw new IllegalAttachment("Editing machine is only permitted on a root anomaly in PENDING state.");
 		}
 		if(machine == null) {
-			throw new IllegalArgumentException("Machine cannot be null.");
+			throw new InvalidValueException("Machine cannot be null.");
 		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
@@ -188,7 +189,7 @@ public class Anomaly {
 			throw new IllegalAttachment("Editing impactedQuantity is only permitted on a root anomaly in PENDING state.");
 		}
 		if(otherQuantity == null) {
-			throw new IllegalArgumentException("Impacted quantity cannot be null.");
+			throw new InvalidValueException("Impacted quantity cannot be null.");
 		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, otherQuantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
@@ -198,14 +199,14 @@ public class Anomaly {
 			throw new IllegalAttachment("Editing productionOrder is only permitted on a root anomaly in PENDING state.");
 		}
 		if(productionOrder == null) {
-			throw new IllegalArgumentException("Production order cannot be null.");
+			throw new InvalidValueException("Production order cannot be null.");
 		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, qualityDecision, anomalyState, description);
 	}
 	
 	public Anomaly attachSector(Sector sector) throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(sector == null) {
-			throw new IllegalArgumentException("Sector cannot be null.");
+			throw new InvalidValueException("Sector cannot be null.");
 		}
 		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
 			throw new IllegalAttachment("Editing sector is only permitted on a root anomaly in PENDING state.");
@@ -233,7 +234,7 @@ public class Anomaly {
 		}
 		return new Anomaly(id, businessId, prolongationContext, childId, sector, quantity, productionOrder, machine, correctiveAction, evidence, traceability, newQualityDecision, anomalyState, description);
 	}
-	
+
 	public Anomaly attachEvidence(String evidenceId)throws IllegalAttachment, InconsistentAnomalyStateException{
 		if(this.anomalyState != AnomalyState.CORRECTED) {
 			throw new IllegalAttachment("Evidence can only be attached in CORRECTED state.");

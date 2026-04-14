@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import domain.exception.InvalidValueException;
 import domain.traceability.EventTrace;
 
 class EventTraceTest {
@@ -21,12 +22,12 @@ class EventTraceTest {
 	@NullAndEmptySource
 	@ValueSource(strings = {""," ","  ","\n"})
 	void eventTrace_ShouldThrowException_WhenActorIdIsInvalid(String actor) {
-		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(actor, VALID_ACTOR_NAME, FIXED_INSTANT));
+		assertThrows(InvalidValueException.class, ()-> new EventTrace(actor, VALID_ACTOR_NAME, FIXED_INSTANT));
 	}
 	
 	@Test
 	void eventTrace_ShouldThrowException_WhenInstantIsNull() {
-		assertThrows(IllegalArgumentException.class, ()-> new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, null));
+		assertThrows(InvalidValueException.class, ()-> new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, null));
 	}
 	
 	@Test

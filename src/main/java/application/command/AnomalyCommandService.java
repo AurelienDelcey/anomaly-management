@@ -56,7 +56,7 @@ public class AnomalyCommandService {
 			newProductionOrder = new ProductionOrder(productionOrder);
 		    newSector = Sector.valueOf(sector);
 			newMachine = Machine.valueOf(machine);
-		}catch(IllegalArgumentException e) {
+		}catch(DomainException e) {
 			 return new CommandFailure(e.getMessage());
 		}
 		
@@ -70,7 +70,7 @@ public class AnomalyCommandService {
 				return new CommandSuccess(anomaly.getId());
 			} catch (BusinessIdColisionException e) {
 				continue;
-			} catch (TechnicalException | IllegalArgumentException e) {
+			} catch (TechnicalException | DomainException | IllegalArgumentException e) {
 				log.warn("CreateAnomaly failed - reason={}", e.getMessage());
 				return new CommandFailure(e.getMessage());
 			}

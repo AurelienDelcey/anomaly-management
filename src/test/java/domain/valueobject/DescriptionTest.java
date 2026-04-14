@@ -7,13 +7,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import domain.exception.InvalidValueException;
+
 class DescriptionTest {
 	
 	@ParameterizedTest
 	@NullAndEmptySource
 	@ValueSource(strings = {""," ","  ","\n"})
 	void description_ShouldThrowException_WhenDescriptionIsInvalid(String description) {
-		assertThrows(IllegalArgumentException.class, ()-> new Description(description));
+		assertThrows(InvalidValueException.class, ()-> new Description(description));
 	}
 	
 	@Test

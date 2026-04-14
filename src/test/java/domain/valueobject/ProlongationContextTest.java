@@ -9,6 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import domain.exception.InvalidValueException;
+
 class ProlongationContextTest {
 	
 	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
@@ -17,12 +19,12 @@ class ProlongationContextTest {
 	@NullAndEmptySource
 	@ValueSource(strings = {""," ","  ","\n"})
 	void prolongationContext_ShouldThrowException_WhenCommentIsInvalid(String comment) {
-		assertThrows(IllegalArgumentException.class, ()-> new ProlongationContext(UUID.randomUUID(),comment));
+		assertThrows(InvalidValueException.class, ()-> new ProlongationContext(UUID.randomUUID(),comment));
 	}
 	
 	@Test
 	void prolongationContext_ShouldThrowException_WhenParentIdIsNull() {
-		assertThrows(IllegalArgumentException.class, ()-> new ProlongationContext(null,"valid"));
+		assertThrows(InvalidValueException.class, ()-> new ProlongationContext(null,"valid"));
 	}
 	
 	@Test
