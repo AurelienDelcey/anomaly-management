@@ -27,14 +27,12 @@ public class ApplicationRoot extends Application{
 	private Actor actor;
 	private ConnectionConfig config;
 	private static final Logger log = LoggerFactory.getLogger(ApplicationRoot.class);
-	
-	
 
 	@Override
 	public void init() throws Exception {
 		Parameters params = getParameters();
 		Map<String, String> argsMap = params.getNamed();
-
+		
 		String name = argsMap.get("name");
 		String role = argsMap.get("role");
 		String id = argsMap.get("id");

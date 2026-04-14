@@ -39,6 +39,9 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import userInterface.creation.CreationViewController;
+import userInterface.detail.DetailViewLayoutController;
+import userInterface.dialog.ErrorViewController;
 
 public class GeneralViewController {
 	

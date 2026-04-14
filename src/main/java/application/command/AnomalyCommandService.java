@@ -75,8 +75,8 @@ public class AnomalyCommandService {
 				return new CommandFailure(e.getMessage());
 			}
 		}
-		log.warn("CreateAnomaly failed - reason=Maximum aptempt of retry to allocate a businessId");
-		return new CommandFailure("CreateAnomaly failed: Maximum aptempt of retry to allocate a businessId");
+		log.warn("CreateAnomaly failed - reason=Maximum attempt of retry to allocate a businessId");
+		return new CommandFailure("CreateAnomaly failed: Maximum attempt of retry to allocate a businessId");
 	}
 	
 	public CommandResult attachDescription (UUID anomalyId, String description) {
@@ -156,8 +156,8 @@ public class AnomalyCommandService {
 				return new CommandFailure(e.getMessage());
 			}
 		}
-		log.warn("transitionToArchivedWithProlongation failed - reason=Maximum aptempt of retry to allocate a businessId");
-		return new CommandFailure("transitionToArchivedWithProlongation failed: Maximum aptempt of retry to allocate a businessId");
+		log.warn("TransitionToArchivedWithProlongation failed - reason=Maximum attempt of retry to allocate a businessId");
+		return new CommandFailure("transitionToArchivedWithProlongation failed: Maximum attempt of retry to allocate a businessId");
 	}
 	
 	private Anomaly createProlongation (QualityDecision qualityDecision, BusinessId businessId, ProlongationContext prolongationContext, Description description, 

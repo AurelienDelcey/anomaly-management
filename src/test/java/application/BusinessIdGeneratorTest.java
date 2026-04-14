@@ -55,16 +55,16 @@ class BusinessIdGeneratorTest {
 
 	@Test
 	void test() {
-		BusinessId BusinessId1 = businessIdGenerator.getBusinessId();
-		Anomaly anomaly1 = createAnomalyWithBusinessId(BusinessId1);
+		BusinessId businessId1 = businessIdGenerator.getBusinessId();
+		Anomaly anomaly1 = createAnomalyWithBusinessId(businessId1);
 		repository.save(anomaly1);
 		
-		BusinessId BusinessId2 = businessIdGenerator.getBusinessId();
-		Anomaly anomaly2 = createAnomalyWithBusinessId(BusinessId2);
+		BusinessId businessId2 = businessIdGenerator.getBusinessId();
+		Anomaly anomaly2 = createAnomalyWithBusinessId(businessId2);
 		repository.save(anomaly2);
 		
-		BusinessId BusinessId3 = businessIdGenerator.getBusinessId();
-		Anomaly anomaly3 = createAnomalyWithBusinessId(BusinessId3);
+		BusinessId businessId3 = businessIdGenerator.getBusinessId();
+		Anomaly anomaly3 = createAnomalyWithBusinessId(businessId3);
 		repository.save(anomaly3);
 		
 		assertEquals(1, anomaly1.getBusinessId().sequence());
@@ -79,7 +79,7 @@ class BusinessIdGeneratorTest {
 	
 	private Anomaly createAnomalyWithBusinessId(BusinessId businessId) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
-		return assertDoesNotThrow(()->new Anomaly(businessId, getValidDescription(), Sector.FORGING, getValidQuantity(), getValideProductionOrder(), Machine.MACHINE_1, creationTrace));
+		return assertDoesNotThrow(()->new Anomaly(businessId, getValidDescription(), Sector.FORGING, getValidQuantity(), getValidProductionOrder(), Machine.MACHINE_1, creationTrace));
 	}
 	
 	private Description getValidDescription() {
@@ -90,7 +90,7 @@ class BusinessIdGeneratorTest {
 		return new ImpactedQuantity(QUANTITY);
 	}
 	
-	private ProductionOrder getValideProductionOrder() {
+	private ProductionOrder getValidProductionOrder() {
 		return new ProductionOrder(ORDER);
 	}
 }
