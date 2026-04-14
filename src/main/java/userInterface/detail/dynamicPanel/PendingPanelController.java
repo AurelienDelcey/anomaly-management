@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.detail.dynamicPanel;
 
 import java.util.EnumSet;
 import java.util.List;

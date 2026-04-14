@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.creation;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -26,6 +26,7 @@ import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import userInterface.dialog.ErrorViewController;
 
 public class CreationViewController {
 	
@@ -84,11 +85,17 @@ public class CreationViewController {
 	
 	@FXML
 	public void onClickCreateAndOpen() {
+		Optional<Integer> quantity = getIntFromString(quantityField.getText());
+		Optional<Integer> productionOrder = getIntFromString(productionOrderField.getText()); 
+		
+		if(quantity.isEmpty() || productionOrder.isEmpty()) {
+			return;
+		}
 		CommandResult result = commandService.createAnomaly(descriptionField.getText(), 
-				 sectorBox.getValue(),
-				 Integer.valueOf(quantityField.getText()), 
-				 Integer.valueOf(productionOrderField.getText()), 
-				 machineBox.getValue());
+															sectorBox.getValue(), 
+															quantity.get(), 
+															productionOrder.get(), 
+															machineBox.getValue());
 		switch(result) {
 			case CommandSuccess success ->{
 				updateAndOpenCallback.accept(success.anomalyId());

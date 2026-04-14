@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.detail.dynamicPanel;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -21,6 +21,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleGroup;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import userInterface.detail.GetProlongationMessageViewController;
+import userInterface.dialog.ErrorViewController;
 
 public class ResolvedPanelController implements Panel{
 
@@ -102,8 +104,8 @@ public class ResolvedPanelController implements Panel{
     	String description = anomalyProperty.get().description();
     	descriptionTextArea.setText(description);
 
-    	Integer ProductionOrder = anomalyProperty.get().productionOrder();
-    	productionOrderLabel.setText(ProductionOrder.toString());
+    	Integer productionOrder = anomalyProperty.get().productionOrder();
+    	productionOrderLabel.setText(productionOrder.toString());
     	
     	Integer impactedQuantity = anomalyProperty.get().impactedQuantity();
     	impactedQuantityLabel.setText(impactedQuantity.toString());

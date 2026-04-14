@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.dialog;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.detail.dynamicPanel;
 
 import java.util.UUID;
 import java.util.function.Consumer;

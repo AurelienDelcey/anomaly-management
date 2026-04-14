@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.detail.dynamicPanel;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -98,8 +98,8 @@ public class CorrectedPanelController implements Panel{
     	String description = anomalyProperty.get().description();
     	descriptionTextArea.setText(description);
 
-    	Integer ProductionOrder = anomalyProperty.get().productionOrder();
-    	productionOrderLabel.setText(ProductionOrder.toString());
+    	Integer productionOrder = anomalyProperty.get().productionOrder();
+    	productionOrderLabel.setText(productionOrder.toString());
     	
     	Integer impactedQuantity = anomalyProperty.get().impactedQuantity();
     	impactedQuantityLabel.setText(impactedQuantity.toString());

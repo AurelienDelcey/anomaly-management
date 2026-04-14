@@ -1,4 +1,4 @@
-package userInterface;
+package userInterface.detail;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
