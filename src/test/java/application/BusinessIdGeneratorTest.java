@@ -79,7 +79,7 @@ class BusinessIdGeneratorTest {
 	
 	private Anomaly createAnomalyWithBusinessId(BusinessId businessId) {
 		EventTrace creationTrace = new EventTrace(VALID_ACTOR_ID, VALID_ACTOR_NAME, FIXED_INSTANT);
-		return assertDoesNotThrow(()->new Anomaly(businessId, getValidDescription(), Sector.FORGING, getValidQuantity(), getValidProductionOrder(), Machine.MACHINE_1, creationTrace));
+		return assertDoesNotThrow(()->new Anomaly(businessId, getValidDescription(), Sector.FORGING, getValidQuantity(), getValidProductionOrder(), Machine.FORGE_PRESS_1, creationTrace));
 	}
 	
 	private Description getValidDescription() {

@@ -45,7 +45,7 @@ class AnomalyCommandServiceTest {
 	private final static String VALID_DOC_ID = "XXX-000-091991";
 	private final static String VALID_ACTOR_ID = "0000";
 	private final static String SECTOR = "FORGING";
-	private final static String MACHINE = "MACHINE_1";
+	private final static String MACHINE = "FORGE_PRESS_1";
 	private final static String ACTOR_NAME = "Dupont";
 	private final static Role PRIVILEGE = Role.SUPERVISOR;
 	private final static int QUANTITY = 50;

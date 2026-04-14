@@ -91,37 +91,45 @@ public class AnomalyRepositoryMapper {
 		
 		Traceability traceability =  buildTraceability(created, corrected, resolved, archived);
 		
-		QualityDecision qualityDecision = decision == null ? null : switch(decision) {
-		case "EMPTY" -> QualityDecision.EMPTY;
-		case "NA" -> QualityDecision.NA;
-		case "REPAIR" -> QualityDecision.REPAIR;
-		case "SCRAP" -> QualityDecision.SCRAP;
-		default -> throw new TechnicalException("Unknown decision: " + decision);
-		};
+		QualityDecision qualityDecision = null;
+
+		if (decision != null) {
+		    try {
+		    	qualityDecision = QualityDecision.valueOf(decision);
+		    } catch (IllegalArgumentException e) {
+		        throw new TechnicalException("Unknown decision: " + decision, e);
+		    }
+		}
 		
-		AnomalyState anomalyState = state == null ? null : switch(state) {
-		case "PENDING" -> AnomalyState.PENDING;
-		case "CORRECTED" -> AnomalyState.CORRECTED; 
-		case "RESOLVED" -> AnomalyState.RESOLVED;
-		case "ARCHIVED" -> AnomalyState.ARCHIVED;
-		default -> throw new TechnicalException("Unknown state: " + state);
-		};
+		AnomalyState anomalyState = null;
+
+		if (state != null) {
+		    try {
+		    	anomalyState = AnomalyState.valueOf(state);
+		    } catch (IllegalArgumentException e) {
+		        throw new TechnicalException("Unknown state: " + state, e);
+		    }
+		}
 		
-		Sector anomalySector = sector == null ? null : switch(sector) {
-		case "FORGING" -> Sector.FORGING;
-		case "FINISHING" -> Sector.FINISHING;
-		case "HEAT_TREATMENT" -> Sector.HEAT_TREATMENT;
-		case "MACHINING" -> Sector.MACHINING;
-		case "SHIPPING" -> Sector.SHIPPING;
-		default -> throw new TechnicalException("Unknown sector: " + sector);
-		};
+		Sector anomalySector = null;
+
+		if (sector != null) {
+		    try {
+		    	anomalySector = Sector.valueOf(sector);
+		    } catch (IllegalArgumentException e) {
+		        throw new TechnicalException("Unknown sector: " + sector, e);
+		    }
+		}
 		
-		Machine anomalyMachine = machine == null ? null : switch(machine) {
-		case "MACHINE_1" -> Machine.MACHINE_1;
-		case "MACHINE_2" -> Machine.MACHINE_2;
-		case "OTHER_MACHINE" -> Machine.OTHER_MACHINE;
-		default -> throw new TechnicalException("Unknown machine: " + machine);
-		};
+		Machine anomalyMachine = null;
+
+		if (machine != null) {
+		    try {
+		        anomalyMachine = Machine.valueOf(machine);
+		    } catch (IllegalArgumentException e) {
+		        throw new TechnicalException("Unknown machine: " + machine, e);
+		    }
+		}
 		
 		Anomaly anomaly = rehydrate(
 				anomalyId, businessId, context, anomalyChildId, anomalySector,
