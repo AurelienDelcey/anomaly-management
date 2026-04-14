@@ -48,8 +48,13 @@ public class ApplicationRoot extends Application{
 		    log.warn("Missing arguments, default actor activated");
 		    setDefaultActor();
 		}
-		this.config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
-		this.repository = new JdbcAnomalyRepository(this.config, "anomaly.anomalies_test");
+		
+		String dbUrl = getEnv("DB_URL");
+		String dbUser = getEnv("DB_USER");
+		String dbPassword = getEnv("DB_PASSWORD");
+		
+		this.config = new ConnectionConfig(dbUrl, dbUser, dbPassword);
+		this.repository = new JdbcAnomalyRepository(this.config, "anomaly.anomalies");
 		this.commandService = new AnomalyCommandService(this.repository, this.actor) ;
 		this.queryService = new AnomalyQueryService(this.repository);
 	}
@@ -71,5 +76,13 @@ public class ApplicationRoot extends Application{
 		Scene scene = new Scene(mainView);
 		stage.setScene(scene);
 		stage.show();
+	}
+	
+	private String getEnv(String key) {
+	    String value = System.getenv(key);
+	    if (value == null || value.isBlank()) {
+	        throw new IllegalStateException("Missing environment variable: " + key);
+	    }
+	    return value;
 	}
 }
