@@ -89,19 +89,6 @@ public class GeneralViewController {
 		});
 	}
 	
-	private void setPageLabel() {
-		pageLabel.textProperty().bind(Bindings.createStringBinding(
-				()->String.valueOf(queryContextProperty.get().page()),
-				queryContextProperty));
-	}
-
-	private void bindPageButtons() {
-		previousPageButton.disableProperty().bind(Bindings.createBooleanBinding(
-				()->queryContextProperty.get().page()<=1,
-				queryContextProperty));
-		nextPageButton.disableProperty().bind(hasNext.not());
-	}
-	
 	@FXML
 	public void onClickNext() {
 		queryContextProperty.set(new QueryContext(this.queryContextProperty.get().includeArchived(), 
@@ -136,29 +123,6 @@ public class GeneralViewController {
 		loadData();
 	}
 	
-	private void setSortCombo() {
-		EnumSet<SortingSelection> sortingSelections = EnumSet.allOf(SortingSelection.class);
-		List<String> list = sortingSelections.stream()
-			    .map(Enum::name)
-			    .toList();
-		sortCombo.setItems(FXCollections.observableArrayList(list));
-	}
-
-	private void setRefreshButton() {
-		SVGPath icon = new SVGPath();
-		icon.setContent("M13.836 2.477a.75.75 0 0 1"
-				+ " .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a."
-				+ "75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7."
-				+ "08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842."
-				+ "84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 "
-				+ "11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1"
-				+ " .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z");
-		icon.setStyle("-fx-fill: black;");
-
-		refreshButton.setGraphic(icon);
-		refreshButton.setTooltip(new Tooltip("Refresh"));
-	}
-
 	@FXML
 	public void onClickCreate() {
 		try {
@@ -202,14 +166,6 @@ public class GeneralViewController {
 		openDetails(anomaly);
 	}
 	
-	private void setDoubleClick() {
-		this.anomalyTable.setOnMouseClicked(e->{
-			if(e.getClickCount() == 2) {
-				onClickDetails();
-			}
-		});
-	}
-
 	public void setupServiceAndLoad(AnomalyQueryService queryService, AnomalyCommandService commandService) {
 		this.queryService = queryService;
 		this.commandService = commandService;
@@ -251,6 +207,50 @@ public class GeneralViewController {
         new SimpleStringProperty(cell.getValue().createdBy()));
 	}
 	
+	private void bindPageButtons() {
+		previousPageButton.disableProperty().bind(Bindings.createBooleanBinding(
+				()->queryContextProperty.get().page()<=1,
+				queryContextProperty));
+		nextPageButton.disableProperty().bind(hasNext.not());
+	}
+
+	private void setPageLabel() {
+		pageLabel.textProperty().bind(Bindings.createStringBinding(
+				()->String.valueOf(queryContextProperty.get().page()),
+				queryContextProperty));
+	}
+
+	private void setDoubleClick() {
+		this.anomalyTable.setOnMouseClicked(e->{
+			if(e.getClickCount() == 2) {
+				onClickDetails();
+			}
+		});
+	}
+
+	private void setSortCombo() {
+		EnumSet<SortingSelection> sortingSelections = EnumSet.allOf(SortingSelection.class);
+		List<String> list = sortingSelections.stream()
+			    .map(Enum::name)
+			    .toList();
+		sortCombo.setItems(FXCollections.observableArrayList(list));
+	}
+
+	private void setRefreshButton() {
+		SVGPath icon = new SVGPath();
+		icon.setContent("M13.836 2.477a.75.75 0 0 1"
+				+ " .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a."
+				+ "75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7."
+				+ "08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842."
+				+ "84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 "
+				+ "11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1"
+				+ " .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z");
+		icon.setStyle("-fx-fill: black;");
+	
+		refreshButton.setGraphic(icon);
+		refreshButton.setTooltip(new Tooltip("Refresh"));
+	}
+
 	private void updateCommand(UUID anomalyId) {
 		QueryResult<AnomalyDto> result = queryService.findById(anomalyId);
 		
