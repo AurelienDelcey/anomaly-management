@@ -165,7 +165,7 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachDescription(Description description) throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+		if(notEditableRoot()) {
 			throw new IllegalAttachment("Editing description is only permitted on a root anomaly in PENDING state.");
 		}
 		if(description == null) {
@@ -175,7 +175,7 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachMachine(Machine machine) throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+		if(notEditableRoot()) {
 			throw new IllegalAttachment("Editing machine is only permitted on a root anomaly in PENDING state.");
 		}
 		if(machine == null) {
@@ -185,7 +185,7 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachImpactedQuantity(ImpactedQuantity otherQuantity) throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+		if(notEditableRoot()) {
 			throw new IllegalAttachment("Editing impactedQuantity is only permitted on a root anomaly in PENDING state.");
 		}
 		if(otherQuantity == null) {
@@ -195,7 +195,7 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachProductionOrder(ProductionOrder productionOrder) throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+		if(notEditableRoot()) {
 			throw new IllegalAttachment("Editing productionOrder is only permitted on a root anomaly in PENDING state.");
 		}
 		if(productionOrder == null) {
@@ -208,7 +208,7 @@ public class Anomaly {
 		if(sector == null) {
 			throw new InvalidValueException("Sector cannot be null.");
 		}
-		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+		if(notEditableRoot()) {
 			throw new IllegalAttachment("Editing sector is only permitted on a root anomaly in PENDING state.");
 		}
 		
@@ -226,7 +226,7 @@ public class Anomaly {
 	}
 	
 	public Anomaly attachQualityDecision(QualityDecision newQualityDecision)throws IllegalAttachment, InconsistentAnomalyStateException{
-		if(this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null) {
+		if(notEditableRoot()) {
 			throw new IllegalAttachment("Editing quality decision is only permitted on a root anomaly in PENDING state.");
 		}
 		if(newQualityDecision==QualityDecision.EMPTY) {
@@ -309,6 +309,10 @@ public class Anomaly {
 
 	public Description getDescription() {
 		return description;
+	}
+
+	private boolean notEditableRoot() {
+		return this.anomalyState != AnomalyState.PENDING || this.prolongationContext != null;
 	}
 
 	private void verifyStructuralConsistency(UUID id, BusinessId businessId, AnomalyState state, CorrectiveAction correctiveAction, 
