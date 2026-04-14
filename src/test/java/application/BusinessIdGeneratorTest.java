@@ -25,13 +25,13 @@ import infrastructure.repository.JdbcAnomalyRepository;
 
 class BusinessIdGeneratorTest {
 	
-	private final static String TABLE = "anomaly.anomalies_test";
-	private final static String VALID_ACTOR_ID = "0000";
-	private final static String VALID_ACTOR_NAME = "Dupont";
-	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
-	private final static String DESCRIPTION = "anomalyTest";
-	private final static int QUANTITY = 50;
-	private final static int ORDER = 99999;
+	private static final String TABLE = "anomaly.anomalies_test";
+	private static final String VALID_ACTOR_ID = "0000";
+	private static final String VALID_ACTOR_NAME = "Dupont";
+	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
+	private static final String DESCRIPTION = "anomalyTest";
+	private static final int QUANTITY = 50;
+	private static final int ORDER = 99999;
 	private ConnectionConfig config ;
 	private BusinessIdGenerator businessIdGenerator;
 	private AnomalyRepository repository;

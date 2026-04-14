@@ -13,7 +13,7 @@ import domain.exception.InvalidValueException;
 
 class ProlongationContextTest {
 	
-	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
+	private static final String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
 
 	@ParameterizedTest
 	@NullAndEmptySource

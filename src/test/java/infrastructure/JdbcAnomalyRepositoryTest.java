@@ -35,18 +35,18 @@ import infrastructure.repository.JdbcAnomalyRepository;
 
 class JdbcAnomalyRepositoryTest {
 	
-	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
-	private final static Instant FIXED_INSTANT_LATER = Instant.parse("2026-02-17T00:00:00Z");
-	private final static String DESCRIPTION = "anomalyTest";
-	private final static String VALID_DOC_ID = "XXX-000-091991";
-	private final static String VALID_ACTOR_ID = "0000";
-	private final static String TABLE = "anomaly.anomalies_test";
-	private final static String VALID_ACTOR_NAME = "Dupont";
-	private final static QueryContext CONTEXT = new QueryContext(true, SortingSelection.DATE, 1);
-	private final static int FIXED_YEAR = 2026;
-	private final static int FIXED_SEQUENCE = 1;
-	private final static int QUANTITY = 50;
-	private final static int ORDER = 99999;
+	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
+	private static final Instant FIXED_INSTANT_LATER = Instant.parse("2026-02-17T00:00:00Z");
+	private static final String DESCRIPTION = "anomalyTest";
+	private static final String VALID_DOC_ID = "XXX-000-091991";
+	private static final String VALID_ACTOR_ID = "0000";
+	private static final String TABLE = "anomaly.anomalies_test";
+	private static final String VALID_ACTOR_NAME = "Dupont";
+	private static final QueryContext CONTEXT = new QueryContext(true, SortingSelection.DATE, 1);
+	private static final int FIXED_YEAR = 2026;
+	private static final int FIXED_SEQUENCE = 1;
+	private static final int QUANTITY = 50;
+	private static final int ORDER = 99999;
 	private static JdbcAnomalyRepository repo;
 	private static ConnectionConfig config;
 	

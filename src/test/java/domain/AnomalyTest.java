@@ -28,19 +28,19 @@ import domain.valueobject.Sector;
 
 class AnomalyTest {
 	
-	private final static Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
-	private final static String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
-	private final static String DESCRIPTION = "anomalyTest";
-	private final static String OTHER_DESCRIPTION = "otherAnomalyTest";
-	private final static String VALID_DOC_ID = "XXX-000-091991";
-	private final static String VALID_ACTOR_ID = "0000";
-	private final static String VALID_ACTOR_NAME = "Dupont";
-	private final static int FIXED_YEAR = 2026;
-	private final static int FIXED_SEQUENCE = 1;
-	private final static int QUANTITY = 50;
-	private final static int OTHER_QUANTITY = 100;
-	private final static int ORDER = 99999;
-	private final static int OTHER_ORDER = 11111;
+	private static final Instant FIXED_INSTANT = Instant.parse("2026-02-16T00:00:00Z");
+	private static final String FIXED_UUID = "3f6b8a4c-9e21-4c7f-b8d2-1a5e0f6c2d9b";
+	private static final String DESCRIPTION = "anomalyTest";
+	private static final String OTHER_DESCRIPTION = "otherAnomalyTest";
+	private static final String VALID_DOC_ID = "XXX-000-091991";
+	private static final String VALID_ACTOR_ID = "0000";
+	private static final String VALID_ACTOR_NAME = "Dupont";
+	private static final int FIXED_YEAR = 2026;
+	private static final int FIXED_SEQUENCE = 1;
+	private static final int QUANTITY = 50;
+	private static final int OTHER_QUANTITY = 100;
+	private static final int ORDER = 99999;
+	private static final int OTHER_ORDER = 11111;
 	
 	@Test
 	void constructor_ShouldReturnValidAnomaly() {
