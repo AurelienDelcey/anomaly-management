@@ -59,7 +59,7 @@
             <Label fx:id="pageLabel" />
             <Button fx:id="nextPageButton" mnemonicParsing="false" onAction="#onClickNext" text="Next page" />
             <Region HBox.hgrow="ALWAYS" />
-            <Button fx:id="detailsButton" mnemonicParsing="false" onAction="#onClickDetails" prefHeight="37.0" prefWidth="94.0" text="View details">
+            <Button fx:id="detailsButton" mnemonicParsing="false" onAction="#onClickDetails" text="View details">
                <HBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" />
                </HBox.margin></Button>
