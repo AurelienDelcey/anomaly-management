@@ -1,0 +1,109 @@
+.root {
+    -fx-font-family: "Segoe UI", "Arial";
+    -fx-font-size: 13px;
+    -fx-background-color: #f4f6f8;
+}
+
+.vbox, .hbox {
+    -fx-spacing: 8;
+}
+
+.label {
+    -fx-text-fill: #2c3e50;
+}
+
+.button {
+    -fx-background-color: #3f5f8a;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-padding: 6 12;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2f4a6a;
+}
+
+.button:pressed {
+    -fx-background-color: #253a52;
+}
+
+.button:disabled {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #666666;
+}
+
+.text-field, .text-area {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-padding: 6;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+}
+
+.text-field:focused, .text-area:focused {
+    -fx-border-color: #3f5f8a;
+    -fx-background-color: #ffffff;
+}
+
+.combo-box {
+    -fx-background-color: white;
+    -fx-background-radius: 5;
+    -fx-padding: 4;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5;
+}
+
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #dddddd;
+    -fx-border-radius: 5;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #e9ecef;
+}
+
+.table-view .column-header, 
+.table-view .filler {
+    -fx-size: 32;
+    -fx-border-color: transparent transparent #dcdcdc transparent;
+}
+
+.table-view .table-row-cell {
+    -fx-cell-size: 30;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #fafbfc;
+}
+
+.table-view .table-row-cell:even {
+    -fx-background-color: #ffffff;
+}
+
+.table-view .table-row-cell:hover {
+    -fx-background-color: #eef3f8;
+}
+
+.table-view .table-row-cell:filled:selected {
+    -fx-background-color: #e3ecf5;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.table-view .table-row-cell:filled:selected .text {
+    -fx-fill: #1f2d3d;
+}
+
+.tooltip {
+    -fx-background-color: #333333;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+    -fx-padding: 5;
+}
+
+.title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}

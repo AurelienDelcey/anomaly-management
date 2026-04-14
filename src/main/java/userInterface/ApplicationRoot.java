@@ -74,6 +74,7 @@ public class ApplicationRoot extends Application{
 		generalViewController.setupServiceAndLoad(this.queryService, this.commandService);
 		
 		Scene scene = new Scene(mainView);
+		scene.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
 		stage.setScene(scene);
 		stage.show();
 	}
