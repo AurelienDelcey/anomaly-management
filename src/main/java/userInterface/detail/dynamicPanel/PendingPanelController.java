@@ -121,7 +121,7 @@ public class PendingPanelController implements Panel{
     @FXML
     void onClickValidationCorrectiveAction() {
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	String text = correctiveActionTextField.getText();
+    	String text = correctiveActionTextField.getText().toUpperCase();
     	handleAction(()->commandService.attachCorrectiveAction(id, text));
     }
 

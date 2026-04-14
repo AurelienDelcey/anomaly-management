@@ -64,7 +64,7 @@ public class CorrectedPanelController implements Panel{
     void onClickValidEvidence() {
     	
     	UUID id = UUID.fromString(anomalyProperty.get().id());
-    	String text = evidenceTextField.getText();
+    	String text = evidenceTextField.getText().toUpperCase();
     	CommandResult result = commandService.attachEvidence(id, text);
     	
     	switch (result) {
