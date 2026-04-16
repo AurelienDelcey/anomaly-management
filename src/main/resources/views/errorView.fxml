@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.dialog.ErrorViewController">
+<VBox fx:id="root" alignment="CENTER" spacing="10.0" xmlns="http://javafx.com/javafx/21.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="userInterface.dialog.ErrorViewController">
    <children>
       <Label fx:id="errorLabel" text="Label" />
       <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#onClickCancel" text="Cancel" />

@@ -61,7 +61,7 @@ class AnomalyCommandServiceTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		this.actor = new Actor(VALID_ACTOR_ID, ACTOR_NAME, PRIVILEGE);
-		this.config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
+		this.config = new ConnectionConfig("jdbc:mysql://localhost:3307/anomaly", "anomaly_user", "anomaly_pass");
 		this.repo= new JdbcAnomalyRepository(config,TABLE);
 		this.command = new AnomalyCommandService(repo, actor);
 		this.query = new AnomalyQueryService(repo);

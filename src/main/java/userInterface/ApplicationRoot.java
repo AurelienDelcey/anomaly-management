@@ -49,7 +49,7 @@ public class ApplicationRoot extends Application{
 		    setDefaultActor();
 		}
 		
-		String url = System.getenv().getOrDefault("DB_URL", "jdbc:mysql://localhost:3306/anomaly");
+		String url = System.getenv().getOrDefault("DB_URL", "jdbc:mysql://localhost:3307/anomaly");
 		String user = System.getenv().getOrDefault("DB_USER", "anomaly_user");
 		String password = System.getenv().getOrDefault("DB_PASSWORD", "anomaly_pass");
 		

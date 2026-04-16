@@ -52,7 +52,7 @@ class JdbcAnomalyRepositoryTest {
 	
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
+		config = new ConnectionConfig("jdbc:mysql://localhost:3307/anomaly", "anomaly_user", "anomaly_pass");
 		try {
 			repo = new JdbcAnomalyRepository(config, TABLE);
 		} catch (Exception e) {

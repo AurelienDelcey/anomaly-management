@@ -38,7 +38,7 @@ class BusinessIdGeneratorTest {
 
 	@BeforeEach
 	void setUp() throws Exception {
-		this.config = new ConnectionConfig("jdbc:mysql://localhost:3306/anomaly", "anomaly_user", "anomaly2026");
+		this.config = new ConnectionConfig("jdbc:mysql://localhost:3307/anomaly", "anomaly_user", "anomaly_pass");
 		this.repository = new JdbcAnomalyRepository(config,TABLE);
 		this.businessIdGenerator = new BusinessIdGenerator(repository);
 	}
