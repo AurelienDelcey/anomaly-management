@@ -111,6 +111,7 @@ src/main/java
 ### Requirements
 
 - Java 21
+- Maven
 - Docker
 - Git
 

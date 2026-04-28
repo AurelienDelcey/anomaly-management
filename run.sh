@@ -63,4 +63,8 @@ done
 
 printf "\r\033[K⌛ Starting database... ✅ Success!\n"
 
+if [ ! -f ./target/anomaly-management-1.0.0.jar ];
+	then mvn package
+fi
+
 java -jar ./target/anomaly-management-1.0.0.jar --name="$NAME" --id="$ID" --role="$ROLE"
